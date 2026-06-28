@@ -70,8 +70,7 @@ abstract class UpdatesModelAlist with _$UpdatesModelAlist {
     @Default({}) Map<String, AlistReleaseExtras> extras,
   }) = _UpdatesModelAlist;
 
-  ReleaseInfo? get latestRelease =>
-      lastRelease.firstWhereOrNull((value) => value.isNewerThanCurrent);
+  ReleaseInfo? get latestRelease => lastRelease.firstWhereOrNull((value) => value.isNewerThanCurrent);
 
   AlistReleaseExtras? extrasFor(String version) => extras[version];
 }

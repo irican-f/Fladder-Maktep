@@ -14,12 +14,10 @@ class SearchAdvancedControls extends ConsumerStatefulWidget {
   const SearchAdvancedControls({super.key});
 
   @override
-  ConsumerState<SearchAdvancedControls> createState() =>
-      _SearchAdvancedControlsState();
+  ConsumerState<SearchAdvancedControls> createState() => _SearchAdvancedControlsState();
 }
 
-class _SearchAdvancedControlsState
-    extends ConsumerState<SearchAdvancedControls> {
+class _SearchAdvancedControlsState extends ConsumerState<SearchAdvancedControls> {
   double? _draftMinScore;
 
   @override
@@ -63,9 +61,7 @@ class _SearchAdvancedControlsState
                 Text(context.localized.jellybotMinScore),
                 const SizedBox(width: 8),
                 Text(
-                  liveScore == 0
-                      ? context.localized.off
-                      : liveScore.toStringAsFixed(2),
+                  liveScore == 0 ? context.localized.off : liveScore.toStringAsFixed(2),
                   style: Theme.of(context).textTheme.labelMedium,
                 ),
               ],

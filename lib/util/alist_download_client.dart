@@ -12,14 +12,11 @@ class AlistDownloadEvent {
 
   const AlistDownloadEvent._(this.kind, {this.progress = 0, this.filePath, this.error});
 
-  factory AlistDownloadEvent.progress(double p) =>
-      AlistDownloadEvent._(AlistDownloadEventKind.progress, progress: p);
+  factory AlistDownloadEvent.progress(double p) => AlistDownloadEvent._(AlistDownloadEventKind.progress, progress: p);
   factory AlistDownloadEvent.complete(String filePath) =>
       AlistDownloadEvent._(AlistDownloadEventKind.complete, filePath: filePath);
-  factory AlistDownloadEvent.failed(String error) =>
-      AlistDownloadEvent._(AlistDownloadEventKind.failed, error: error);
-  factory AlistDownloadEvent.cancelled() =>
-      const AlistDownloadEvent._(AlistDownloadEventKind.cancelled);
+  factory AlistDownloadEvent.failed(String error) => AlistDownloadEvent._(AlistDownloadEventKind.failed, error: error);
+  factory AlistDownloadEvent.cancelled() => const AlistDownloadEvent._(AlistDownloadEventKind.cancelled);
 }
 
 abstract class AlistDownloadClient {

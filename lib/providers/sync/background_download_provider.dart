@@ -25,8 +25,7 @@ class BackgroundDownloader extends _$BackgroundDownloader {
       () => updateListener?.cancel(),
     );
 
-    final maxDownloads = ref.read(
-        clientSettingsProvider.select((value) => value.maxConcurrentDownloads));
+    final maxDownloads = ref.read(clientSettingsProvider.select((value) => value.maxConcurrentDownloads));
     final downloader = FileDownloader()
       ..configure(
         globalConfig: globalConfig(maxDownloads),
@@ -46,12 +45,10 @@ class BackgroundDownloader extends _$BackgroundDownloader {
             );
 
         if (status == TaskStatus.complete || status == TaskStatus.canceled) {
+          ref.read(downloadTasksProvider(update.task.taskId).notifier).update((state) => DownloadStream.empty());
           ref
-              .read(downloadTasksProvider(update.task.taskId).notifier)
-              .update((state) => DownloadStream.empty());
-          ref.read(activeDownloadTasksProvider.notifier).update((state) => state
-              .where((element) => element.taskId != update.task.taskId)
-              .toList());
+              .read(activeDownloadTasksProvider.notifier)
+              .update((state) => state.where((element) => element.taskId != update.task.taskId).toList());
 
           ref.read(syncProvider.notifier).cleanupTemporaryFiles();
         }
@@ -76,15 +73,10 @@ class BackgroundDownloader extends _$BackgroundDownloader {
   void updateTranslations(BuildContext context) async {
     if (kIsWeb) return;
     state?.configureNotification(
-      running: TaskNotification(
-          context.localized.notificationDownloadingDownloading,
-          '{filename}\n{networkSpeed}'),
-      complete: TaskNotification(
-          context.localized.notificationDownloadingFinished, '{filename}'),
-      paused: TaskNotification(
-          context.localized.notificationDownloadingPaused, '{filename}'),
-      error: TaskNotification(
-          context.localized.notificationDownloadingError, '{filename}'),
+      running: TaskNotification(context.localized.notificationDownloadingDownloading, '{filename}\n{networkSpeed}'),
+      complete: TaskNotification(context.localized.notificationDownloadingFinished, '{filename}'),
+      paused: TaskNotification(context.localized.notificationDownloadingPaused, '{filename}'),
+      error: TaskNotification(context.localized.notificationDownloadingError, '{filename}'),
       progressBar: true,
     );
   }

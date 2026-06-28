@@ -43,8 +43,7 @@ class UpdateDownloadState {
 }
 
 @Riverpod(keepAlive: true)
-AlistDownloadClient alistDownloadClient(Ref ref) =>
-    BackgroundDownloaderAlistClient();
+AlistDownloadClient alistDownloadClient(Ref ref) => BackgroundDownloaderAlistClient();
 
 typedef AlistInstaller = Future<bool> Function(String filePath);
 
@@ -87,9 +86,7 @@ class UpdateDownloader extends _$UpdateDownloader {
 
     _activeTaskId = version;
     final client = ref.read(alistDownloadClientProvider);
-    _sub = client
-        .download(taskId: version, url: url, filename: filename)
-        .listen((event) async {
+    _sub = client.download(taskId: version, url: url, filename: filename).listen((event) async {
       switch (event.kind) {
         case AlistDownloadEventKind.progress:
           state = UpdateDownloadState(
@@ -135,8 +132,7 @@ class UpdateDownloader extends _$UpdateDownloader {
 
   Future<void> install() async {
     final ready = state;
-    if (ready.kind != UpdateDownloadStateKind.ready ||
-        ready.filePath == null) {
+    if (ready.kind != UpdateDownloadStateKind.ready || ready.filePath == null) {
       return;
     }
     state = UpdateDownloadState(

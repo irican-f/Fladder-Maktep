@@ -7,8 +7,7 @@ class SearchSkeletonCard extends StatefulWidget {
   State<SearchSkeletonCard> createState() => _SearchSkeletonCardState();
 }
 
-class _SearchSkeletonCardState extends State<SearchSkeletonCard>
-    with SingleTickerProviderStateMixin {
+class _SearchSkeletonCardState extends State<SearchSkeletonCard> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1200),

@@ -36,23 +36,19 @@ class SettingsUpdateInformationAlist extends ConsumerStatefulWidget {
   const SettingsUpdateInformationAlist({super.key});
 
   @override
-  ConsumerState<SettingsUpdateInformationAlist> createState() =>
-      _SettingsUpdateInformationAlistState();
+  ConsumerState<SettingsUpdateInformationAlist> createState() => _SettingsUpdateInformationAlistState();
 }
 
-class _SettingsUpdateInformationAlistState
-    extends ConsumerState<SettingsUpdateInformationAlist> {
+class _SettingsUpdateInformationAlistState extends ConsumerState<SettingsUpdateInformationAlist> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final latest = ref.read(updateAlistProvider.select((v) => v.latestRelease));
       if (latest == null) return;
-      final lastViewed = ref.read(
-          clientSettingsProvider.select((value) => value.lastViewedUpdate));
+      final lastViewed = ref.read(clientSettingsProvider.select((value) => value.lastViewedUpdate));
       if (lastViewed != latest.version) {
-        ref.read(clientSettingsProvider.notifier).update(
-            (value) => value.copyWith(lastViewedUpdate: latest.version));
+        ref.read(clientSettingsProvider.notifier).update((value) => value.copyWith(lastViewedUpdate: latest.version));
       }
     });
   }
@@ -64,8 +60,7 @@ class _SettingsUpdateInformationAlistState
     final updates = ref.watch(updateAlistProvider);
     final latest = updates.latestRelease;
     final others = updates.lastRelease;
-    final checkForUpdate = ref.watch(
-        clientSettingsProvider.select((value) => value.checkForUpdates));
+    final checkForUpdate = ref.watch(clientSettingsProvider.select((value) => value.checkForUpdates));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -77,19 +72,17 @@ class _SettingsUpdateInformationAlistState
           SettingsListTile(
             label: Text(context.localized.latestReleases),
             subLabel: Text(context.localized.autoCheckForUpdates),
-            onTap: () => ref.read(clientSettingsProvider.notifier).update(
-                (value) => value.copyWith(checkForUpdates: !checkForUpdate)),
+            onTap: () => ref
+                .read(clientSettingsProvider.notifier)
+                .update((value) => value.copyWith(checkForUpdates: !checkForUpdate)),
             trailing: Switch(
               value: checkForUpdate,
-              onChanged: (value) => ref.read(clientSettingsProvider.notifier).update(
-                  (v) => v.copyWith(checkForUpdates: !checkForUpdate)),
+              onChanged: (value) =>
+                  ref.read(clientSettingsProvider.notifier).update((v) => v.copyWith(checkForUpdates: !checkForUpdate)),
             ),
           ),
-          if (latest != null)
-            _AlistReleaseTile(release: latest, expanded: true),
-          ...others
-              .where((e) => e != latest)
-              .map((r) => _AlistReleaseTile(release: r)),
+          if (latest != null) _AlistReleaseTile(release: latest, expanded: true),
+          ...others.where((e) => e != latest).map((r) => _AlistReleaseTile(release: r)),
         ],
       ),
     );
@@ -109,14 +102,10 @@ class _AlistReleaseTile extends ConsumerWidget {
     final sha256 = extras?.sha256[_currentPlatformKey];
 
     return ExpansionTile(
-      backgroundColor: release.isNewerThanCurrent
-          ? context.colors.primaryContainer
-          : context.colors.surfaceContainer,
-      collapsedBackgroundColor:
-          release.isNewerThanCurrent ? context.colors.primaryContainer : null,
+      backgroundColor: release.isNewerThanCurrent ? context.colors.primaryContainer : context.colors.surfaceContainer,
+      collapsedBackgroundColor: release.isNewerThanCurrent ? context.colors.primaryContainer : null,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      collapsedShape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(release.version),
       initiallyExpanded: expanded,
       childrenPadding: const EdgeInsets.all(16),

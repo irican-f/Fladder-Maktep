@@ -45,5 +45,4 @@ bool hasJellybotLiveTvChannels(Ref ref) {
 }
 
 /// Provider for the currently selected Live TV channel during playback.
-final currentJellybotLiveTvChannelProvider =
-    StateProvider<LiveTvChannelDto?>((ref) => null);
+final currentJellybotLiveTvChannelProvider = StateProvider<LiveTvChannelDto?>((ref) => null);

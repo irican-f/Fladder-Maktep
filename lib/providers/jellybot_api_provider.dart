@@ -66,8 +66,7 @@ class JellybotApi extends _$JellybotApi {
 /// Creates an HTTP client that handles SSL certificates properly on non-web platforms
 http.Client? _createHttpClient() {
   if (kIsWeb) return null;
-  
-  final httpClient = HttpClient()
-    ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+  final httpClient = HttpClient()..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   return IOClient(httpClient);
 }

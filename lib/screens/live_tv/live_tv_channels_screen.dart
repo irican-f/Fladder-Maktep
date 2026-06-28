@@ -26,12 +26,10 @@ class JellybotLiveTvChannelsScreen extends ConsumerStatefulWidget {
   const JellybotLiveTvChannelsScreen({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _JellybotLiveTvChannelsScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _JellybotLiveTvChannelsScreenState();
 }
 
-class _JellybotLiveTvChannelsScreenState
-    extends ConsumerState<JellybotLiveTvChannelsScreen> {
+class _JellybotLiveTvChannelsScreenState extends ConsumerState<JellybotLiveTvChannelsScreen> {
   final GlobalKey<RefreshIndicatorState>? refreshKey = GlobalKey();
   bool refreshing = false;
 

@@ -70,12 +70,10 @@ class _ConfirmCrawlLinkDialogState extends State<ConfirmCrawlLinkDialog> {
                       width: 64,
                       height: 96,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          const SizedBox(width: 64, height: 96),
+                      errorBuilder: (_, __, ___) => const SizedBox(width: 64, height: 96),
                     ),
                   ),
-                if ((link.thumbnailUrl ?? '').isNotEmpty)
-                  const SizedBox(width: 12),
+                if ((link.thumbnailUrl ?? '').isNotEmpty) const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,8 +89,7 @@ class _ConfirmCrawlLinkDialogState extends State<ConfirmCrawlLinkDialog> {
                                 '${context.localized.season(1)} ${link.season}',
                               ),
                             ),
-                          if ((link.quality ?? '').isNotEmpty)
-                            QualityBadge(quality: link.quality!),
+                          if ((link.quality ?? '').isNotEmpty) QualityBadge(quality: link.quality!),
                           if (link.productionYear != null)
                             Chip(
                               visualDensity: VisualDensity.compact,
@@ -105,10 +102,9 @@ class _ConfirmCrawlLinkDialogState extends State<ConfirmCrawlLinkDialog> {
                           padding: const EdgeInsets.only(top: 6),
                           child: Text(
                             '$aired / $total ${context.localized.jellybotEpisodes(total)}',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: scheme.onSurfaceVariant,
-                                    ),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                ),
                           ),
                         ),
                     ],

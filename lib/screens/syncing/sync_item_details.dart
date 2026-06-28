@@ -1,4 +1,8 @@
 import 'package:background_downloader/background_downloader.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
+
+import 'package:fladder/models/item_base_model.dart';
 import 'package:fladder/models/syncing/sync_item.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/sync/sync_provider_helpers.dart';
@@ -21,8 +25,6 @@ import 'package:fladder/widgets/shared/alert_content.dart';
 import 'package:fladder/widgets/shared/icon_button_await.dart';
 import 'package:fladder/widgets/shared/pull_to_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
 
 Future<void> showSyncItemDetails(
   BuildContext context,
@@ -56,6 +58,9 @@ class _SyncItemDetailsState extends ConsumerState<SyncItemDetails> {
     final downloadTask = ref.watch(downloadTasksProvider(syncedItem.id));
     final syncedChildren = ref.watch(syncedChildrenProvider(syncedItem));
     final nestedChildren = ref.watch(syncedNestedChildrenProvider(syncedItem));
+    final canDeleteSyncedItem = syncedItem.parentId == null ||
+        baseItem?.type == FladderItemType.musicAlbum ||
+        baseItem?.type == FladderItemType.audio;
     return PullToRefresh(
       refreshOnStart: false,
       onRefresh: () async {
@@ -208,7 +213,7 @@ class _SyncItemDetailsState extends ConsumerState<SyncItemDetails> {
                   ],
                 ),
                 actions: [
-                  if (syncedItem.parentId == null)
+                  if (canDeleteSyncedItem)
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.errorContainer,
@@ -231,8 +236,8 @@ class _SyncItemDetailsState extends ConsumerState<SyncItemDetails> {
                         );
                       },
                       child: Text(context.localized.delete),
-                    )
-                  else if (baseItem?.parentBaseModel != null)
+                    ),
+                  if (syncedItem.parentId != null && baseItem?.parentBaseModel != null)
                     ElevatedButton(
                       onPressed: () async {
                         final parentItem =

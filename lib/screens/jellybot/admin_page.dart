@@ -31,18 +31,9 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
 
   // Known job types from the API
   static const List<_JobTypeData> _availableJobTypes = [
-    _JobTypeData(
-        type: 'CrawlJob',
-        icon: IconsaxPlusLinear.global_search,
-        label: 'Crawl'),
-    _JobTypeData(
-        type: 'DomainUpdateJob',
-        icon: IconsaxPlusLinear.refresh,
-        label: 'Domain Update'),
-    _JobTypeData(
-        type: 'LiveTvChannelsJob',
-        icon: IconsaxPlusLinear.monitor,
-        label: 'Live TV Channels'),
+    _JobTypeData(type: 'CrawlJob', icon: IconsaxPlusLinear.global_search, label: 'Crawl'),
+    _JobTypeData(type: 'DomainUpdateJob', icon: IconsaxPlusLinear.refresh, label: 'Domain Update'),
+    _JobTypeData(type: 'LiveTvChannelsJob', icon: IconsaxPlusLinear.monitor, label: 'Live TV Channels'),
   ];
 
   @override
@@ -51,8 +42,7 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadJobs();
     });
-    _refreshTimer =
-        Timer.periodic(const Duration(seconds: 10), (_) => _loadJobs());
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) => _loadJobs());
   }
 
   @override
@@ -79,14 +69,12 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
     try {
       setState(() => _isLoading = true);
       final api = ref.read(jellybotApiProvider);
-      final response =
-          await api.apiJobsPost(body: TriggerJobRequest(jobType: jobType));
+      final response = await api.apiJobsPost(body: TriggerJobRequest(jobType: jobType));
       if (response.isSuccessful) {
         await _loadJobs();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(context.localized.jellybotJobTriggered(jobType))),
+            SnackBar(content: Text(context.localized.jellybotJobTriggered(jobType))),
           );
         }
       }
@@ -107,16 +95,14 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.localized.jellybotCancelJob),
-        content: Text(
-            context.localized.jellybotCancelJobConfirm(job.type ?? 'Unknown')),
+        content: Text(context.localized.jellybotCancelJobConfirm(job.type ?? 'Unknown')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(context.localized.cancel),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.error),
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
             onPressed: () => Navigator.pop(context, true),
             child: Text(context.localized.confirm),
           ),
@@ -141,8 +127,7 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = ref.watch(userProvider
-        .select((value) => value?.policy?.isAdministrator ?? false));
+    final isAdmin = ref.watch(userProvider.select((value) => value?.policy?.isAdministrator ?? false));
 
     if (!isAdmin) {
       return Scaffold(
@@ -168,8 +153,7 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
     }
 
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final floatingAppBar =
-        AdaptiveLayout.layoutModeOf(context) != LayoutMode.single;
+    final floatingAppBar = AdaptiveLayout.layoutModeOf(context) != LayoutMode.single;
 
     return NestedScaffold(
       body: Padding(
@@ -191,8 +175,7 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                     floating: !floatingAppBar,
                     collapsedHeight: 80,
                     automaticallyImplyLeading: false,
-                    leading: AdaptiveLayout.layoutModeOf(context) ==
-                            LayoutMode.single
+                    leading: AdaptiveLayout.layoutModeOf(context) == LayoutMode.single
                         ? IconButton(
                             icon: const Icon(Icons.arrow_back),
                             onPressed: () => context.router.maybePop(),
@@ -205,29 +188,27 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                     shadowColor: Colors.transparent,
                     backgroundColor: Colors.transparent,
                     titleSpacing: 4,
-                    flexibleSpace:
-                        AdaptiveLayout.layoutModeOf(context) != LayoutMode.dual
-                            ? Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      surfaceColor.withValues(alpha: 0.8),
-                                      surfaceColor.withValues(alpha: 0.75),
-                                      surfaceColor.withValues(alpha: 0.5),
-                                      surfaceColor.withValues(alpha: 0),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
-                                ),
-                              )
-                            : null,
+                    flexibleSpace: AdaptiveLayout.layoutModeOf(context) != LayoutMode.dual
+                        ? Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  surfaceColor.withValues(alpha: 0.8),
+                                  surfaceColor.withValues(alpha: 0.75),
+                                  surfaceColor.withValues(alpha: 0.5),
+                                  surfaceColor.withValues(alpha: 0),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                          )
+                        : null,
                     title: Card(
                       elevation: 2,
                       shadowColor: Colors.transparent,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
                             const Icon(IconsaxPlusLinear.setting_2),
@@ -239,8 +220,7 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                             const Spacer(),
                             if (_jobs.isNotEmpty)
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 2),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).colorScheme.primary,
                                   borderRadius: BorderRadius.circular(12),
@@ -260,9 +240,7 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                                     Text(
                                       '${_jobs.length}',
                                       style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
+                                        color: Theme.of(context).colorScheme.onPrimary,
                                         fontSize: 12,
                                       ),
                                     ),
@@ -280,10 +258,9 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                       child: Text(
                         context.localized.jellybotTriggerJob,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                       ),
                     ),
                   ),
@@ -311,10 +288,9 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                       child: Text(
                         context.localized.jellybotRunningJobs,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                       ),
                     ),
                   ),
@@ -334,12 +310,8 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                               const SizedBox(height: 12),
                               Text(
                                 context.localized.jellybotNoRunningJobs,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      color:
-                                          Theme.of(context).colorScheme.outline,
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      color: Theme.of(context).colorScheme.outline,
                                     ),
                               ),
                             ],
@@ -369,10 +341,9 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                       padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                       child: Text(
                         context.localized.jellybotServerSettings,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                       ),
                     ),
                   ),
@@ -383,8 +354,7 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
                     ),
                   ),
                   SliverPadding(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).padding.bottom + 80),
+                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 80),
                   ),
                 ],
               ),
@@ -464,10 +434,7 @@ class _JobCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .primary
-                    .withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SizedBox(
@@ -494,8 +461,7 @@ class _JobCard extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: Colors.orange.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
@@ -512,12 +478,9 @@ class _JobCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           '${context.localized.jellybotStartedAt}: ${_formatDateTime(job.startedAt!)}',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
                         ),
                       ],
                     ],
@@ -528,8 +491,7 @@ class _JobCard extends StatelessWidget {
             IconButton.filled(
               onPressed: onCancel,
               style: IconButton.styleFrom(
-                backgroundColor:
-                    Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                backgroundColor: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
               ),
               icon: Icon(
                 IconsaxPlusLinear.stop,
@@ -559,8 +521,7 @@ class _ServerUrlCardState extends ConsumerState<_ServerUrlCard> {
   @override
   void initState() {
     super.initState();
-    _controller =
-        TextEditingController(text: ref.read(jellybotBaseUrlProvider));
+    _controller = TextEditingController(text: ref.read(jellybotBaseUrlProvider));
   }
 
   @override
@@ -571,8 +532,7 @@ class _ServerUrlCardState extends ConsumerState<_ServerUrlCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isUsingDefault =
-        ref.watch(jellybotBaseUrlProvider.notifier).isUsingDefault;
+    final isUsingDefault = ref.watch(jellybotBaseUrlProvider.notifier).isUsingDefault;
 
     return Card(
       child: Padding(
@@ -585,8 +545,7 @@ class _ServerUrlCardState extends ConsumerState<_ServerUrlCard> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(IconsaxPlusLinear.global),
@@ -603,10 +562,7 @@ class _ServerUrlCardState extends ConsumerState<_ServerUrlCard> {
                       if (!isUsingDefault)
                         Text(
                           'Custom URL',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                         ),
@@ -623,14 +579,10 @@ class _ServerUrlCardState extends ConsumerState<_ServerUrlCard> {
                 hintText: 'http://localhost:8888',
                 suffixIcon: IconButton(
                   onPressed: () async {
-                    await ref
-                        .read(jellybotBaseUrlProvider.notifier)
-                        .setUrl(_controller.text);
+                    await ref.read(jellybotBaseUrlProvider.notifier).setUrl(_controller.text);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text(
-                                context.localized.jellybotServerUrlUpdated)),
+                        SnackBar(content: Text(context.localized.jellybotServerUrlUpdated)),
                       );
                     }
                   },
@@ -643,15 +595,11 @@ class _ServerUrlCardState extends ConsumerState<_ServerUrlCard> {
               const SizedBox(height: 12),
               TextButton.icon(
                 onPressed: () async {
-                  await ref
-                      .read(jellybotBaseUrlProvider.notifier)
-                      .resetToDefault();
+                  await ref.read(jellybotBaseUrlProvider.notifier).resetToDefault();
                   _controller.text = ref.read(jellybotBaseUrlProvider);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content:
-                              Text(context.localized.jellybotServerUrlReset)),
+                      SnackBar(content: Text(context.localized.jellybotServerUrlReset)),
                     );
                   }
                 },

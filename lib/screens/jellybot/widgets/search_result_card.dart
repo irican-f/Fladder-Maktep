@@ -25,8 +25,7 @@ class SearchResultCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final addedUrls = ref.watch(addedCrawlLinkUrlsProvider).valueOrNull ??
-        const <String>{};
+    final addedUrls = ref.watch(addedCrawlLinkUrlsProvider).valueOrNull ?? const <String>{};
     final isAlreadyAdded = item.url != null && addedUrls.contains(item.url);
     final scheme = Theme.of(context).colorScheme;
 
@@ -63,15 +62,11 @@ class SearchResultCard extends ConsumerWidget {
                         if (item.season != null)
                           _MetaChip(
                             icon: IconsaxPlusLinear.video_play,
-                            label:
-                                '${context.localized.season(1)} ${item.season}',
+                            label: '${context.localized.season(1)} ${item.season}',
                           ),
-                        if ((item.quality ?? '').isNotEmpty)
-                          QualityBadge(quality: item.quality!),
-                        if ((item.language ?? '').isNotEmpty)
-                          LanguageBadge(language: item.language!),
-                        if (provider != null &&
-                            (provider!.displayName ?? provider!.name) != null)
+                        if ((item.quality ?? '').isNotEmpty) QualityBadge(quality: item.quality!),
+                        if ((item.language ?? '').isNotEmpty) LanguageBadge(language: item.language!),
+                        if (provider != null && (provider!.displayName ?? provider!.name) != null)
                           _MetaChip(
                             icon: IconsaxPlusLinear.global,
                             label: provider!.displayName ?? provider!.name!,

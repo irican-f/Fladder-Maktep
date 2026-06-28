@@ -39,8 +39,7 @@ class AdaptiveResultsView extends StatelessWidget {
               item: items[index],
               provider: provider,
               isAdding: addingItemUrl == items[index].url,
-              onAdd:
-                  addingItemUrl != null ? null : () => onAdd(items[index]),
+              onAdd: addingItemUrl != null ? null : () => onAdd(items[index]),
             ),
             childCount: items.length,
           ),

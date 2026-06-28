@@ -54,8 +54,7 @@ enum HomeTabs {
         HomeTabs.favorites => context.router.navigate(const FavouritesRoute()),
         HomeTabs.sync => context.router.navigate(const SyncedRoute()),
         HomeTabs.jellybot => context.router.navigate(const JellybotRoute()),
-        HomeTabs.jellybotLiveTv =>
-          context.router.navigate(const JellybotLiveTvChannelsRoute()),
+        HomeTabs.jellybotLiveTv => context.router.navigate(const JellybotLiveTvChannelsRoute()),
       };
 
   String label(BuildContext context) => switch (this) {
@@ -97,8 +96,7 @@ class HomeScreen extends ConsumerWidget {
                   context: context,
                   title: context.localized.filter(0),
                   key: Key(e.name.capitalize()),
-                  onPressed: () => context.router
-                      .navigate(LibrarySearchRoute(favourites: true)),
+                  onPressed: () => context.router.navigate(LibrarySearchRoute(favourites: true)),
                   child: const Icon(IconsaxPlusLinear.heart_search),
                 ),
                 action: () => e.navigate(context),
@@ -110,8 +108,7 @@ class HomeScreen extends ConsumerWidget {
                   icon: Icon(e.icon),
                   badge: Consumer(
                     builder: (context, ref, child) {
-                      final length = ref.watch(activeDownloadTasksProvider
-                          .select((value) => value.length));
+                      final length = ref.watch(activeDownloadTasksProvider.select((value) => value.length));
                       return length != 0
                           ? CircleAvatar(
                               radius: 10,
@@ -138,8 +135,7 @@ class HomeScreen extends ConsumerWidget {
                   context: context,
                   title: context.localized.search,
                   key: Key(e.name.capitalize()),
-                  onPressed: () =>
-                      context.router.navigate(LibrarySearchRoute()),
+                  onPressed: () => context.router.navigate(LibrarySearchRoute()),
                   child: const Icon(IconsaxPlusLinear.search_status),
                 ),
               );
@@ -184,15 +180,15 @@ class HomeScreen extends ConsumerWidget {
                 if (await manager.isClosable()) {
                   manager.close();
                 } else {
-                  FladderSnack.show(context.localized.somethingWentWrong,
-                      context: context);
+                  FladderSnack.show(context.localized.somethingWentWrong, context: context);
                 }
               });
               return true;
+            case GlobalHotKeys.closeWindow:
+              return false;
           }
         },
-        keyMap: ref.watch(
-            clientSettingsProvider.select((value) => value.currentShortcuts)),
+        keyMap: ref.watch(clientSettingsProvider.select((value) => value.currentShortcuts)),
         child: HeroControllerScope(
           controller: HeroController(),
           child: AutoRouter(

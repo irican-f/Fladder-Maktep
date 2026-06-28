@@ -73,8 +73,7 @@ class _Header extends StatelessWidget {
                 width: 50,
                 height: 70,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const SizedBox(width: 50, height: 70),
+                errorBuilder: (_, __, ___) => const SizedBox(width: 50, height: 70),
               ),
             ),
           if ((thumbnailUrl ?? '').isNotEmpty) const SizedBox(width: 8),

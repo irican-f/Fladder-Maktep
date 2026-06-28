@@ -19,8 +19,7 @@ abstract class JellybotSearchState with _$JellybotSearchState {
     @Default(20) int pageSize,
   }) = _JellybotSearchState;
 
-  int get activeFilterCount =>
-      selectedFilters.length + (exactMatch ? 1 : 0) + (minScore != null ? 1 : 0);
+  int get activeFilterCount => selectedFilters.length + (exactMatch ? 1 : 0) + (minScore != null ? 1 : 0);
 
   ApiMediaSearchRequest toRequest() {
     return ApiMediaSearchRequest(
@@ -30,9 +29,7 @@ abstract class JellybotSearchState with _$JellybotSearchState {
       minScore: minScore,
       page: page,
       pageSize: pageSize,
-      filters: selectedFilters.entries
-          .map((e) => SearchFilter(name: e.key, $value: e.value))
-          .toList(),
+      filters: selectedFilters.entries.map((e) => SearchFilter(name: e.key, $value: e.value)).toList(),
     );
   }
 }

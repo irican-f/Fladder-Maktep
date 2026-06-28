@@ -42,11 +42,9 @@ class LiveTvChannelBrowser extends ConsumerWidget {
     final channelsAsync = ref.watch(jellybotLiveTvChannelsProvider);
     final currentChannel = ref.watch(currentJellybotLiveTvChannelProvider);
     final currentPlayback = ref.watch(playBackModel);
-    
+
     // Get current channel from playback model if available
-    final activeChannelId = currentPlayback is LiveTvPlaybackModel
-        ? currentPlayback.channel.id
-        : currentChannel?.id;
+    final activeChannelId = currentPlayback is LiveTvPlaybackModel ? currentPlayback.channel.id : currentChannel?.id;
 
     return Container(
       decoration: BoxDecoration(

@@ -35,8 +35,7 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
     });
   }
 
-  Future<void> openRequest(
-      BuildContext context, SeerrDashboardPosterModel poster) async {
+  Future<void> openRequest(BuildContext context, SeerrDashboardPosterModel poster) async {
     await openSeerrRequestPopup(context, poster);
     await ref.read(seerrDashboardProvider.notifier).fetchDashboard();
   }
@@ -45,8 +44,7 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
   Widget build(BuildContext context) {
     final padding = AdaptiveLayout.adaptivePadding(context);
     final dashboardState = ref.watch(seerrDashboardProvider);
-    final canViewRecent = ref.watch(
-        seerrUserProvider.select((state) => state?.canViewRecent ?? false));
+    final canViewRecent = ref.watch(seerrUserProvider.select((state) => state?.canViewRecent ?? false));
     final backgroundImages = [
       ...dashboardState.recentlyAdded,
       ...dashboardState.recentRequests,
@@ -64,8 +62,7 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
           images: backgroundImages,
         ),
         body: PullToRefresh(
-          onRefresh: () =>
-              ref.read(seerrDashboardProvider.notifier).fetchDashboard(),
+          onRefresh: () => ref.read(seerrDashboardProvider.notifier).fetchDashboard(),
           child: (context) => CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             controller: AdaptiveLayout.scrollOf(context, HomeTabs.jellybot),
@@ -97,8 +94,7 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
                     label: context.localized.trending,
                     posters: dashboardState.trending,
                     contentPadding: padding,
-                    onLabelClick: () => context.pushRoute(
-                        SeerrSearchRoute(mode: SeerrSearchMode.trending)),
+                    onLabelClick: () => context.pushRoute(SeerrSearchRoute(mode: SeerrSearchMode.trending)),
                   ),
                 ),
               if (dashboardState.popularMovies.isNotEmpty)
@@ -107,8 +103,7 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
                     label: context.localized.popularMovies,
                     posters: dashboardState.popularMovies,
                     contentPadding: padding,
-                    onLabelClick: () => context.pushRoute(
-                        SeerrSearchRoute(mode: SeerrSearchMode.discoverMovies)),
+                    onLabelClick: () => context.pushRoute(SeerrSearchRoute(mode: SeerrSearchMode.discoverMovies)),
                   ),
                 ),
               if (dashboardState.popularSeries.isNotEmpty)
@@ -117,8 +112,7 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
                     label: context.localized.popularSeries,
                     posters: dashboardState.popularSeries,
                     contentPadding: padding,
-                    onLabelClick: () => context.pushRoute(
-                        SeerrSearchRoute(mode: SeerrSearchMode.discoverTv)),
+                    onLabelClick: () => context.pushRoute(SeerrSearchRoute(mode: SeerrSearchMode.discoverTv)),
                   ),
                 ),
               if (dashboardState.expectedMovies.isNotEmpty)

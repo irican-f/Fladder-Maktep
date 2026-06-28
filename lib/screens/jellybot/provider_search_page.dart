@@ -33,12 +33,10 @@ class JellybotProviderSearchPage extends ConsumerStatefulWidget {
   const JellybotProviderSearchPage({super.key});
 
   @override
-  ConsumerState<JellybotProviderSearchPage> createState() =>
-      _JellybotProviderSearchPageState();
+  ConsumerState<JellybotProviderSearchPage> createState() => _JellybotProviderSearchPageState();
 }
 
-class _JellybotProviderSearchPageState
-    extends ConsumerState<JellybotProviderSearchPage> {
+class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSearchPage> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
@@ -68,13 +66,11 @@ class _JellybotProviderSearchPageState
   @override
   Widget build(BuildContext context) {
     final surfaceColor = Theme.of(context).colorScheme.surface;
-    final floatingAppBar =
-        AdaptiveLayout.layoutModeOf(context) != LayoutMode.single;
+    final floatingAppBar = AdaptiveLayout.layoutModeOf(context) != LayoutMode.single;
 
     final providersAsync = ref.watch(jellybotProvidersProvider);
     final searchState = ref.watch(jellybotSearchControllerProvider);
-    final controllerState =
-        ref.read(jellybotSearchControllerProvider.notifier).searchState;
+    final controllerState = ref.read(jellybotSearchControllerProvider.notifier).searchState;
     final filtersAsync = controllerState.provider == null
         ? const AsyncValue<List<ISearchFilter>>.data(<ISearchFilter>[])
         : ref.watch(
@@ -96,9 +92,7 @@ class _JellybotProviderSearchPageState
               onRefresh: () async {
                 ref.invalidate(jellybotProvidersProvider);
                 ref.invalidate(addedCrawlLinkUrlsProvider);
-                await ref
-                    .read(jellybotSearchControllerProvider.notifier)
-                    .search();
+                await ref.read(jellybotSearchControllerProvider.notifier).search();
               },
               child: (context) => CustomScrollView(
                 controller: _scrollController,
@@ -111,8 +105,7 @@ class _JellybotProviderSearchPageState
                     providersAsync,
                     filtersAsync,
                   ),
-                  if (_showAdvanced)
-                    const SliverToBoxAdapter(child: SearchAdvancedControls()),
+                  if (_showAdvanced) const SliverToBoxAdapter(child: SearchAdvancedControls()),
                   ..._buildResultsSlivers(searchState, controllerState),
                   SliverPadding(
                     padding: EdgeInsets.only(
@@ -171,9 +164,7 @@ class _JellybotProviderSearchPageState
                     currentPage: response.currentPage ?? 0,
                     totalPages: response.totalPages ?? 0,
                     totalCount: response.totalCount ?? 0,
-                    onJump: (p) => ref
-                        .read(jellybotSearchControllerProvider.notifier)
-                        .search(page: p),
+                    onJump: (p) => ref.read(jellybotSearchControllerProvider.notifier).search(page: p),
                   ),
                 ),
             ],
@@ -188,9 +179,7 @@ class _JellybotProviderSearchPageState
         error: (e, _) => SliverFillRemaining(
           child: SearchErrorState(
             message: e.toString(),
-            onRetry: () => ref
-                .read(jellybotSearchControllerProvider.notifier)
-                .search(),
+            onRetry: () => ref.read(jellybotSearchControllerProvider.notifier).search(),
           ),
         ),
       ),
@@ -283,8 +272,7 @@ class _JellybotProviderSearchPageState
                 )
               : IconButton(
                   onPressed: () {
-                    final ctrl =
-                        ref.read(jellybotSearchControllerProvider.notifier);
+                    final ctrl = ref.read(jellybotSearchControllerProvider.notifier);
                     ctrl.setQuery(_searchController.text);
                     ctrl.search();
                   },
@@ -326,9 +314,7 @@ class _JellybotProviderSearchPageState
               label: Row(
                 spacing: 6,
                 children: [
-                  Text(state.provider?.displayName ??
-                      state.provider?.name ??
-                      context.localized.jellybotProvider),
+                  Text(state.provider?.displayName ?? state.provider?.name ?? context.localized.jellybotProvider),
                   const Icon(IconsaxPlusLinear.arrow_down, size: 16),
                 ],
               ),
@@ -346,8 +332,7 @@ class _JellybotProviderSearchPageState
                 isSelected: _showAdvanced || state.activeFilterCount > 0,
                 icon: const Icon(IconsaxPlusLinear.setting_4),
                 label: Text(context.localized.jellybotAdvancedSearch),
-                onPressed: () =>
-                    setState(() => _showAdvanced = !_showAdvanced),
+                onPressed: () => setState(() => _showAdvanced = !_showAdvanced),
               ),
               if (state.activeFilterCount > 0)
                 Positioned(
@@ -386,9 +371,7 @@ class _JellybotProviderSearchPageState
       final i = e.key;
       final (category, label, selectedIcon) = e.value;
       final isSelected = state.category == category;
-      final position = noProviders && i == 0
-          ? PositionContext.first
-          : PositionContext.middle;
+      final position = noProviders && i == 0 ? PositionContext.first : PositionContext.middle;
       return PositionProvider(
         position: position,
         child: ExpressiveButton(
@@ -418,10 +401,7 @@ class _JellybotProviderSearchPageState
           spacing: 6,
           children: [
             Text(isSelected
-                ? state.selectedFilters[filter.name] ??
-                    filter.label ??
-                    filter.name ??
-                    ''
+                ? state.selectedFilters[filter.name] ?? filter.label ?? filter.name ?? ''
                 : filter.label ?? filter.name ?? ''),
             const Icon(IconsaxPlusLinear.arrow_down, size: 16),
           ],
@@ -483,30 +463,24 @@ class _JellybotProviderSearchPageState
             shrinkWrap: true,
             children: [
               ListTile(
-                leading: !ctrl.searchState.selectedFilters
-                        .containsKey(filter.name)
+                leading: !ctrl.searchState.selectedFilters.containsKey(filter.name)
                     ? Icon(
                         IconsaxPlusBold.tick_circle,
                         color: Theme.of(context).colorScheme.primary,
                       )
                     : const Icon(IconsaxPlusLinear.filter_remove),
                 title: Text(context.localized.all),
-                selected:
-                    !ctrl.searchState.selectedFilters.containsKey(filter.name),
+                selected: !ctrl.searchState.selectedFilters.containsKey(filter.name),
                 onTap: () {
                   Navigator.pop(context);
-                  final next = Map<String, String>.from(
-                      ctrl.searchState.selectedFilters)
-                    ..remove(filter.name);
+                  final next = Map<String, String>.from(ctrl.searchState.selectedFilters)..remove(filter.name);
                   ctrl.setSelectedFilters(next);
                   setState(() {});
                 },
               ),
               const Divider(),
               ...?filter.options?.map((option) {
-                final isSelected =
-                    ctrl.searchState.selectedFilters[filter.name] ==
-                        option.$value;
+                final isSelected = ctrl.searchState.selectedFilters[filter.name] == option.$value;
                 return ListTile(
                   leading: isSelected
                       ? Icon(
@@ -518,8 +492,7 @@ class _JellybotProviderSearchPageState
                   selected: isSelected,
                   onTap: () {
                     Navigator.pop(context);
-                    final next = Map<String, String>.from(
-                        ctrl.searchState.selectedFilters);
+                    final next = Map<String, String>.from(ctrl.searchState.selectedFilters);
                     next[filter.name ?? ''] = option.$value ?? '';
                     ctrl.setSelectedFilters(next);
                     setState(() {});
@@ -539,8 +512,7 @@ class _JellybotProviderSearchPageState
     try {
       final api = ref.read(jellybotApiProvider);
       final user = ref.read(userProvider);
-      final category =
-          ref.read(jellybotSearchControllerProvider.notifier).searchState.category;
+      final category = ref.read(jellybotSearchControllerProvider.notifier).searchState.category;
 
       final response = await api.apiCrawlLinksPost(
         body: ExtractMediaRequest(
@@ -593,8 +565,7 @@ class _JellybotProviderSearchPageState
         if (!seasonResponse.isSuccessful || seasonResponse.body == null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text(context.localized.jellybotErrorAddingLink)),
+              SnackBar(content: Text(context.localized.jellybotErrorAddingLink)),
             );
           }
           return;
@@ -608,8 +579,7 @@ class _JellybotProviderSearchPageState
         );
       }
 
-      if (responseToCheck.mediaExistsOnServer == true &&
-          responseToCheck.existingMedia != null) {
+      if (responseToCheck.mediaExistsOnServer == true && responseToCheck.existingMedia != null) {
         final existingMedia = MediaSearchResultDto.fromJson(
           responseToCheck.existingMedia as Map<String, dynamic>,
         );
@@ -738,8 +708,7 @@ class _PaginationBar extends StatelessWidget {
             children: [
               IconButton.filled(
                 icon: const Icon(Icons.chevron_left),
-                onPressed:
-                    currentPage > 0 ? () => onJump(currentPage - 1) : null,
+                onPressed: currentPage > 0 ? () => onJump(currentPage - 1) : null,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -750,9 +719,7 @@ class _PaginationBar extends StatelessWidget {
               ),
               IconButton.filled(
                 icon: const Icon(Icons.chevron_right),
-                onPressed: currentPage < totalPages - 1
-                    ? () => onJump(currentPage + 1)
-                    : null,
+                onPressed: currentPage < totalPages - 1 ? () => onJump(currentPage + 1) : null,
               ),
             ],
           ),

@@ -32,8 +32,7 @@ class ExistingMediaDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasOriginalTitle = existingMedia.originalTitle != null &&
-        existingMedia.originalTitle != existingMedia.title;
+    final hasOriginalTitle = existingMedia.originalTitle != null && existingMedia.originalTitle != existingMedia.title;
 
     return AlertDialog(
       title: Text(context.localized.jellybotMediaExistsTitle),
@@ -97,8 +96,7 @@ class ExistingMediaDialog extends StatelessWidget {
                           style: theme.textTheme.bodyMedium,
                         ),
                       ],
-                      if (existingMedia.mediaUrl != null &&
-                          existingMedia.mediaUrl!.isNotEmpty) ...[
+                      if (existingMedia.mediaUrl != null && existingMedia.mediaUrl!.isNotEmpty) ...[
                         const SizedBox(height: 12),
                         TextButton.icon(
                           onPressed: _openJellyfinUrl,

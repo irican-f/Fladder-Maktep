@@ -68,7 +68,8 @@ class LibMDK extends BasePlayer {
   }
 
   @override
-  Future<void> loadVideo(String url, bool play, {Duration startPosition = Duration.zero, bool isLiveStream = false}) async {
+  Future<void> loadVideo(String url, bool play,
+      {Duration startPosition = Duration.zero, bool isLiveStream = false}) async {
     _controller?.dispose();
 
     final validUrl = isValidUrl(url);
