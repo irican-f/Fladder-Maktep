@@ -239,6 +239,7 @@ class _ChannelListTile extends StatelessWidget {
       LiveTvChannelCategory.documentary => context.localized.categoryDocumentary,
       LiveTvChannelCategory.music => context.localized.categoryMusic,
       LiveTvChannelCategory.news => context.localized.categoryNews,
+      LiveTvChannelCategory.entertainment => context.localized.categoryEntertainment,
       LiveTvChannelCategory.other => context.localized.categoryOther,
       _ => '',
     };

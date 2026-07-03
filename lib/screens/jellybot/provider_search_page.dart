@@ -5,14 +5,9 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/models/jellybot/jellybot_search_state.dart';
-import 'package:fladder/providers/jellybot_api_provider.dart';
 import 'package:fladder/providers/jellybot_search_provider.dart';
-import 'package:fladder/providers/user_provider.dart';
-import 'package:fladder/routes/auto_router.gr.dart';
-import 'package:fladder/screens/jellybot/dialogs/confirm_crawl_link_dialog.dart';
-import 'package:fladder/screens/jellybot/dialogs/existing_media_dialog.dart';
-import 'package:fladder/screens/jellybot/dialogs/season_picker_dialog.dart';
 import 'package:fladder/screens/jellybot/widgets/adaptive_results_view.dart';
+import 'package:fladder/screens/jellybot/widgets/add_flow_sheet.dart';
 import 'package:fladder/screens/jellybot/widgets/search_advanced_controls.dart';
 import 'package:fladder/screens/jellybot/widgets/search_empty_state.dart';
 import 'package:fladder/screens/jellybot/widgets/search_error_state.dart';
@@ -40,7 +35,6 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
-  String? _addingItemUrl;
   bool _showAdvanced = false;
 
   @override
@@ -155,8 +149,7 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
               AdaptiveResultsView(
                 items: items,
                 provider: controllerState.provider,
-                addingItemUrl: _addingItemUrl,
-                onAdd: _addToCrawlLinks,
+                onAdd: (item) => showAddFlowSheet(context, ref, item),
               ),
               if ((response.totalPages ?? 0) > 1)
                 SliverToBoxAdapter(
@@ -504,160 +497,6 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
         ),
       ),
     );
-  }
-
-  Future<void> _addToCrawlLinks(ProviderSearchItemDto item) async {
-    if (_addingItemUrl != null) return;
-    setState(() => _addingItemUrl = item.url);
-    try {
-      final api = ref.read(jellybotApiProvider);
-      final user = ref.read(userProvider);
-      final category = ref.read(jellybotSearchControllerProvider.notifier).searchState.category;
-
-      final response = await api.apiCrawlLinksPost(
-        body: ExtractMediaRequest(
-          url: item.url,
-          mediaCategory: category,
-          userId: user?.id,
-          userName: user?.name,
-        ),
-      );
-
-      if (!mounted) return;
-      if (response.statusCode == 400) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.localized.jellybotLinkAlreadyExists)),
-        );
-        return;
-      }
-      if (!response.isSuccessful || response.body == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.localized.jellybotErrorAddingLink)),
-        );
-        return;
-      }
-
-      var responseToCheck = response.body!;
-      CrawlLinkDto? crawlLink;
-
-      if (responseToCheck.requiresSeasonSelection == true &&
-          responseToCheck.availableSeasons != null &&
-          responseToCheck.availableSeasons! > 0) {
-        final selectedSeason = await showDialog<int>(
-          context: context,
-          builder: (context) => SeasonPickerDialog(
-            mediaTitle: responseToCheck.mediaTitle ?? item.title ?? '',
-            availableSeasons: responseToCheck.availableSeasons!,
-            thumbnailUrl: item.thumbnailUrl,
-          ),
-        );
-        if (selectedSeason == null || !mounted) return;
-
-        final seasonResponse = await api.apiCrawlLinksSelectSeasonPost(
-          body: SelectSeasonRequest(
-            url: responseToCheck.originalUrl ?? item.url,
-            season: selectedSeason,
-            userName: user?.name,
-            userId: user?.id,
-            mediaCategory: category,
-          ),
-        );
-        if (!seasonResponse.isSuccessful || seasonResponse.body == null) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(context.localized.jellybotErrorAddingLink)),
-            );
-          }
-          return;
-        }
-        responseToCheck = seasonResponse.body!;
-      }
-
-      if (responseToCheck.crawlLink != null) {
-        crawlLink = CrawlLinkDto.fromJson(
-          responseToCheck.crawlLink as Map<String, dynamic>,
-        );
-      }
-
-      if (responseToCheck.mediaExistsOnServer == true && responseToCheck.existingMedia != null) {
-        final existingMedia = MediaSearchResultDto.fromJson(
-          responseToCheck.existingMedia as Map<String, dynamic>,
-        );
-        final isDifferent = await showDialog<bool>(
-          context: context,
-          builder: (context) => ExistingMediaDialog(
-            existingMedia: existingMedia,
-            addedLinkTitle: responseToCheck.mediaTitle ?? item.title ?? '',
-          ),
-        );
-        if (isDifferent == null) {
-          await _deleteCrawlLink(api, crawlLink?.id);
-          return;
-        }
-        if (isDifferent == false) {
-          await _deleteCrawlLink(api, crawlLink?.id);
-          if (mounted) {
-            _navigateToExistingMedia(existingMedia);
-          }
-          return;
-        }
-      }
-
-      if (crawlLink == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.localized.jellybotErrorAddingLink)),
-          );
-        }
-        return;
-      }
-
-      final result = await showDialog<ConfirmDialogResult>(
-        context: context,
-        builder: (context) => ConfirmCrawlLinkDialog(crawlLink: crawlLink!),
-      );
-      if (result != null && result.confirmed) {
-        await api.apiCrawlLinksConfirmAddPost(
-          body: ExtractMediaConfirmationRequest(
-            crawlLinkId: crawlLink.id,
-            mediaTitle: result.editedName,
-          ),
-        );
-        ref.invalidate(addedCrawlLinkUrlsProvider);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.localized.jellybotLinkAdded)),
-          );
-        }
-      } else {
-        await _deleteCrawlLink(api, crawlLink.id);
-      }
-    } catch (e) {
-      debugPrint('Error adding to crawl links: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.localized.jellybotErrorAddingLink)),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _addingItemUrl = null);
-      }
-    }
-  }
-
-  void _navigateToExistingMedia(MediaSearchResultDto existingMedia) {
-    if (existingMedia.id == null) return;
-    context.router.push(DetailsRoute(id: existingMedia.id!.replaceAll('-', '')));
-  }
-
-  Future<void> _deleteCrawlLink(Jellybot api, String? crawlLinkId) async {
-    if (crawlLinkId == null) return;
-    try {
-      await api.apiCrawlLinksDelete(id: crawlLinkId);
-    } catch (e) {
-      debugPrint('Error deleting crawl link: $e');
-    }
   }
 }
 

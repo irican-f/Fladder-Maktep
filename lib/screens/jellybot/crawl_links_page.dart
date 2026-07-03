@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/providers/jellybot_api_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/screens/shared/nested_scaffold.dart';
 import 'package:fladder/screens/shared/outlined_text_field.dart';
 import 'package:fladder/theme.dart';
@@ -138,9 +139,7 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
       if (response.isSuccessful) {
         _loadCrawlLinks(page: _currentPage);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.localized.jellybotLinkDeleted)),
-          );
+          FladderSnack.show(context.localized.jellybotLinkDeleted, context: context);
         }
       }
     } catch (e) {
@@ -187,9 +186,7 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
       if (response.isSuccessful) {
         _loadCrawlLinks(page: _currentPage);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.localized.jellybotLinkRenamed)),
-          );
+          FladderSnack.show(context.localized.jellybotLinkRenamed, context: context);
         }
       }
     } catch (e) {

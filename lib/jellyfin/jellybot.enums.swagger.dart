@@ -66,7 +66,9 @@ enum LiveTvChannelCategory {
   @JsonValue(6)
   news(6),
   @JsonValue(7)
-  other(7);
+  other(7),
+  @JsonValue(8)
+  entertainment(8);
 
   final int? value;
 

@@ -69,6 +69,75 @@ abstract class Jellybot extends ChopperService {
   @GET(path: '/api/logs')
   Future<chopper.Response<String>> _apiLogsGet({@Query('date') DateTime? date});
 
+  ///Lists every configured api client. Secrets are never returned.
+  Future<chopper.Response<List<ApiClientDto>>> apiApiClientsGet() {
+    generatedMapping.putIfAbsent(
+      ApiClientDto,
+      () => ApiClientDto.fromJsonFactory,
+    );
+
+    return _apiApiClientsGet();
+  }
+
+  ///Lists every configured api client. Secrets are never returned.
+  @GET(path: '/api/api-clients')
+  Future<chopper.Response<List<ApiClientDto>>> _apiApiClientsGet();
+
+  ///Creates a new api client.
+  Future<chopper.Response<ApiClientDto>> apiApiClientsPost({
+    required CreateApiClientRequest? body,
+  }) {
+    generatedMapping.putIfAbsent(
+      ApiClientDto,
+      () => ApiClientDto.fromJsonFactory,
+    );
+
+    return _apiApiClientsPost(body: body);
+  }
+
+  ///Creates a new api client.
+  @POST(path: '/api/api-clients', optionalBody: true)
+  Future<chopper.Response<ApiClientDto>> _apiApiClientsPost({
+    @Body() required CreateApiClientRequest? body,
+  });
+
+  ///Updates an api client. Secrets are overwritten only when a new value is sent.
+  ///@param apiClientId
+  Future<chopper.Response<ApiClientDto>> apiApiClientsApiClientIdPut({
+    required String? apiClientId,
+    required UpdateApiClientRequest? body,
+  }) {
+    generatedMapping.putIfAbsent(
+      ApiClientDto,
+      () => ApiClientDto.fromJsonFactory,
+    );
+
+    return _apiApiClientsApiClientIdPut(apiClientId: apiClientId, body: body);
+  }
+
+  ///Updates an api client. Secrets are overwritten only when a new value is sent.
+  ///@param apiClientId
+  @PUT(path: '/api/api-clients/{apiClientId}', optionalBody: true)
+  Future<chopper.Response<ApiClientDto>> _apiApiClientsApiClientIdPut({
+    @Path('apiClientId') required String? apiClientId,
+    @Body() required UpdateApiClientRequest? body,
+  });
+
+  ///Deletes an api client.
+  ///@param apiClientId
+  Future<chopper.Response> apiApiClientsApiClientIdDelete({
+    required String? apiClientId,
+  }) {
+    return _apiApiClientsApiClientIdDelete(apiClientId: apiClientId);
+  }
+
+  ///Deletes an api client.
+  ///@param apiClientId
+  @DELETE(path: '/api/api-clients/{apiClientId}')
+  Future<chopper.Response> _apiApiClientsApiClientIdDelete({
+    @Path('apiClientId') required String? apiClientId,
+  });
+
   ///Gets added crawl links, the results are paginated.
   ///@param page The page index.
   ///@param limit The number of elements to return.
@@ -116,9 +185,10 @@ abstract class Jellybot extends ChopperService {
     @Query('category') Object? category,
   });
 
-  ///Extracts media information from a URL. If the URL points to a show page with multiple seasons,
-  ///the response will indicate that season selection is required. In that case, call the select-season
-  ///endpoint with the chosen season number before calling confirm-add.
+  ///Extracts media information from a URL without persisting anything. If the URL points to a show
+  ///page with multiple seasons, the response indicates that season selection is required — call the
+  ///select-season endpoint with the chosen season. Otherwise the response carries an addToken; pass
+  ///it to confirm-add to commit the link.
   Future<chopper.Response<ExtractMediaResponse>> apiCrawlLinksPost({
     required ExtractMediaRequest? body,
   }) {
@@ -130,9 +200,10 @@ abstract class Jellybot extends ChopperService {
     return _apiCrawlLinksPost(body: body);
   }
 
-  ///Extracts media information from a URL. If the URL points to a show page with multiple seasons,
-  ///the response will indicate that season selection is required. In that case, call the select-season
-  ///endpoint with the chosen season number before calling confirm-add.
+  ///Extracts media information from a URL without persisting anything. If the URL points to a show
+  ///page with multiple seasons, the response indicates that season selection is required — call the
+  ///select-season endpoint with the chosen season. Otherwise the response carries an addToken; pass
+  ///it to confirm-add to commit the link.
   @POST(path: '/api/crawl-links', optionalBody: true)
   Future<chopper.Response<ExtractMediaResponse>> _apiCrawlLinksPost({
     @Body() required ExtractMediaRequest? body,
@@ -149,8 +220,8 @@ abstract class Jellybot extends ChopperService {
   @DELETE(path: '/api/crawl-links')
   Future<chopper.Response> _apiCrawlLinksDelete({@Query('id') String? id});
 
-  ///Selects a season for a show page URL and creates the crawl link. Call this endpoint when
-  ///the initial extraction returned requiresSeasonSelection = true.
+  ///Selects a season for a show page URL and previews the crawl link (without persisting). Call this
+  ///when the initial extraction returned requiresSeasonSelection = true.
   Future<chopper.Response<ExtractMediaResponse>> apiCrawlLinksSelectSeasonPost({
     required SelectSeasonRequest? body,
   }) {
@@ -162,13 +233,14 @@ abstract class Jellybot extends ChopperService {
     return _apiCrawlLinksSelectSeasonPost(body: body);
   }
 
-  ///Selects a season for a show page URL and creates the crawl link. Call this endpoint when
-  ///the initial extraction returned requiresSeasonSelection = true.
+  ///Selects a season for a show page URL and previews the crawl link (without persisting). Call this
+  ///when the initial extraction returned requiresSeasonSelection = true.
   @POST(path: '/api/crawl-links/select-season', optionalBody: true)
   Future<chopper.Response<ExtractMediaResponse>> _apiCrawlLinksSelectSeasonPost(
       {@Body() required SelectSeasonRequest? body});
 
-  ///Saves a crawl link to the database, this endpoint should be called after calling the add link endpoint.
+  ///Commits a previously-previewed crawl link to the database. Call after add or select-season,
+  ///passing the addToken from that response.
   Future<chopper.Response<CrawlLinkDto>> apiCrawlLinksConfirmAddPost({
     required ExtractMediaConfirmationRequest? body,
   }) {
@@ -180,7 +252,8 @@ abstract class Jellybot extends ChopperService {
     return _apiCrawlLinksConfirmAddPost(body: body);
   }
 
-  ///Saves a crawl link to the database, this endpoint should be called after calling the add link endpoint.
+  ///Commits a previously-previewed crawl link to the database. Call after add or select-season,
+  ///passing the addToken from that response.
   @POST(path: '/api/crawl-links/confirm-add', optionalBody: true)
   Future<chopper.Response<CrawlLinkDto>> _apiCrawlLinksConfirmAddPost({
     @Body() required ExtractMediaConfirmationRequest? body,
@@ -358,15 +431,6 @@ abstract class Jellybot extends ChopperService {
   });
 
   ///
-  Future<chopper.Response<String>> apiIptvAtlasProGet() {
-    return _apiIptvAtlasProGet();
-  }
-
-  ///
-  @GET(path: '/api/iptv/atlas-pro')
-  Future<chopper.Response<String>> _apiIptvAtlasProGet();
-
-  ///
   Future<chopper.Response<List<ScheduledJob>>> apiJobsGet() {
     generatedMapping.putIfAbsent(
       ScheduledJob,
@@ -497,6 +561,36 @@ abstract class Jellybot extends ChopperService {
     @Query('searchEnabled') bool? searchEnabled,
   });
 
+  ///Gets every provider regardless of enabled state (management view).
+  Future<chopper.Response<List<IProvider>>> apiProvidersAllGet() {
+    generatedMapping.putIfAbsent(IProvider, () => IProvider.fromJsonFactory);
+
+    return _apiProvidersAllGet();
+  }
+
+  ///Gets every provider regardless of enabled state (management view).
+  @GET(path: '/api/providers/all')
+  Future<chopper.Response<List<IProvider>>> _apiProvidersAllGet();
+
+  ///Updates a provider's configuration.
+  ///@param providerId
+  Future<chopper.Response<IProvider>> apiProvidersProviderIdPut({
+    required String? providerId,
+    required UpdateProviderRequest? body,
+  }) {
+    generatedMapping.putIfAbsent(IProvider, () => IProvider.fromJsonFactory);
+
+    return _apiProvidersProviderIdPut(providerId: providerId, body: body);
+  }
+
+  ///Updates a provider's configuration.
+  ///@param providerId
+  @PUT(path: '/api/providers/{providerId}', optionalBody: true)
+  Future<chopper.Response<IProvider>> _apiProvidersProviderIdPut({
+    @Path('providerId') required String? providerId,
+    @Body() required UpdateProviderRequest? body,
+  });
+
   ///Gets the available search filters for a given provider and a media category
   ///@param providerId
   ///@param mediaCategory
@@ -549,6 +643,47 @@ abstract class Jellybot extends ChopperService {
     @Body() required ApiMediaSearchRequest? body,
   });
 
+  ///Gets the Live TV channel source (DB value, or config fallback when never saved).
+  Future<chopper.Response<LiveTvSourceResult>> apiSettingsLiveTvSourceGet() {
+    generatedMapping.putIfAbsent(
+      LiveTvSourceResult,
+      () => LiveTvSourceResult.fromJsonFactory,
+    );
+
+    return _apiSettingsLiveTvSourceGet();
+  }
+
+  ///Gets the Live TV channel source (DB value, or config fallback when never saved).
+  @GET(path: '/api/settings/live-tv-source')
+  Future<chopper.Response<LiveTvSourceResult>> _apiSettingsLiveTvSourceGet();
+
+  ///Updates the Live TV channel source. Applies from the next LiveTvChannelsJob run.
+  Future<chopper.Response<LiveTvSourceResult>> apiSettingsLiveTvSourcePut({
+    required UpdateLiveTvSourceRequest? body,
+  }) {
+    generatedMapping.putIfAbsent(
+      LiveTvSourceResult,
+      () => LiveTvSourceResult.fromJsonFactory,
+    );
+
+    return _apiSettingsLiveTvSourcePut(body: body);
+  }
+
+  ///Updates the Live TV channel source. Applies from the next LiveTvChannelsJob run.
+  @PUT(path: '/api/settings/live-tv-source', optionalBody: true)
+  Future<chopper.Response<LiveTvSourceResult>> _apiSettingsLiveTvSourcePut({
+    @Body() required UpdateLiveTvSourceRequest? body,
+  });
+
+  ///Gets the list of countries the current Live TV source exposes (empty if it can't be reached).
+  Future<chopper.Response<List<String>>> apiSettingsLiveTvSourceCountriesGet() {
+    return _apiSettingsLiveTvSourceCountriesGet();
+  }
+
+  ///Gets the list of countries the current Live TV source exposes (empty if it can't be reached).
+  @GET(path: '/api/settings/live-tv-source/countries')
+  Future<chopper.Response<List<String>>> _apiSettingsLiveTvSourceCountriesGet();
+
   ///
   Future<chopper.Response> apiTorrentsUploadPost({
     List<int>? file,
@@ -573,6 +708,712 @@ abstract class Jellybot extends ChopperService {
     @Part('mediaCategory') dynamic mediaCategory,
     @Part('authorId') String? authorId,
   });
+}
+
+@JsonSerializable(explicitToJson: true)
+class ApiClientDto {
+  const ApiClientDto({
+    this.id,
+    this.name,
+    this.type,
+    this.baseUrl,
+    this.username,
+    this.hasApiKey,
+    this.hasPassword,
+    this.isEnabled,
+    this.isActive,
+    this.subscriptionExpiresAt,
+    this.priority,
+    this.maxConcurrentRequests,
+    this.rateLimitPerMinute,
+    this.isTorrentClient,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory ApiClientDto.fromJson(Map<String, dynamic> json) => _$ApiClientDtoFromJson(json);
+
+  static const toJsonFactory = _$ApiClientDtoToJson;
+  Map<String, dynamic> toJson() => _$ApiClientDtoToJson(this);
+
+  @JsonKey(name: 'id', includeIfNull: false)
+  final String? id;
+  @JsonKey(name: 'name', includeIfNull: false)
+  final String? name;
+  @JsonKey(name: 'type', includeIfNull: false)
+  final String? type;
+  @JsonKey(name: 'baseUrl', includeIfNull: false)
+  final String? baseUrl;
+  @JsonKey(name: 'username', includeIfNull: false)
+  final String? username;
+  @JsonKey(name: 'hasApiKey', includeIfNull: false)
+  final bool? hasApiKey;
+  @JsonKey(name: 'hasPassword', includeIfNull: false)
+  final bool? hasPassword;
+  @JsonKey(name: 'isEnabled', includeIfNull: false)
+  final bool? isEnabled;
+  @JsonKey(name: 'isActive', includeIfNull: false)
+  final bool? isActive;
+  @JsonKey(name: 'subscriptionExpiresAt', includeIfNull: false)
+  final DateTime? subscriptionExpiresAt;
+  @JsonKey(name: 'priority', includeIfNull: false)
+  final int? priority;
+  @JsonKey(name: 'maxConcurrentRequests', includeIfNull: false)
+  final int? maxConcurrentRequests;
+  @JsonKey(name: 'rateLimitPerMinute', includeIfNull: false)
+  final int? rateLimitPerMinute;
+  @JsonKey(name: 'isTorrentClient', includeIfNull: false)
+  final bool? isTorrentClient;
+  @JsonKey(name: 'createdAt', includeIfNull: false)
+  final DateTime? createdAt;
+  @JsonKey(name: 'updatedAt', includeIfNull: false)
+  final DateTime? updatedAt;
+  static const fromJsonFactory = _$ApiClientDtoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ApiClientDto &&
+            (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
+            (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
+            (identical(other.baseUrl, baseUrl) ||
+                const DeepCollectionEquality().equals(
+                  other.baseUrl,
+                  baseUrl,
+                )) &&
+            (identical(other.username, username) ||
+                const DeepCollectionEquality().equals(
+                  other.username,
+                  username,
+                )) &&
+            (identical(other.hasApiKey, hasApiKey) ||
+                const DeepCollectionEquality().equals(
+                  other.hasApiKey,
+                  hasApiKey,
+                )) &&
+            (identical(other.hasPassword, hasPassword) ||
+                const DeepCollectionEquality().equals(
+                  other.hasPassword,
+                  hasPassword,
+                )) &&
+            (identical(other.isEnabled, isEnabled) ||
+                const DeepCollectionEquality().equals(
+                  other.isEnabled,
+                  isEnabled,
+                )) &&
+            (identical(other.isActive, isActive) ||
+                const DeepCollectionEquality().equals(
+                  other.isActive,
+                  isActive,
+                )) &&
+            (identical(other.subscriptionExpiresAt, subscriptionExpiresAt) ||
+                const DeepCollectionEquality().equals(
+                  other.subscriptionExpiresAt,
+                  subscriptionExpiresAt,
+                )) &&
+            (identical(other.priority, priority) ||
+                const DeepCollectionEquality().equals(
+                  other.priority,
+                  priority,
+                )) &&
+            (identical(other.maxConcurrentRequests, maxConcurrentRequests) ||
+                const DeepCollectionEquality().equals(
+                  other.maxConcurrentRequests,
+                  maxConcurrentRequests,
+                )) &&
+            (identical(other.rateLimitPerMinute, rateLimitPerMinute) ||
+                const DeepCollectionEquality().equals(
+                  other.rateLimitPerMinute,
+                  rateLimitPerMinute,
+                )) &&
+            (identical(other.isTorrentClient, isTorrentClient) ||
+                const DeepCollectionEquality().equals(
+                  other.isTorrentClient,
+                  isTorrentClient,
+                )) &&
+            (identical(other.createdAt, createdAt) ||
+                const DeepCollectionEquality().equals(
+                  other.createdAt,
+                  createdAt,
+                )) &&
+            (identical(other.updatedAt, updatedAt) ||
+                const DeepCollectionEquality().equals(
+                  other.updatedAt,
+                  updatedAt,
+                )));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(name) ^
+      const DeepCollectionEquality().hash(type) ^
+      const DeepCollectionEquality().hash(baseUrl) ^
+      const DeepCollectionEquality().hash(username) ^
+      const DeepCollectionEquality().hash(hasApiKey) ^
+      const DeepCollectionEquality().hash(hasPassword) ^
+      const DeepCollectionEquality().hash(isEnabled) ^
+      const DeepCollectionEquality().hash(isActive) ^
+      const DeepCollectionEquality().hash(subscriptionExpiresAt) ^
+      const DeepCollectionEquality().hash(priority) ^
+      const DeepCollectionEquality().hash(maxConcurrentRequests) ^
+      const DeepCollectionEquality().hash(rateLimitPerMinute) ^
+      const DeepCollectionEquality().hash(isTorrentClient) ^
+      const DeepCollectionEquality().hash(createdAt) ^
+      const DeepCollectionEquality().hash(updatedAt) ^
+      runtimeType.hashCode;
+}
+
+extension $ApiClientDtoExtension on ApiClientDto {
+  ApiClientDto copyWith({
+    String? id,
+    String? name,
+    String? type,
+    String? baseUrl,
+    String? username,
+    bool? hasApiKey,
+    bool? hasPassword,
+    bool? isEnabled,
+    bool? isActive,
+    DateTime? subscriptionExpiresAt,
+    int? priority,
+    int? maxConcurrentRequests,
+    int? rateLimitPerMinute,
+    bool? isTorrentClient,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return ApiClientDto(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      baseUrl: baseUrl ?? this.baseUrl,
+      username: username ?? this.username,
+      hasApiKey: hasApiKey ?? this.hasApiKey,
+      hasPassword: hasPassword ?? this.hasPassword,
+      isEnabled: isEnabled ?? this.isEnabled,
+      isActive: isActive ?? this.isActive,
+      subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
+      priority: priority ?? this.priority,
+      maxConcurrentRequests: maxConcurrentRequests ?? this.maxConcurrentRequests,
+      rateLimitPerMinute: rateLimitPerMinute ?? this.rateLimitPerMinute,
+      isTorrentClient: isTorrentClient ?? this.isTorrentClient,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  ApiClientDto copyWithWrapped({
+    Wrapped<String?>? id,
+    Wrapped<String?>? name,
+    Wrapped<String?>? type,
+    Wrapped<String?>? baseUrl,
+    Wrapped<String?>? username,
+    Wrapped<bool?>? hasApiKey,
+    Wrapped<bool?>? hasPassword,
+    Wrapped<bool?>? isEnabled,
+    Wrapped<bool?>? isActive,
+    Wrapped<DateTime?>? subscriptionExpiresAt,
+    Wrapped<int?>? priority,
+    Wrapped<int?>? maxConcurrentRequests,
+    Wrapped<int?>? rateLimitPerMinute,
+    Wrapped<bool?>? isTorrentClient,
+    Wrapped<DateTime?>? createdAt,
+    Wrapped<DateTime?>? updatedAt,
+  }) {
+    return ApiClientDto(
+      id: (id != null ? id.value : this.id),
+      name: (name != null ? name.value : this.name),
+      type: (type != null ? type.value : this.type),
+      baseUrl: (baseUrl != null ? baseUrl.value : this.baseUrl),
+      username: (username != null ? username.value : this.username),
+      hasApiKey: (hasApiKey != null ? hasApiKey.value : this.hasApiKey),
+      hasPassword: (hasPassword != null ? hasPassword.value : this.hasPassword),
+      isEnabled: (isEnabled != null ? isEnabled.value : this.isEnabled),
+      isActive: (isActive != null ? isActive.value : this.isActive),
+      subscriptionExpiresAt: (subscriptionExpiresAt != null ? subscriptionExpiresAt.value : this.subscriptionExpiresAt),
+      priority: (priority != null ? priority.value : this.priority),
+      maxConcurrentRequests: (maxConcurrentRequests != null ? maxConcurrentRequests.value : this.maxConcurrentRequests),
+      rateLimitPerMinute: (rateLimitPerMinute != null ? rateLimitPerMinute.value : this.rateLimitPerMinute),
+      isTorrentClient: (isTorrentClient != null ? isTorrentClient.value : this.isTorrentClient),
+      createdAt: (createdAt != null ? createdAt.value : this.createdAt),
+      updatedAt: (updatedAt != null ? updatedAt.value : this.updatedAt),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ProblemDetails {
+  const ProblemDetails({
+    this.type,
+    this.title,
+    this.status,
+    this.detail,
+    this.instance,
+    this.extensions,
+  });
+
+  factory ProblemDetails.fromJson(Map<String, dynamic> json) => _$ProblemDetailsFromJson(json);
+
+  static const toJsonFactory = _$ProblemDetailsToJson;
+  Map<String, dynamic> toJson() => _$ProblemDetailsToJson(this);
+
+  @JsonKey(name: 'type', includeIfNull: false)
+  final String? type;
+  @JsonKey(name: 'title', includeIfNull: false)
+  final String? title;
+  @JsonKey(name: 'status', includeIfNull: false)
+  final int? status;
+  @JsonKey(name: 'detail', includeIfNull: false)
+  final String? detail;
+  @JsonKey(name: 'instance', includeIfNull: false)
+  final String? instance;
+  @JsonKey(name: 'extensions', includeIfNull: false)
+  final Map<String, dynamic>? extensions;
+  static const fromJsonFactory = _$ProblemDetailsFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ProblemDetails &&
+            (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
+            (identical(other.title, title) || const DeepCollectionEquality().equals(other.title, title)) &&
+            (identical(other.status, status) || const DeepCollectionEquality().equals(other.status, status)) &&
+            (identical(other.detail, detail) || const DeepCollectionEquality().equals(other.detail, detail)) &&
+            (identical(other.instance, instance) ||
+                const DeepCollectionEquality().equals(
+                  other.instance,
+                  instance,
+                )) &&
+            (identical(other.extensions, extensions) ||
+                const DeepCollectionEquality().equals(
+                  other.extensions,
+                  extensions,
+                )));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(type) ^
+      const DeepCollectionEquality().hash(title) ^
+      const DeepCollectionEquality().hash(status) ^
+      const DeepCollectionEquality().hash(detail) ^
+      const DeepCollectionEquality().hash(instance) ^
+      const DeepCollectionEquality().hash(extensions) ^
+      runtimeType.hashCode;
+}
+
+extension $ProblemDetailsExtension on ProblemDetails {
+  ProblemDetails copyWith({
+    String? type,
+    String? title,
+    int? status,
+    String? detail,
+    String? instance,
+    Map<String, dynamic>? extensions,
+  }) {
+    return ProblemDetails(
+      type: type ?? this.type,
+      title: title ?? this.title,
+      status: status ?? this.status,
+      detail: detail ?? this.detail,
+      instance: instance ?? this.instance,
+      extensions: extensions ?? this.extensions,
+    );
+  }
+
+  ProblemDetails copyWithWrapped({
+    Wrapped<String?>? type,
+    Wrapped<String?>? title,
+    Wrapped<int?>? status,
+    Wrapped<String?>? detail,
+    Wrapped<String?>? instance,
+    Wrapped<Map<String, dynamic>?>? extensions,
+  }) {
+    return ProblemDetails(
+      type: (type != null ? type.value : this.type),
+      title: (title != null ? title.value : this.title),
+      status: (status != null ? status.value : this.status),
+      detail: (detail != null ? detail.value : this.detail),
+      instance: (instance != null ? instance.value : this.instance),
+      extensions: (extensions != null ? extensions.value : this.extensions),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class CreateApiClientRequest {
+  const CreateApiClientRequest({
+    this.name,
+    this.type,
+    this.baseUrl,
+    this.apiKey,
+    this.username,
+    this.password,
+    this.isEnabled,
+    this.subscriptionExpiresAt,
+    this.priority,
+    this.maxConcurrentRequests,
+    this.rateLimitPerMinute,
+    this.isTorrentClient,
+  });
+
+  factory CreateApiClientRequest.fromJson(Map<String, dynamic> json) => _$CreateApiClientRequestFromJson(json);
+
+  static const toJsonFactory = _$CreateApiClientRequestToJson;
+  Map<String, dynamic> toJson() => _$CreateApiClientRequestToJson(this);
+
+  @JsonKey(name: 'name', includeIfNull: false)
+  final String? name;
+  @JsonKey(name: 'type', includeIfNull: false)
+  final String? type;
+  @JsonKey(name: 'baseUrl', includeIfNull: false)
+  final String? baseUrl;
+  @JsonKey(name: 'apiKey', includeIfNull: false)
+  final String? apiKey;
+  @JsonKey(name: 'username', includeIfNull: false)
+  final String? username;
+  @JsonKey(name: 'password', includeIfNull: false)
+  final String? password;
+  @JsonKey(name: 'isEnabled', includeIfNull: false)
+  final bool? isEnabled;
+  @JsonKey(name: 'subscriptionExpiresAt', includeIfNull: false)
+  final DateTime? subscriptionExpiresAt;
+  @JsonKey(name: 'priority', includeIfNull: false)
+  final int? priority;
+  @JsonKey(name: 'maxConcurrentRequests', includeIfNull: false)
+  final int? maxConcurrentRequests;
+  @JsonKey(name: 'rateLimitPerMinute', includeIfNull: false)
+  final int? rateLimitPerMinute;
+  @JsonKey(name: 'isTorrentClient', includeIfNull: false)
+  final bool? isTorrentClient;
+  static const fromJsonFactory = _$CreateApiClientRequestFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is CreateApiClientRequest &&
+            (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
+            (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
+            (identical(other.baseUrl, baseUrl) ||
+                const DeepCollectionEquality().equals(
+                  other.baseUrl,
+                  baseUrl,
+                )) &&
+            (identical(other.apiKey, apiKey) || const DeepCollectionEquality().equals(other.apiKey, apiKey)) &&
+            (identical(other.username, username) ||
+                const DeepCollectionEquality().equals(
+                  other.username,
+                  username,
+                )) &&
+            (identical(other.password, password) ||
+                const DeepCollectionEquality().equals(
+                  other.password,
+                  password,
+                )) &&
+            (identical(other.isEnabled, isEnabled) ||
+                const DeepCollectionEquality().equals(
+                  other.isEnabled,
+                  isEnabled,
+                )) &&
+            (identical(other.subscriptionExpiresAt, subscriptionExpiresAt) ||
+                const DeepCollectionEquality().equals(
+                  other.subscriptionExpiresAt,
+                  subscriptionExpiresAt,
+                )) &&
+            (identical(other.priority, priority) ||
+                const DeepCollectionEquality().equals(
+                  other.priority,
+                  priority,
+                )) &&
+            (identical(other.maxConcurrentRequests, maxConcurrentRequests) ||
+                const DeepCollectionEquality().equals(
+                  other.maxConcurrentRequests,
+                  maxConcurrentRequests,
+                )) &&
+            (identical(other.rateLimitPerMinute, rateLimitPerMinute) ||
+                const DeepCollectionEquality().equals(
+                  other.rateLimitPerMinute,
+                  rateLimitPerMinute,
+                )) &&
+            (identical(other.isTorrentClient, isTorrentClient) ||
+                const DeepCollectionEquality().equals(
+                  other.isTorrentClient,
+                  isTorrentClient,
+                )));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(name) ^
+      const DeepCollectionEquality().hash(type) ^
+      const DeepCollectionEquality().hash(baseUrl) ^
+      const DeepCollectionEquality().hash(apiKey) ^
+      const DeepCollectionEquality().hash(username) ^
+      const DeepCollectionEquality().hash(password) ^
+      const DeepCollectionEquality().hash(isEnabled) ^
+      const DeepCollectionEquality().hash(subscriptionExpiresAt) ^
+      const DeepCollectionEquality().hash(priority) ^
+      const DeepCollectionEquality().hash(maxConcurrentRequests) ^
+      const DeepCollectionEquality().hash(rateLimitPerMinute) ^
+      const DeepCollectionEquality().hash(isTorrentClient) ^
+      runtimeType.hashCode;
+}
+
+extension $CreateApiClientRequestExtension on CreateApiClientRequest {
+  CreateApiClientRequest copyWith({
+    String? name,
+    String? type,
+    String? baseUrl,
+    String? apiKey,
+    String? username,
+    String? password,
+    bool? isEnabled,
+    DateTime? subscriptionExpiresAt,
+    int? priority,
+    int? maxConcurrentRequests,
+    int? rateLimitPerMinute,
+    bool? isTorrentClient,
+  }) {
+    return CreateApiClientRequest(
+      name: name ?? this.name,
+      type: type ?? this.type,
+      baseUrl: baseUrl ?? this.baseUrl,
+      apiKey: apiKey ?? this.apiKey,
+      username: username ?? this.username,
+      password: password ?? this.password,
+      isEnabled: isEnabled ?? this.isEnabled,
+      subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
+      priority: priority ?? this.priority,
+      maxConcurrentRequests: maxConcurrentRequests ?? this.maxConcurrentRequests,
+      rateLimitPerMinute: rateLimitPerMinute ?? this.rateLimitPerMinute,
+      isTorrentClient: isTorrentClient ?? this.isTorrentClient,
+    );
+  }
+
+  CreateApiClientRequest copyWithWrapped({
+    Wrapped<String?>? name,
+    Wrapped<String?>? type,
+    Wrapped<String?>? baseUrl,
+    Wrapped<String?>? apiKey,
+    Wrapped<String?>? username,
+    Wrapped<String?>? password,
+    Wrapped<bool?>? isEnabled,
+    Wrapped<DateTime?>? subscriptionExpiresAt,
+    Wrapped<int?>? priority,
+    Wrapped<int?>? maxConcurrentRequests,
+    Wrapped<int?>? rateLimitPerMinute,
+    Wrapped<bool?>? isTorrentClient,
+  }) {
+    return CreateApiClientRequest(
+      name: (name != null ? name.value : this.name),
+      type: (type != null ? type.value : this.type),
+      baseUrl: (baseUrl != null ? baseUrl.value : this.baseUrl),
+      apiKey: (apiKey != null ? apiKey.value : this.apiKey),
+      username: (username != null ? username.value : this.username),
+      password: (password != null ? password.value : this.password),
+      isEnabled: (isEnabled != null ? isEnabled.value : this.isEnabled),
+      subscriptionExpiresAt: (subscriptionExpiresAt != null ? subscriptionExpiresAt.value : this.subscriptionExpiresAt),
+      priority: (priority != null ? priority.value : this.priority),
+      maxConcurrentRequests: (maxConcurrentRequests != null ? maxConcurrentRequests.value : this.maxConcurrentRequests),
+      rateLimitPerMinute: (rateLimitPerMinute != null ? rateLimitPerMinute.value : this.rateLimitPerMinute),
+      isTorrentClient: (isTorrentClient != null ? isTorrentClient.value : this.isTorrentClient),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class UpdateApiClientRequest {
+  const UpdateApiClientRequest({
+    this.name,
+    this.type,
+    this.baseUrl,
+    this.apiKey,
+    this.username,
+    this.password,
+    this.isEnabled,
+    this.subscriptionExpiresAt,
+    this.priority,
+    this.maxConcurrentRequests,
+    this.rateLimitPerMinute,
+    this.isTorrentClient,
+  });
+
+  factory UpdateApiClientRequest.fromJson(Map<String, dynamic> json) => _$UpdateApiClientRequestFromJson(json);
+
+  static const toJsonFactory = _$UpdateApiClientRequestToJson;
+  Map<String, dynamic> toJson() => _$UpdateApiClientRequestToJson(this);
+
+  @JsonKey(name: 'name', includeIfNull: false)
+  final String? name;
+  @JsonKey(name: 'type', includeIfNull: false)
+  final String? type;
+  @JsonKey(name: 'baseUrl', includeIfNull: false)
+  final String? baseUrl;
+  @JsonKey(name: 'apiKey', includeIfNull: false)
+  final String? apiKey;
+  @JsonKey(name: 'username', includeIfNull: false)
+  final String? username;
+  @JsonKey(name: 'password', includeIfNull: false)
+  final String? password;
+  @JsonKey(name: 'isEnabled', includeIfNull: false)
+  final bool? isEnabled;
+  @JsonKey(name: 'subscriptionExpiresAt', includeIfNull: false)
+  final DateTime? subscriptionExpiresAt;
+  @JsonKey(name: 'priority', includeIfNull: false)
+  final int? priority;
+  @JsonKey(name: 'maxConcurrentRequests', includeIfNull: false)
+  final int? maxConcurrentRequests;
+  @JsonKey(name: 'rateLimitPerMinute', includeIfNull: false)
+  final int? rateLimitPerMinute;
+  @JsonKey(name: 'isTorrentClient', includeIfNull: false)
+  final bool? isTorrentClient;
+  static const fromJsonFactory = _$UpdateApiClientRequestFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is UpdateApiClientRequest &&
+            (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
+            (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
+            (identical(other.baseUrl, baseUrl) ||
+                const DeepCollectionEquality().equals(
+                  other.baseUrl,
+                  baseUrl,
+                )) &&
+            (identical(other.apiKey, apiKey) || const DeepCollectionEquality().equals(other.apiKey, apiKey)) &&
+            (identical(other.username, username) ||
+                const DeepCollectionEquality().equals(
+                  other.username,
+                  username,
+                )) &&
+            (identical(other.password, password) ||
+                const DeepCollectionEquality().equals(
+                  other.password,
+                  password,
+                )) &&
+            (identical(other.isEnabled, isEnabled) ||
+                const DeepCollectionEquality().equals(
+                  other.isEnabled,
+                  isEnabled,
+                )) &&
+            (identical(other.subscriptionExpiresAt, subscriptionExpiresAt) ||
+                const DeepCollectionEquality().equals(
+                  other.subscriptionExpiresAt,
+                  subscriptionExpiresAt,
+                )) &&
+            (identical(other.priority, priority) ||
+                const DeepCollectionEquality().equals(
+                  other.priority,
+                  priority,
+                )) &&
+            (identical(other.maxConcurrentRequests, maxConcurrentRequests) ||
+                const DeepCollectionEquality().equals(
+                  other.maxConcurrentRequests,
+                  maxConcurrentRequests,
+                )) &&
+            (identical(other.rateLimitPerMinute, rateLimitPerMinute) ||
+                const DeepCollectionEquality().equals(
+                  other.rateLimitPerMinute,
+                  rateLimitPerMinute,
+                )) &&
+            (identical(other.isTorrentClient, isTorrentClient) ||
+                const DeepCollectionEquality().equals(
+                  other.isTorrentClient,
+                  isTorrentClient,
+                )));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(name) ^
+      const DeepCollectionEquality().hash(type) ^
+      const DeepCollectionEquality().hash(baseUrl) ^
+      const DeepCollectionEquality().hash(apiKey) ^
+      const DeepCollectionEquality().hash(username) ^
+      const DeepCollectionEquality().hash(password) ^
+      const DeepCollectionEquality().hash(isEnabled) ^
+      const DeepCollectionEquality().hash(subscriptionExpiresAt) ^
+      const DeepCollectionEquality().hash(priority) ^
+      const DeepCollectionEquality().hash(maxConcurrentRequests) ^
+      const DeepCollectionEquality().hash(rateLimitPerMinute) ^
+      const DeepCollectionEquality().hash(isTorrentClient) ^
+      runtimeType.hashCode;
+}
+
+extension $UpdateApiClientRequestExtension on UpdateApiClientRequest {
+  UpdateApiClientRequest copyWith({
+    String? name,
+    String? type,
+    String? baseUrl,
+    String? apiKey,
+    String? username,
+    String? password,
+    bool? isEnabled,
+    DateTime? subscriptionExpiresAt,
+    int? priority,
+    int? maxConcurrentRequests,
+    int? rateLimitPerMinute,
+    bool? isTorrentClient,
+  }) {
+    return UpdateApiClientRequest(
+      name: name ?? this.name,
+      type: type ?? this.type,
+      baseUrl: baseUrl ?? this.baseUrl,
+      apiKey: apiKey ?? this.apiKey,
+      username: username ?? this.username,
+      password: password ?? this.password,
+      isEnabled: isEnabled ?? this.isEnabled,
+      subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
+      priority: priority ?? this.priority,
+      maxConcurrentRequests: maxConcurrentRequests ?? this.maxConcurrentRequests,
+      rateLimitPerMinute: rateLimitPerMinute ?? this.rateLimitPerMinute,
+      isTorrentClient: isTorrentClient ?? this.isTorrentClient,
+    );
+  }
+
+  UpdateApiClientRequest copyWithWrapped({
+    Wrapped<String?>? name,
+    Wrapped<String?>? type,
+    Wrapped<String?>? baseUrl,
+    Wrapped<String?>? apiKey,
+    Wrapped<String?>? username,
+    Wrapped<String?>? password,
+    Wrapped<bool?>? isEnabled,
+    Wrapped<DateTime?>? subscriptionExpiresAt,
+    Wrapped<int?>? priority,
+    Wrapped<int?>? maxConcurrentRequests,
+    Wrapped<int?>? rateLimitPerMinute,
+    Wrapped<bool?>? isTorrentClient,
+  }) {
+    return UpdateApiClientRequest(
+      name: (name != null ? name.value : this.name),
+      type: (type != null ? type.value : this.type),
+      baseUrl: (baseUrl != null ? baseUrl.value : this.baseUrl),
+      apiKey: (apiKey != null ? apiKey.value : this.apiKey),
+      username: (username != null ? username.value : this.username),
+      password: (password != null ? password.value : this.password),
+      isEnabled: (isEnabled != null ? isEnabled.value : this.isEnabled),
+      subscriptionExpiresAt: (subscriptionExpiresAt != null ? subscriptionExpiresAt.value : this.subscriptionExpiresAt),
+      priority: (priority != null ? priority.value : this.priority),
+      maxConcurrentRequests: (maxConcurrentRequests != null ? maxConcurrentRequests.value : this.maxConcurrentRequests),
+      rateLimitPerMinute: (rateLimitPerMinute != null ? rateLimitPerMinute.value : this.rateLimitPerMinute),
+      isTorrentClient: (isTorrentClient != null ? isTorrentClient.value : this.isTorrentClient),
+    );
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -1201,6 +2042,7 @@ class ExtractMediaResponse {
     this.availableSeasons,
     this.mediaTitle,
     this.originalUrl,
+    this.addToken,
     this.crawlLink,
     this.mediaExistsOnServer,
     this.requiresExistenceConfirmation,
@@ -1220,6 +2062,8 @@ class ExtractMediaResponse {
   final String? mediaTitle;
   @JsonKey(name: 'originalUrl', includeIfNull: false)
   final String? originalUrl;
+  @JsonKey(name: 'addToken', includeIfNull: false)
+  final String? addToken;
   @JsonKey(name: 'crawlLink', includeIfNull: false)
   final dynamic crawlLink;
   @JsonKey(name: 'mediaExistsOnServer', includeIfNull: false)
@@ -1257,6 +2101,11 @@ class ExtractMediaResponse {
                   other.originalUrl,
                   originalUrl,
                 )) &&
+            (identical(other.addToken, addToken) ||
+                const DeepCollectionEquality().equals(
+                  other.addToken,
+                  addToken,
+                )) &&
             (identical(other.crawlLink, crawlLink) ||
                 const DeepCollectionEquality().equals(
                   other.crawlLink,
@@ -1291,6 +2140,7 @@ class ExtractMediaResponse {
       const DeepCollectionEquality().hash(availableSeasons) ^
       const DeepCollectionEquality().hash(mediaTitle) ^
       const DeepCollectionEquality().hash(originalUrl) ^
+      const DeepCollectionEquality().hash(addToken) ^
       const DeepCollectionEquality().hash(crawlLink) ^
       const DeepCollectionEquality().hash(mediaExistsOnServer) ^
       const DeepCollectionEquality().hash(requiresExistenceConfirmation) ^
@@ -1304,6 +2154,7 @@ extension $ExtractMediaResponseExtension on ExtractMediaResponse {
     int? availableSeasons,
     String? mediaTitle,
     String? originalUrl,
+    String? addToken,
     dynamic crawlLink,
     bool? mediaExistsOnServer,
     bool? requiresExistenceConfirmation,
@@ -1314,6 +2165,7 @@ extension $ExtractMediaResponseExtension on ExtractMediaResponse {
       availableSeasons: availableSeasons ?? this.availableSeasons,
       mediaTitle: mediaTitle ?? this.mediaTitle,
       originalUrl: originalUrl ?? this.originalUrl,
+      addToken: addToken ?? this.addToken,
       crawlLink: crawlLink ?? this.crawlLink,
       mediaExistsOnServer: mediaExistsOnServer ?? this.mediaExistsOnServer,
       requiresExistenceConfirmation: requiresExistenceConfirmation ?? this.requiresExistenceConfirmation,
@@ -1326,6 +2178,7 @@ extension $ExtractMediaResponseExtension on ExtractMediaResponse {
     Wrapped<int?>? availableSeasons,
     Wrapped<String?>? mediaTitle,
     Wrapped<String?>? originalUrl,
+    Wrapped<String?>? addToken,
     Wrapped<dynamic>? crawlLink,
     Wrapped<bool?>? mediaExistsOnServer,
     Wrapped<bool?>? requiresExistenceConfirmation,
@@ -1337,6 +2190,7 @@ extension $ExtractMediaResponseExtension on ExtractMediaResponse {
       availableSeasons: (availableSeasons != null ? availableSeasons.value : this.availableSeasons),
       mediaTitle: (mediaTitle != null ? mediaTitle.value : this.mediaTitle),
       originalUrl: (originalUrl != null ? originalUrl.value : this.originalUrl),
+      addToken: (addToken != null ? addToken.value : this.addToken),
       crawlLink: (crawlLink != null ? crawlLink.value : this.crawlLink),
       mediaExistsOnServer: (mediaExistsOnServer != null ? mediaExistsOnServer.value : this.mediaExistsOnServer),
       requiresExistenceConfirmation: (requiresExistenceConfirmation != null
@@ -1449,108 +2303,6 @@ extension $MediaSearchResultDtoExtension on MediaSearchResultDto {
       productionYear: (productionYear != null ? productionYear.value : this.productionYear),
       isShow: (isShow != null ? isShow.value : this.isShow),
       mediaUrl: (mediaUrl != null ? mediaUrl.value : this.mediaUrl),
-    );
-  }
-}
-
-@JsonSerializable(explicitToJson: true)
-class ProblemDetails {
-  const ProblemDetails({
-    this.type,
-    this.title,
-    this.status,
-    this.detail,
-    this.instance,
-    this.extensions,
-  });
-
-  factory ProblemDetails.fromJson(Map<String, dynamic> json) => _$ProblemDetailsFromJson(json);
-
-  static const toJsonFactory = _$ProblemDetailsToJson;
-  Map<String, dynamic> toJson() => _$ProblemDetailsToJson(this);
-
-  @JsonKey(name: 'type', includeIfNull: false)
-  final String? type;
-  @JsonKey(name: 'title', includeIfNull: false)
-  final String? title;
-  @JsonKey(name: 'status', includeIfNull: false)
-  final int? status;
-  @JsonKey(name: 'detail', includeIfNull: false)
-  final String? detail;
-  @JsonKey(name: 'instance', includeIfNull: false)
-  final String? instance;
-  @JsonKey(name: 'extensions', includeIfNull: false)
-  final Map<String, dynamic>? extensions;
-  static const fromJsonFactory = _$ProblemDetailsFromJson;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other is ProblemDetails &&
-            (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
-            (identical(other.title, title) || const DeepCollectionEquality().equals(other.title, title)) &&
-            (identical(other.status, status) || const DeepCollectionEquality().equals(other.status, status)) &&
-            (identical(other.detail, detail) || const DeepCollectionEquality().equals(other.detail, detail)) &&
-            (identical(other.instance, instance) ||
-                const DeepCollectionEquality().equals(
-                  other.instance,
-                  instance,
-                )) &&
-            (identical(other.extensions, extensions) ||
-                const DeepCollectionEquality().equals(
-                  other.extensions,
-                  extensions,
-                )));
-  }
-
-  @override
-  String toString() => jsonEncode(this);
-
-  @override
-  int get hashCode =>
-      const DeepCollectionEquality().hash(type) ^
-      const DeepCollectionEquality().hash(title) ^
-      const DeepCollectionEquality().hash(status) ^
-      const DeepCollectionEquality().hash(detail) ^
-      const DeepCollectionEquality().hash(instance) ^
-      const DeepCollectionEquality().hash(extensions) ^
-      runtimeType.hashCode;
-}
-
-extension $ProblemDetailsExtension on ProblemDetails {
-  ProblemDetails copyWith({
-    String? type,
-    String? title,
-    int? status,
-    String? detail,
-    String? instance,
-    Map<String, dynamic>? extensions,
-  }) {
-    return ProblemDetails(
-      type: type ?? this.type,
-      title: title ?? this.title,
-      status: status ?? this.status,
-      detail: detail ?? this.detail,
-      instance: instance ?? this.instance,
-      extensions: extensions ?? this.extensions,
-    );
-  }
-
-  ProblemDetails copyWithWrapped({
-    Wrapped<String?>? type,
-    Wrapped<String?>? title,
-    Wrapped<int?>? status,
-    Wrapped<String?>? detail,
-    Wrapped<String?>? instance,
-    Wrapped<Map<String, dynamic>?>? extensions,
-  }) {
-    return ProblemDetails(
-      type: (type != null ? type.value : this.type),
-      title: (title != null ? title.value : this.title),
-      status: (status != null ? status.value : this.status),
-      detail: (detail != null ? detail.value : this.detail),
-      instance: (instance != null ? instance.value : this.instance),
-      extensions: (extensions != null ? extensions.value : this.extensions),
     );
   }
 }
@@ -1744,7 +2496,7 @@ extension $SelectSeasonRequestExtension on SelectSeasonRequest {
 
 @JsonSerializable(explicitToJson: true)
 class ExtractMediaConfirmationRequest {
-  const ExtractMediaConfirmationRequest({this.crawlLinkId, this.mediaTitle});
+  const ExtractMediaConfirmationRequest({this.addToken, this.mediaTitle});
 
   factory ExtractMediaConfirmationRequest.fromJson(Map<String, dynamic> json) =>
       _$ExtractMediaConfirmationRequestFromJson(json);
@@ -1752,8 +2504,8 @@ class ExtractMediaConfirmationRequest {
   static const toJsonFactory = _$ExtractMediaConfirmationRequestToJson;
   Map<String, dynamic> toJson() => _$ExtractMediaConfirmationRequestToJson(this);
 
-  @JsonKey(name: 'crawlLinkId', includeIfNull: false)
-  final String? crawlLinkId;
+  @JsonKey(name: 'addToken', includeIfNull: false)
+  final String? addToken;
   @JsonKey(name: 'mediaTitle', includeIfNull: false)
   final String? mediaTitle;
   static const fromJsonFactory = _$ExtractMediaConfirmationRequestFromJson;
@@ -1762,10 +2514,10 @@ class ExtractMediaConfirmationRequest {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is ExtractMediaConfirmationRequest &&
-            (identical(other.crawlLinkId, crawlLinkId) ||
+            (identical(other.addToken, addToken) ||
                 const DeepCollectionEquality().equals(
-                  other.crawlLinkId,
-                  crawlLinkId,
+                  other.addToken,
+                  addToken,
                 )) &&
             (identical(other.mediaTitle, mediaTitle) ||
                 const DeepCollectionEquality().equals(
@@ -1779,28 +2531,28 @@ class ExtractMediaConfirmationRequest {
 
   @override
   int get hashCode =>
-      const DeepCollectionEquality().hash(crawlLinkId) ^
+      const DeepCollectionEquality().hash(addToken) ^
       const DeepCollectionEquality().hash(mediaTitle) ^
       runtimeType.hashCode;
 }
 
 extension $ExtractMediaConfirmationRequestExtension on ExtractMediaConfirmationRequest {
   ExtractMediaConfirmationRequest copyWith({
-    String? crawlLinkId,
+    String? addToken,
     String? mediaTitle,
   }) {
     return ExtractMediaConfirmationRequest(
-      crawlLinkId: crawlLinkId ?? this.crawlLinkId,
+      addToken: addToken ?? this.addToken,
       mediaTitle: mediaTitle ?? this.mediaTitle,
     );
   }
 
   ExtractMediaConfirmationRequest copyWithWrapped({
-    Wrapped<String?>? crawlLinkId,
+    Wrapped<String?>? addToken,
     Wrapped<String?>? mediaTitle,
   }) {
     return ExtractMediaConfirmationRequest(
-      crawlLinkId: (crawlLinkId != null ? crawlLinkId.value : this.crawlLinkId),
+      addToken: (addToken != null ? addToken.value : this.addToken),
       mediaTitle: (mediaTitle != null ? mediaTitle.value : this.mediaTitle),
     );
   }
@@ -4339,6 +5091,107 @@ extension $IExtractedItemInfoExtension on IExtractedItemInfo {
 }
 
 @JsonSerializable(explicitToJson: true)
+class UpdateProviderRequest {
+  const UpdateProviderRequest({
+    this.displayName,
+    this.url,
+    this.enabled,
+    this.searchEnabled,
+    this.isManuallyDisabled,
+  });
+
+  factory UpdateProviderRequest.fromJson(Map<String, dynamic> json) => _$UpdateProviderRequestFromJson(json);
+
+  static const toJsonFactory = _$UpdateProviderRequestToJson;
+  Map<String, dynamic> toJson() => _$UpdateProviderRequestToJson(this);
+
+  @JsonKey(name: 'displayName', includeIfNull: false)
+  final String? displayName;
+  @JsonKey(name: 'url', includeIfNull: false)
+  final String? url;
+  @JsonKey(name: 'enabled', includeIfNull: false)
+  final bool? enabled;
+  @JsonKey(name: 'searchEnabled', includeIfNull: false)
+  final bool? searchEnabled;
+  @JsonKey(name: 'isManuallyDisabled', includeIfNull: false)
+  final bool? isManuallyDisabled;
+  static const fromJsonFactory = _$UpdateProviderRequestFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is UpdateProviderRequest &&
+            (identical(other.displayName, displayName) ||
+                const DeepCollectionEquality().equals(
+                  other.displayName,
+                  displayName,
+                )) &&
+            (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
+            (identical(other.enabled, enabled) ||
+                const DeepCollectionEquality().equals(
+                  other.enabled,
+                  enabled,
+                )) &&
+            (identical(other.searchEnabled, searchEnabled) ||
+                const DeepCollectionEquality().equals(
+                  other.searchEnabled,
+                  searchEnabled,
+                )) &&
+            (identical(other.isManuallyDisabled, isManuallyDisabled) ||
+                const DeepCollectionEquality().equals(
+                  other.isManuallyDisabled,
+                  isManuallyDisabled,
+                )));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(displayName) ^
+      const DeepCollectionEquality().hash(url) ^
+      const DeepCollectionEquality().hash(enabled) ^
+      const DeepCollectionEquality().hash(searchEnabled) ^
+      const DeepCollectionEquality().hash(isManuallyDisabled) ^
+      runtimeType.hashCode;
+}
+
+extension $UpdateProviderRequestExtension on UpdateProviderRequest {
+  UpdateProviderRequest copyWith({
+    String? displayName,
+    String? url,
+    bool? enabled,
+    bool? searchEnabled,
+    bool? isManuallyDisabled,
+  }) {
+    return UpdateProviderRequest(
+      displayName: displayName ?? this.displayName,
+      url: url ?? this.url,
+      enabled: enabled ?? this.enabled,
+      searchEnabled: searchEnabled ?? this.searchEnabled,
+      isManuallyDisabled: isManuallyDisabled ?? this.isManuallyDisabled,
+    );
+  }
+
+  UpdateProviderRequest copyWithWrapped({
+    Wrapped<String?>? displayName,
+    Wrapped<String?>? url,
+    Wrapped<bool?>? enabled,
+    Wrapped<bool?>? searchEnabled,
+    Wrapped<bool?>? isManuallyDisabled,
+  }) {
+    return UpdateProviderRequest(
+      displayName: (displayName != null ? displayName.value : this.displayName),
+      url: (url != null ? url.value : this.url),
+      enabled: (enabled != null ? enabled.value : this.enabled),
+      searchEnabled: (searchEnabled != null ? searchEnabled.value : this.searchEnabled),
+      isManuallyDisabled: (isManuallyDisabled != null ? isManuallyDisabled.value : this.isManuallyDisabled),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class ISearchFilter {
   const ISearchFilter({
     this.label,
@@ -4599,6 +5452,8 @@ class ProviderSearchItemDto {
     this.season,
     this.quality,
     this.language,
+    this.year,
+    this.score,
   });
 
   factory ProviderSearchItemDto.fromJson(Map<String, dynamic> json) => _$ProviderSearchItemDtoFromJson(json);
@@ -4620,6 +5475,10 @@ class ProviderSearchItemDto {
   final String? quality;
   @JsonKey(name: 'language', includeIfNull: false)
   final String? language;
+  @JsonKey(name: 'year', includeIfNull: false)
+  final int? year;
+  @JsonKey(name: 'score', includeIfNull: false)
+  final double? score;
   static const fromJsonFactory = _$ProviderSearchItemDtoFromJson;
 
   @override
@@ -4648,7 +5507,9 @@ class ProviderSearchItemDto {
                 const DeepCollectionEquality().equals(
                   other.language,
                   language,
-                )));
+                )) &&
+            (identical(other.year, year) || const DeepCollectionEquality().equals(other.year, year)) &&
+            (identical(other.score, score) || const DeepCollectionEquality().equals(other.score, score)));
   }
 
   @override
@@ -4663,6 +5524,8 @@ class ProviderSearchItemDto {
       const DeepCollectionEquality().hash(season) ^
       const DeepCollectionEquality().hash(quality) ^
       const DeepCollectionEquality().hash(language) ^
+      const DeepCollectionEquality().hash(year) ^
+      const DeepCollectionEquality().hash(score) ^
       runtimeType.hashCode;
 }
 
@@ -4675,6 +5538,8 @@ extension $ProviderSearchItemDtoExtension on ProviderSearchItemDto {
     int? season,
     String? quality,
     String? language,
+    int? year,
+    double? score,
   }) {
     return ProviderSearchItemDto(
       title: title ?? this.title,
@@ -4684,6 +5549,8 @@ extension $ProviderSearchItemDtoExtension on ProviderSearchItemDto {
       season: season ?? this.season,
       quality: quality ?? this.quality,
       language: language ?? this.language,
+      year: year ?? this.year,
+      score: score ?? this.score,
     );
   }
 
@@ -4695,6 +5562,8 @@ extension $ProviderSearchItemDtoExtension on ProviderSearchItemDto {
     Wrapped<int?>? season,
     Wrapped<String?>? quality,
     Wrapped<String?>? language,
+    Wrapped<int?>? year,
+    Wrapped<double?>? score,
   }) {
     return ProviderSearchItemDto(
       title: (title != null ? title.value : this.title),
@@ -4704,6 +5573,8 @@ extension $ProviderSearchItemDtoExtension on ProviderSearchItemDto {
       season: (season != null ? season.value : this.season),
       quality: (quality != null ? quality.value : this.quality),
       language: (language != null ? language.value : this.language),
+      year: (year != null ? year.value : this.year),
+      score: (score != null ? score.value : this.score),
     );
   }
 }
@@ -5022,6 +5893,144 @@ extension $MediaSearchRequestExtension on MediaSearchRequest {
       category: (category != null ? category.value : this.category),
       exactMatch: (exactMatch != null ? exactMatch.value : this.exactMatch),
       minScore: (minScore != null ? minScore.value : this.minScore),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class LiveTvSourceResult {
+  const LiveTvSourceResult({this.baseUrl, this.countries, this.fromDatabase});
+
+  factory LiveTvSourceResult.fromJson(Map<String, dynamic> json) => _$LiveTvSourceResultFromJson(json);
+
+  static const toJsonFactory = _$LiveTvSourceResultToJson;
+  Map<String, dynamic> toJson() => _$LiveTvSourceResultToJson(this);
+
+  @JsonKey(name: 'baseUrl', includeIfNull: false)
+  final String? baseUrl;
+  @JsonKey(name: 'countries', includeIfNull: false, defaultValue: <String>[])
+  final List<String>? countries;
+  @JsonKey(name: 'fromDatabase', includeIfNull: false)
+  final bool? fromDatabase;
+  static const fromJsonFactory = _$LiveTvSourceResultFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is LiveTvSourceResult &&
+            (identical(other.baseUrl, baseUrl) ||
+                const DeepCollectionEquality().equals(
+                  other.baseUrl,
+                  baseUrl,
+                )) &&
+            (identical(other.countries, countries) ||
+                const DeepCollectionEquality().equals(
+                  other.countries,
+                  countries,
+                )) &&
+            (identical(other.fromDatabase, fromDatabase) ||
+                const DeepCollectionEquality().equals(
+                  other.fromDatabase,
+                  fromDatabase,
+                )));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(baseUrl) ^
+      const DeepCollectionEquality().hash(countries) ^
+      const DeepCollectionEquality().hash(fromDatabase) ^
+      runtimeType.hashCode;
+}
+
+extension $LiveTvSourceResultExtension on LiveTvSourceResult {
+  LiveTvSourceResult copyWith({
+    String? baseUrl,
+    List<String>? countries,
+    bool? fromDatabase,
+  }) {
+    return LiveTvSourceResult(
+      baseUrl: baseUrl ?? this.baseUrl,
+      countries: countries ?? this.countries,
+      fromDatabase: fromDatabase ?? this.fromDatabase,
+    );
+  }
+
+  LiveTvSourceResult copyWithWrapped({
+    Wrapped<String?>? baseUrl,
+    Wrapped<List<String>?>? countries,
+    Wrapped<bool?>? fromDatabase,
+  }) {
+    return LiveTvSourceResult(
+      baseUrl: (baseUrl != null ? baseUrl.value : this.baseUrl),
+      countries: (countries != null ? countries.value : this.countries),
+      fromDatabase: (fromDatabase != null ? fromDatabase.value : this.fromDatabase),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class UpdateLiveTvSourceRequest {
+  const UpdateLiveTvSourceRequest({this.baseUrl, this.countries});
+
+  factory UpdateLiveTvSourceRequest.fromJson(Map<String, dynamic> json) => _$UpdateLiveTvSourceRequestFromJson(json);
+
+  static const toJsonFactory = _$UpdateLiveTvSourceRequestToJson;
+  Map<String, dynamic> toJson() => _$UpdateLiveTvSourceRequestToJson(this);
+
+  @JsonKey(name: 'baseUrl', includeIfNull: false)
+  final String? baseUrl;
+  @JsonKey(name: 'countries', includeIfNull: false, defaultValue: <String>[])
+  final List<String>? countries;
+  static const fromJsonFactory = _$UpdateLiveTvSourceRequestFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is UpdateLiveTvSourceRequest &&
+            (identical(other.baseUrl, baseUrl) ||
+                const DeepCollectionEquality().equals(
+                  other.baseUrl,
+                  baseUrl,
+                )) &&
+            (identical(other.countries, countries) ||
+                const DeepCollectionEquality().equals(
+                  other.countries,
+                  countries,
+                )));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(baseUrl) ^
+      const DeepCollectionEquality().hash(countries) ^
+      runtimeType.hashCode;
+}
+
+extension $UpdateLiveTvSourceRequestExtension on UpdateLiveTvSourceRequest {
+  UpdateLiveTvSourceRequest copyWith({
+    String? baseUrl,
+    List<String>? countries,
+  }) {
+    return UpdateLiveTvSourceRequest(
+      baseUrl: baseUrl ?? this.baseUrl,
+      countries: countries ?? this.countries,
+    );
+  }
+
+  UpdateLiveTvSourceRequest copyWithWrapped({
+    Wrapped<String?>? baseUrl,
+    Wrapped<List<String>?>? countries,
+  }) {
+    return UpdateLiveTvSourceRequest(
+      baseUrl: (baseUrl != null ? baseUrl.value : this.baseUrl),
+      countries: (countries != null ? countries.value : this.countries),
     );
   }
 }

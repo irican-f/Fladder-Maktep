@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/providers/jellybot_api_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/screens/shared/nested_scaffold.dart';
 import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
 import 'package:fladder/util/localization_helper.dart';
@@ -73,17 +74,13 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
       if (response.isSuccessful) {
         await _loadJobs();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.localized.jellybotJobTriggered(jobType))),
-          );
+          FladderSnack.show(context.localized.jellybotJobTriggered(jobType), context: context);
         }
       }
     } catch (e) {
       debugPrint('Error triggering job: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.localized.jellybotErrorTriggeringJob)),
-        );
+        FladderSnack.show(context.localized.jellybotErrorTriggeringJob, context: context);
       }
     } finally {
       setState(() => _isLoading = false);
@@ -116,9 +113,7 @@ class _JellybotAdminPageState extends ConsumerState<JellybotAdminPage> {
       await api.apiJobsDelete(body: job);
       await _loadJobs();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.localized.jellybotJobCancelled)),
-        );
+        FladderSnack.show(context.localized.jellybotJobCancelled, context: context);
       }
     } catch (e) {
       debugPrint('Error cancelling job: $e');
@@ -581,9 +576,7 @@ class _ServerUrlCardState extends ConsumerState<_ServerUrlCard> {
                   onPressed: () async {
                     await ref.read(jellybotBaseUrlProvider.notifier).setUrl(_controller.text);
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(context.localized.jellybotServerUrlUpdated)),
-                      );
+                      FladderSnack.show(context.localized.jellybotServerUrlUpdated, context: context);
                     }
                   },
                   icon: const Icon(IconsaxPlusLinear.tick_circle),
@@ -598,9 +591,7 @@ class _ServerUrlCardState extends ConsumerState<_ServerUrlCard> {
                   await ref.read(jellybotBaseUrlProvider.notifier).resetToDefault();
                   _controller.text = ref.read(jellybotBaseUrlProvider);
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(context.localized.jellybotServerUrlReset)),
-                    );
+                    FladderSnack.show(context.localized.jellybotServerUrlReset, context: context);
                   }
                 },
                 icon: const Icon(IconsaxPlusLinear.refresh),

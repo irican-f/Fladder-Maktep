@@ -3,37 +3,39 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
+import 'package:fladder/models/jellybot/jellybot_url_matcher.dart';
 import 'package:fladder/providers/jellybot_search_provider.dart';
 import 'package:fladder/screens/jellybot/widgets/already_added_badge.dart';
+import 'package:fladder/screens/jellybot/widgets/jellybot_meta_chip.dart';
 import 'package:fladder/screens/jellybot/widgets/language_badge.dart';
 import 'package:fladder/screens/jellybot/widgets/quality_badge.dart';
+import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/util/localization_helper.dart';
 
 class SearchResultCard extends ConsumerWidget {
   final ProviderSearchItemDto item;
   final IProvider? provider;
-  final bool isAdding;
   final VoidCallback? onAdd;
 
   const SearchResultCard({
     super.key,
     required this.item,
     required this.provider,
-    required this.isAdding,
     required this.onAdd,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final addedUrls = ref.watch(addedCrawlLinkUrlsProvider).valueOrNull ?? const <String>{};
-    final isAlreadyAdded = item.url != null && addedUrls.contains(item.url);
+    final addedKeys = ref.watch(addedCrawlLinkUrlsProvider).valueOrNull ?? const <String>{};
+    final itemKey = normalizeCrawlUrlKey(item.url);
+    final isAlreadyAdded = itemKey != null && addedKeys.contains(itemKey);
     final scheme = Theme.of(context).colorScheme;
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: (isAdding || isAlreadyAdded) ? null : onAdd,
+        onTap: isAlreadyAdded ? null : onAdd,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -60,14 +62,27 @@ class SearchResultCard extends ConsumerWidget {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         if (item.season != null)
-                          _MetaChip(
+                          JellybotMetaChip(
                             icon: IconsaxPlusLinear.video_play,
                             label: '${context.localized.season(1)} ${item.season}',
                           ),
                         if ((item.quality ?? '').isNotEmpty) QualityBadge(quality: item.quality!),
                         if ((item.language ?? '').isNotEmpty) LanguageBadge(language: item.language!),
+                        if (item.year != null)
+                          JellybotMetaChip(
+                            icon: IconsaxPlusLinear.calendar_1,
+                            label: '${item.year}',
+                          ),
+                        if (item.score != null)
+                          Tooltip(
+                            message: context.localized.jellybotMatchScore,
+                            child: JellybotMetaChip(
+                              icon: IconsaxPlusLinear.activity,
+                              label: '${(item.score! * 100).round()}%',
+                            ),
+                          ),
                         if (provider != null && (provider!.displayName ?? provider!.name) != null)
-                          _MetaChip(
+                          JellybotMetaChip(
                             icon: IconsaxPlusLinear.global,
                             label: provider!.displayName ?? provider!.name!,
                           ),
@@ -88,23 +103,11 @@ class SearchResultCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              if (isAdding)
-                const SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Padding(
-                    padding: EdgeInsets.all(8),
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                )
-              else if (isAlreadyAdded)
-                Tooltip(
-                  message: context.localized.jellybotAlreadyAdded,
-                  child: Icon(
-                    IconsaxPlusBold.tick_circle,
-                    color: scheme.tertiary,
-                    size: 28,
-                  ),
+              if (isAlreadyAdded)
+                IconButton(
+                  onPressed: () => FladderSnack.show(context.localized.jellybotLinkAlreadyExists, context: context),
+                  tooltip: context.localized.jellybotAlreadyAdded,
+                  icon: Icon(IconsaxPlusBold.tick_circle, color: scheme.tertiary, size: 28),
                 )
               else
                 IconButton.filled(
@@ -154,37 +157,6 @@ class _Thumbnail extends StatelessWidget {
             child: AlreadyAddedBadge(),
           ),
       ],
-    );
-  }
-}
-
-class _MetaChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _MetaChip({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: scheme.onSurfaceVariant),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-          ),
-        ],
-      ),
     );
   }
 }

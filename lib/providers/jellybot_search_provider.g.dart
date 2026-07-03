@@ -182,12 +182,12 @@ class _JellybotSearchFiltersProviderElement extends AutoDisposeFutureProviderEle
   MediaCategory get category => (origin as JellybotSearchFiltersProvider).category;
 }
 
-String _$addedCrawlLinkUrlsHash() => r'78719257ff1310f84b9fee8828930fb17a562fb2';
+String _$addedCrawlLinkUrlsHash() => r'a15d2a5a7d10dc382ba5f332ec7769873659752f';
 
-/// Set of crawl-link `fullUrl` values currently added by the user — backs the
-/// "Already in your library" badge on search-result cards. Paginated through
-/// in pages of 200 to avoid huge payloads on libraries with many links.
-/// Invalidate after a successful add to refresh the badging.
+/// Normalized URL keys (see [normalizeCrawlUrlKey]) of every crawl link the
+/// server knows — backs the "already added" badge on search-result cards.
+/// Page 0 is fetched first to learn totalPages, remaining pages concurrently.
+/// Invalidated after every successful add (and on 409s) to refresh badging.
 ///
 /// Copied from [addedCrawlLinkUrls].
 @ProviderFor(addedCrawlLinkUrls)

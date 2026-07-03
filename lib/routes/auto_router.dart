@@ -99,6 +99,9 @@ final List<AutoRoute> _jellybotChildren = [
   AutoRoute(page: JellybotProviderSearchRoute.page, path: 'search'),
   AutoRoute(page: JellybotCrawlLinksRoute.page, path: 'links'),
   AutoRoute(page: JellybotDownloadsRoute.page, path: 'downloads'),
+  AutoRoute(page: JellybotApiClientsRoute.page, path: 'api-clients'),
+  AutoRoute(page: JellybotProvidersRoute.page, path: 'providers'),
+  AutoRoute(page: JellybotLiveTvSourceRoute.page, path: 'live-tv-source'),
   AutoRoute(page: JellybotAdminRoute.page, path: 'admin'),
 ];
 

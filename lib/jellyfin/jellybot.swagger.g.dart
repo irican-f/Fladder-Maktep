@@ -6,6 +6,125 @@ part of 'jellybot.swagger.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+ApiClientDto _$ApiClientDtoFromJson(Map<String, dynamic> json) => ApiClientDto(
+      id: json['id'] as String?,
+      name: json['name'] as String?,
+      type: json['type'] as String?,
+      baseUrl: json['baseUrl'] as String?,
+      username: json['username'] as String?,
+      hasApiKey: json['hasApiKey'] as bool?,
+      hasPassword: json['hasPassword'] as bool?,
+      isEnabled: json['isEnabled'] as bool?,
+      isActive: json['isActive'] as bool?,
+      subscriptionExpiresAt:
+          json['subscriptionExpiresAt'] == null ? null : DateTime.parse(json['subscriptionExpiresAt'] as String),
+      priority: (json['priority'] as num?)?.toInt(),
+      maxConcurrentRequests: (json['maxConcurrentRequests'] as num?)?.toInt(),
+      rateLimitPerMinute: (json['rateLimitPerMinute'] as num?)?.toInt(),
+      isTorrentClient: json['isTorrentClient'] as bool?,
+      createdAt: json['createdAt'] == null ? null : DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] == null ? null : DateTime.parse(json['updatedAt'] as String),
+    );
+
+Map<String, dynamic> _$ApiClientDtoToJson(ApiClientDto instance) => <String, dynamic>{
+      if (instance.id case final value?) 'id': value,
+      if (instance.name case final value?) 'name': value,
+      if (instance.type case final value?) 'type': value,
+      if (instance.baseUrl case final value?) 'baseUrl': value,
+      if (instance.username case final value?) 'username': value,
+      if (instance.hasApiKey case final value?) 'hasApiKey': value,
+      if (instance.hasPassword case final value?) 'hasPassword': value,
+      if (instance.isEnabled case final value?) 'isEnabled': value,
+      if (instance.isActive case final value?) 'isActive': value,
+      if (instance.subscriptionExpiresAt?.toIso8601String() case final value?) 'subscriptionExpiresAt': value,
+      if (instance.priority case final value?) 'priority': value,
+      if (instance.maxConcurrentRequests case final value?) 'maxConcurrentRequests': value,
+      if (instance.rateLimitPerMinute case final value?) 'rateLimitPerMinute': value,
+      if (instance.isTorrentClient case final value?) 'isTorrentClient': value,
+      if (instance.createdAt?.toIso8601String() case final value?) 'createdAt': value,
+      if (instance.updatedAt?.toIso8601String() case final value?) 'updatedAt': value,
+    };
+
+ProblemDetails _$ProblemDetailsFromJson(Map<String, dynamic> json) => ProblemDetails(
+      type: json['type'] as String?,
+      title: json['title'] as String?,
+      status: (json['status'] as num?)?.toInt(),
+      detail: json['detail'] as String?,
+      instance: json['instance'] as String?,
+      extensions: json['extensions'] as Map<String, dynamic>?,
+    );
+
+Map<String, dynamic> _$ProblemDetailsToJson(ProblemDetails instance) => <String, dynamic>{
+      if (instance.type case final value?) 'type': value,
+      if (instance.title case final value?) 'title': value,
+      if (instance.status case final value?) 'status': value,
+      if (instance.detail case final value?) 'detail': value,
+      if (instance.instance case final value?) 'instance': value,
+      if (instance.extensions case final value?) 'extensions': value,
+    };
+
+CreateApiClientRequest _$CreateApiClientRequestFromJson(Map<String, dynamic> json) => CreateApiClientRequest(
+      name: json['name'] as String?,
+      type: json['type'] as String?,
+      baseUrl: json['baseUrl'] as String?,
+      apiKey: json['apiKey'] as String?,
+      username: json['username'] as String?,
+      password: json['password'] as String?,
+      isEnabled: json['isEnabled'] as bool?,
+      subscriptionExpiresAt:
+          json['subscriptionExpiresAt'] == null ? null : DateTime.parse(json['subscriptionExpiresAt'] as String),
+      priority: (json['priority'] as num?)?.toInt(),
+      maxConcurrentRequests: (json['maxConcurrentRequests'] as num?)?.toInt(),
+      rateLimitPerMinute: (json['rateLimitPerMinute'] as num?)?.toInt(),
+      isTorrentClient: json['isTorrentClient'] as bool?,
+    );
+
+Map<String, dynamic> _$CreateApiClientRequestToJson(CreateApiClientRequest instance) => <String, dynamic>{
+      if (instance.name case final value?) 'name': value,
+      if (instance.type case final value?) 'type': value,
+      if (instance.baseUrl case final value?) 'baseUrl': value,
+      if (instance.apiKey case final value?) 'apiKey': value,
+      if (instance.username case final value?) 'username': value,
+      if (instance.password case final value?) 'password': value,
+      if (instance.isEnabled case final value?) 'isEnabled': value,
+      if (instance.subscriptionExpiresAt?.toIso8601String() case final value?) 'subscriptionExpiresAt': value,
+      if (instance.priority case final value?) 'priority': value,
+      if (instance.maxConcurrentRequests case final value?) 'maxConcurrentRequests': value,
+      if (instance.rateLimitPerMinute case final value?) 'rateLimitPerMinute': value,
+      if (instance.isTorrentClient case final value?) 'isTorrentClient': value,
+    };
+
+UpdateApiClientRequest _$UpdateApiClientRequestFromJson(Map<String, dynamic> json) => UpdateApiClientRequest(
+      name: json['name'] as String?,
+      type: json['type'] as String?,
+      baseUrl: json['baseUrl'] as String?,
+      apiKey: json['apiKey'] as String?,
+      username: json['username'] as String?,
+      password: json['password'] as String?,
+      isEnabled: json['isEnabled'] as bool?,
+      subscriptionExpiresAt:
+          json['subscriptionExpiresAt'] == null ? null : DateTime.parse(json['subscriptionExpiresAt'] as String),
+      priority: (json['priority'] as num?)?.toInt(),
+      maxConcurrentRequests: (json['maxConcurrentRequests'] as num?)?.toInt(),
+      rateLimitPerMinute: (json['rateLimitPerMinute'] as num?)?.toInt(),
+      isTorrentClient: json['isTorrentClient'] as bool?,
+    );
+
+Map<String, dynamic> _$UpdateApiClientRequestToJson(UpdateApiClientRequest instance) => <String, dynamic>{
+      if (instance.name case final value?) 'name': value,
+      if (instance.type case final value?) 'type': value,
+      if (instance.baseUrl case final value?) 'baseUrl': value,
+      if (instance.apiKey case final value?) 'apiKey': value,
+      if (instance.username case final value?) 'username': value,
+      if (instance.password case final value?) 'password': value,
+      if (instance.isEnabled case final value?) 'isEnabled': value,
+      if (instance.subscriptionExpiresAt?.toIso8601String() case final value?) 'subscriptionExpiresAt': value,
+      if (instance.priority case final value?) 'priority': value,
+      if (instance.maxConcurrentRequests case final value?) 'maxConcurrentRequests': value,
+      if (instance.rateLimitPerMinute case final value?) 'rateLimitPerMinute': value,
+      if (instance.isTorrentClient case final value?) 'isTorrentClient': value,
+    };
+
 PaginatedResponseOfCrawlLinkDto _$PaginatedResponseOfCrawlLinkDtoFromJson(Map<String, dynamic> json) =>
     PaginatedResponseOfCrawlLinkDto(
       currentPage: (json['currentPage'] as num?)?.toInt(),
@@ -110,6 +229,7 @@ ExtractMediaResponse _$ExtractMediaResponseFromJson(Map<String, dynamic> json) =
       availableSeasons: (json['availableSeasons'] as num?)?.toInt(),
       mediaTitle: json['mediaTitle'] as String?,
       originalUrl: json['originalUrl'] as String?,
+      addToken: json['addToken'] as String?,
       crawlLink: json['crawlLink'],
       mediaExistsOnServer: json['mediaExistsOnServer'] as bool?,
       requiresExistenceConfirmation: json['requiresExistenceConfirmation'] as bool?,
@@ -121,6 +241,7 @@ Map<String, dynamic> _$ExtractMediaResponseToJson(ExtractMediaResponse instance)
       if (instance.availableSeasons case final value?) 'availableSeasons': value,
       if (instance.mediaTitle case final value?) 'mediaTitle': value,
       if (instance.originalUrl case final value?) 'originalUrl': value,
+      if (instance.addToken case final value?) 'addToken': value,
       if (instance.crawlLink case final value?) 'crawlLink': value,
       if (instance.mediaExistsOnServer case final value?) 'mediaExistsOnServer': value,
       if (instance.requiresExistenceConfirmation case final value?) 'requiresExistenceConfirmation': value,
@@ -143,24 +264,6 @@ Map<String, dynamic> _$MediaSearchResultDtoToJson(MediaSearchResultDto instance)
       if (instance.productionYear case final value?) 'productionYear': value,
       if (instance.isShow case final value?) 'isShow': value,
       if (instance.mediaUrl case final value?) 'mediaUrl': value,
-    };
-
-ProblemDetails _$ProblemDetailsFromJson(Map<String, dynamic> json) => ProblemDetails(
-      type: json['type'] as String?,
-      title: json['title'] as String?,
-      status: (json['status'] as num?)?.toInt(),
-      detail: json['detail'] as String?,
-      instance: json['instance'] as String?,
-      extensions: json['extensions'] as Map<String, dynamic>?,
-    );
-
-Map<String, dynamic> _$ProblemDetailsToJson(ProblemDetails instance) => <String, dynamic>{
-      if (instance.type case final value?) 'type': value,
-      if (instance.title case final value?) 'title': value,
-      if (instance.status case final value?) 'status': value,
-      if (instance.detail case final value?) 'detail': value,
-      if (instance.instance case final value?) 'instance': value,
-      if (instance.extensions case final value?) 'extensions': value,
     };
 
 ExtractMediaRequest _$ExtractMediaRequestFromJson(Map<String, dynamic> json) => ExtractMediaRequest(
@@ -195,13 +298,13 @@ Map<String, dynamic> _$SelectSeasonRequestToJson(SelectSeasonRequest instance) =
 
 ExtractMediaConfirmationRequest _$ExtractMediaConfirmationRequestFromJson(Map<String, dynamic> json) =>
     ExtractMediaConfirmationRequest(
-      crawlLinkId: json['crawlLinkId'] as String?,
+      addToken: json['addToken'] as String?,
       mediaTitle: json['mediaTitle'] as String?,
     );
 
 Map<String, dynamic> _$ExtractMediaConfirmationRequestToJson(ExtractMediaConfirmationRequest instance) =>
     <String, dynamic>{
-      if (instance.crawlLinkId case final value?) 'crawlLinkId': value,
+      if (instance.addToken case final value?) 'addToken': value,
       if (instance.mediaTitle case final value?) 'mediaTitle': value,
     };
 
@@ -632,6 +735,22 @@ Map<String, dynamic> _$IExtractedItemInfoToJson(IExtractedItemInfo instance) => 
       if (instance.thumbnailUrl case final value?) 'thumbnailUrl': value,
     };
 
+UpdateProviderRequest _$UpdateProviderRequestFromJson(Map<String, dynamic> json) => UpdateProviderRequest(
+      displayName: json['displayName'] as String?,
+      url: json['url'] as String?,
+      enabled: json['enabled'] as bool?,
+      searchEnabled: json['searchEnabled'] as bool?,
+      isManuallyDisabled: json['isManuallyDisabled'] as bool?,
+    );
+
+Map<String, dynamic> _$UpdateProviderRequestToJson(UpdateProviderRequest instance) => <String, dynamic>{
+      if (instance.displayName case final value?) 'displayName': value,
+      if (instance.url case final value?) 'url': value,
+      if (instance.enabled case final value?) 'enabled': value,
+      if (instance.searchEnabled case final value?) 'searchEnabled': value,
+      if (instance.isManuallyDisabled case final value?) 'isManuallyDisabled': value,
+    };
+
 ISearchFilter _$ISearchFilterFromJson(Map<String, dynamic> json) => ISearchFilter(
       label: json['label'] as String?,
       name: json['name'] as String?,
@@ -692,6 +811,8 @@ ProviderSearchItemDto _$ProviderSearchItemDtoFromJson(Map<String, dynamic> json)
       season: (json['season'] as num?)?.toInt(),
       quality: json['quality'] as String?,
       language: json['language'] as String?,
+      year: (json['year'] as num?)?.toInt(),
+      score: (json['score'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$ProviderSearchItemDtoToJson(ProviderSearchItemDto instance) => <String, dynamic>{
@@ -702,6 +823,8 @@ Map<String, dynamic> _$ProviderSearchItemDtoToJson(ProviderSearchItemDto instanc
       if (instance.season case final value?) 'season': value,
       if (instance.quality case final value?) 'quality': value,
       if (instance.language case final value?) 'language': value,
+      if (instance.year case final value?) 'year': value,
+      if (instance.score case final value?) 'score': value,
     };
 
 ApiMediaSearchRequest _$ApiMediaSearchRequestFromJson(Map<String, dynamic> json) => ApiMediaSearchRequest(
@@ -757,6 +880,28 @@ Map<String, dynamic> _$MediaSearchRequestToJson(MediaSearchRequest instance) => 
       if (mediaCategoryNullableToJson(instance.category) case final value?) 'category': value,
       if (instance.exactMatch case final value?) 'exactMatch': value,
       if (instance.minScore case final value?) 'minScore': value,
+    };
+
+LiveTvSourceResult _$LiveTvSourceResultFromJson(Map<String, dynamic> json) => LiveTvSourceResult(
+      baseUrl: json['baseUrl'] as String?,
+      countries: (json['countries'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      fromDatabase: json['fromDatabase'] as bool?,
+    );
+
+Map<String, dynamic> _$LiveTvSourceResultToJson(LiveTvSourceResult instance) => <String, dynamic>{
+      if (instance.baseUrl case final value?) 'baseUrl': value,
+      if (instance.countries case final value?) 'countries': value,
+      if (instance.fromDatabase case final value?) 'fromDatabase': value,
+    };
+
+UpdateLiveTvSourceRequest _$UpdateLiveTvSourceRequestFromJson(Map<String, dynamic> json) => UpdateLiveTvSourceRequest(
+      baseUrl: json['baseUrl'] as String?,
+      countries: (json['countries'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+    );
+
+Map<String, dynamic> _$UpdateLiveTvSourceRequestToJson(UpdateLiveTvSourceRequest instance) => <String, dynamic>{
+      if (instance.baseUrl case final value?) 'baseUrl': value,
+      if (instance.countries case final value?) 'countries': value,
     };
 
 ApiTorrentsUploadPost$RequestBody _$ApiTorrentsUploadPost$RequestBodyFromJson(Map<String, dynamic> json) =>

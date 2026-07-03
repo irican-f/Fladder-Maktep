@@ -63,6 +63,170 @@
         }
       }
     },
+    "/api/api-clients": {
+      "get": {
+        "tags": [
+          "ApiClient"
+        ],
+        "summary": "Lists every configured api client. Secrets are never returned.",
+        "operationId": "ApiClient_GetApiClients",
+        "responses": {
+          "200": {
+            "description": "Api clients returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiClientDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "ApiClient"
+        ],
+        "summary": "Creates a new api client.",
+        "operationId": "ApiClient_CreateApiClient",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApiClientRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Api client created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiClientDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or duplicate name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/api-clients/{apiClientId}": {
+      "put": {
+        "tags": [
+          "ApiClient"
+        ],
+        "summary": "Updates an api client. Secrets are overwritten only when a new value is sent.",
+        "operationId": "ApiClient_UpdateApiClient",
+        "parameters": [
+          {
+            "name": "apiClientId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApiClientRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "Api client updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiClientDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Api client not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ApiClient"
+        ],
+        "summary": "Deletes an api client.",
+        "operationId": "ApiClient_DeleteApiClient",
+        "parameters": [
+          {
+            "name": "apiClientId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Api client deleted"
+          },
+          "404": {
+            "description": "Api client not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/crawl-links": {
       "get": {
         "tags": [
@@ -159,7 +323,7 @@
         "tags": [
           "CrawlLink"
         ],
-        "summary": "Extracts media information from a URL. If the URL points to a show page with multiple seasons,\nthe response will indicate that season selection is required. In that case, call the select-season\nendpoint with the chosen season number before calling confirm-add.",
+        "summary": "Extracts media information from a URL without persisting anything. If the URL points to a show\npage with multiple seasons, the response indicates that season selection is required — call the\nselect-season endpoint with the chosen season. Otherwise the response carries an addToken; pass\nit to confirm-add to commit the link.",
         "operationId": "CrawlLink_AddCrawlLink",
         "requestBody": {
           "x-name": "extractMediaRequest",
@@ -176,7 +340,7 @@
         },
         "responses": {
           "200": {
-            "description": "Extraction result returned (check requiresSeasonSelection)",
+            "description": "Extraction result returned (check requiresSeasonSelection / addToken)",
             "content": {
               "application/json": {
                 "schema": {
@@ -187,6 +351,16 @@
           },
           "400": {
             "description": "Provider not supported or extraction failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A link for this URL is already added",
             "content": {
               "application/json": {
                 "schema": {
@@ -238,7 +412,7 @@
         "tags": [
           "CrawlLink"
         ],
-        "summary": "Selects a season for a show page URL and creates the crawl link. Call this endpoint when\nthe initial extraction returned requiresSeasonSelection = true.",
+        "summary": "Selects a season for a show page URL and previews the crawl link (without persisting). Call this\nwhen the initial extraction returned requiresSeasonSelection = true.",
         "operationId": "CrawlLink_SelectSeason",
         "requestBody": {
           "x-name": "selectSeasonRequest",
@@ -255,7 +429,7 @@
         },
         "responses": {
           "200": {
-            "description": "Crawl link created for the selected season (check mediaExistsOnServer for duplicates)",
+            "description": "Preview returned with an add token (check mediaExistsOnServer for duplicates)",
             "content": {
               "application/json": {
                 "schema": {
@@ -273,6 +447,16 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "A link for this URL is already added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -282,11 +466,11 @@
         "tags": [
           "CrawlLink"
         ],
-        "summary": "Saves a crawl link to the database, this endpoint should be called after calling the add link endpoint.",
+        "summary": "Commits a previously-previewed crawl link to the database. Call after add or select-season,\npassing the addToken from that response.",
         "operationId": "CrawlLink_ConfirmCrawlLink",
         "requestBody": {
           "x-name": "confirmationRequest",
-          "description": "The request containing the id of the crawl link and an optional title.",
+          "description": "The request containing the add token and an optional title.",
           "content": {
             "application/json": {
               "schema": {
@@ -308,8 +492,8 @@
               }
             }
           },
-          "404": {
-            "description": "No crawl link found for the given id",
+          "409": {
+            "description": "A link for this URL is already added",
             "content": {
               "application/json": {
                 "schema": {
@@ -318,8 +502,8 @@
               }
             }
           },
-          "409": {
-            "description": "Error when saving to database",
+          "410": {
+            "description": "The preview expired or the token was already used — add the link again",
             "content": {
               "application/json": {
                 "schema": {
@@ -799,26 +983,6 @@
         }
       }
     },
-    "/api/iptv/atlas-pro": {
-      "get": {
-        "tags": [
-          "Iptv"
-        ],
-        "operationId": "Iptv_GetAtlasProPlaylist",
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/jobs": {
       "get": {
         "tags": [
@@ -1116,6 +1280,85 @@
         }
       }
     },
+    "/api/providers/all": {
+      "get": {
+        "tags": [
+          "Provider"
+        ],
+        "summary": "Gets every provider regardless of enabled state (management view).",
+        "operationId": "Provider_GetAllProviders",
+        "responses": {
+          "200": {
+            "description": "Providers returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IProvider"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/providers/{providerId}": {
+      "put": {
+        "tags": [
+          "Provider"
+        ],
+        "summary": "Updates a provider's configuration.",
+        "operationId": "Provider_UpdateProvider",
+        "parameters": [
+          {
+            "name": "providerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProviderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "Provider updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IProvider"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Provider not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/providers/{providerId}/search-filters": {
       "get": {
         "tags": [
@@ -1227,6 +1470,82 @@
         }
       }
     },
+    "/api/settings/live-tv-source": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Gets the Live TV channel source (DB value, or config fallback when never saved).",
+        "operationId": "Settings_GetLiveTvSource",
+        "responses": {
+          "200": {
+            "description": "Live TV source returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiveTvSourceResult"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Updates the Live TV channel source. Applies from the next LiveTvChannelsJob run.",
+        "operationId": "Settings_UpdateLiveTvSource",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLiveTvSourceRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "Live TV source updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiveTvSourceResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/settings/live-tv-source/countries": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "summary": "Gets the list of countries the current Live TV source exposes (empty if it can't be reached).",
+        "operationId": "Settings_GetLiveTvSourceCountries",
+        "responses": {
+          "200": {
+            "description": "Available countries returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/torrents/upload": {
       "post": {
         "tags": [
@@ -1280,6 +1599,212 @@
   },
   "components": {
     "schemas": {
+      "ApiClientDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "hasApiKey": {
+            "type": "boolean"
+          },
+          "hasPassword": {
+            "type": "boolean"
+          },
+          "isEnabled": {
+            "type": "boolean"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "subscriptionExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxConcurrentRequests": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rateLimitPerMinute": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isTorrentClient": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "additionalProperties": {
+          "nullable": true
+        },
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          },
+          "extensions": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        }
+      },
+      "CreateApiClientRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "baseUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "isEnabled": {
+            "type": "boolean"
+          },
+          "subscriptionExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxConcurrentRequests": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rateLimitPerMinute": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isTorrentClient": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateApiClientRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "baseUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "apiKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "subscriptionExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "priority": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "maxConcurrentRequests": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "rateLimitPerMinute": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isTorrentClient": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
       "PaginatedResponseOfCrawlLinkDto": {
         "type": "object",
         "additionalProperties": false,
@@ -1507,6 +2032,10 @@
           "originalUrl": {
             "type": "string"
           },
+          "addToken": {
+            "type": "string",
+            "nullable": true
+          },
           "crawlLink": {
             "nullable": true,
             "oneOf": [
@@ -1559,39 +2088,6 @@
           }
         }
       },
-      "ProblemDetails": {
-        "type": "object",
-        "additionalProperties": {
-          "nullable": true
-        },
-        "properties": {
-          "type": {
-            "type": "string",
-            "nullable": true
-          },
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "detail": {
-            "type": "string",
-            "nullable": true
-          },
-          "instance": {
-            "type": "string",
-            "nullable": true
-          },
-          "extensions": {
-            "type": "object",
-            "additionalProperties": {}
-          }
-        }
-      },
       "ExtractMediaRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -1636,9 +2132,8 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "crawlLinkId": {
-            "type": "string",
-            "format": "guid"
+          "addToken": {
+            "type": "string"
           },
           "mediaTitle": {
             "type": "string",
@@ -1936,7 +2431,8 @@
           "Documentary",
           "Music",
           "News",
-          "Other"
+          "Other",
+          "Entertainment"
         ],
         "enum": [
           0,
@@ -1946,7 +2442,8 @@
           4,
           5,
           6,
-          7
+          7,
+          8
         ]
       },
       "DebridLinkResult": {
@@ -2416,6 +2913,32 @@
           }
         }
       },
+      "UpdateProviderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "nullable": true
+          },
+          "enabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "searchEnabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isManuallyDisabled": {
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
       "ISearchFilter": {
         "type": "object",
         "x-abstract": true,
@@ -2510,6 +3033,16 @@
           "language": {
             "type": "string",
             "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "score": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },
@@ -2582,6 +3115,40 @@
             "type": "number",
             "format": "decimal",
             "nullable": true
+          }
+        }
+      },
+      "LiveTvSourceResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "baseUrl": {
+            "type": "string"
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fromDatabase": {
+            "type": "boolean",
+            "description": "False when the values come from the config-file fallback (nothing saved yet)."
+          }
+        }
+      },
+      "UpdateLiveTvSourceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "baseUrl": {
+            "type": "string"
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }

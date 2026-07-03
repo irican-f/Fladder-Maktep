@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
+import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
 import 'package:fladder/screens/settings/settings_list_tile.dart';
 import 'package:fladder/screens/settings/settings_scaffold.dart';
@@ -71,6 +72,8 @@ class _JellybotScreenState extends ConsumerState<JellybotScreen> {
     bool containsRoute(PageRouteInfo route) =>
         AdaptiveLayout.layoutModeOf(context) == LayoutMode.dual && context.tabsRouter.current.name == route.routeName;
 
+    final isAdmin = ref.watch(userProvider.select((value) => value?.policy?.isAdministrator ?? false));
+
     return Padding(
       padding: EdgeInsets.only(left: AdaptiveLayout.of(context).sideBarWidth),
       child: Container(
@@ -102,6 +105,29 @@ class _JellybotScreenState extends ConsumerState<JellybotScreen> {
               icon: IconsaxPlusLinear.arrow_down_2,
               onTap: () => navigateTo(const JellybotDownloadsRoute()),
             ),
+            if (isAdmin) ...[
+              SettingsListTile(
+                label: Text(context.localized.jellybotApiClients),
+                subLabel: Text(context.localized.jellybotApiClientsDesc),
+                selected: containsRoute(const JellybotApiClientsRoute()),
+                icon: IconsaxPlusLinear.cloud,
+                onTap: () => navigateTo(const JellybotApiClientsRoute()),
+              ),
+              SettingsListTile(
+                label: Text(context.localized.jellybotProvidersManage),
+                subLabel: Text(context.localized.jellybotProvidersManageDesc),
+                selected: containsRoute(const JellybotProvidersRoute()),
+                icon: IconsaxPlusLinear.global_edit,
+                onTap: () => navigateTo(const JellybotProvidersRoute()),
+              ),
+              SettingsListTile(
+                label: Text(context.localized.jellybotLiveTvSource),
+                subLabel: Text(context.localized.jellybotLiveTvSourceDesc),
+                selected: containsRoute(const JellybotLiveTvSourceRoute()),
+                icon: IconsaxPlusLinear.monitor,
+                onTap: () => navigateTo(const JellybotLiveTvSourceRoute()),
+              ),
+            ],
             SettingsListTile(
               label: Text(context.localized.jellybotAdmin),
               subLabel: Text(context.localized.jellybotAdminDesc),

@@ -43,6 +43,57 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
+  Future<Response<List<ApiClientDto>>> _apiApiClientsGet() {
+    final Uri $url = Uri.parse('/api/api-clients');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<List<ApiClientDto>, ApiClientDto>($request);
+  }
+
+  @override
+  Future<Response<ApiClientDto>> _apiApiClientsPost({required CreateApiClientRequest? body}) {
+    final Uri $url = Uri.parse('/api/api-clients');
+    final $body = body;
+    final Request $request = Request(
+      'POST',
+      $url,
+      client.baseUrl,
+      body: $body,
+    );
+    return client.send<ApiClientDto, ApiClientDto>($request);
+  }
+
+  @override
+  Future<Response<ApiClientDto>> _apiApiClientsApiClientIdPut({
+    required String? apiClientId,
+    required UpdateApiClientRequest? body,
+  }) {
+    final Uri $url = Uri.parse('/api/api-clients/${apiClientId}');
+    final $body = body;
+    final Request $request = Request(
+      'PUT',
+      $url,
+      client.baseUrl,
+      body: $body,
+    );
+    return client.send<ApiClientDto, ApiClientDto>($request);
+  }
+
+  @override
+  Future<Response<dynamic>> _apiApiClientsApiClientIdDelete({required String? apiClientId}) {
+    final Uri $url = Uri.parse('/api/api-clients/${apiClientId}');
+    final Request $request = Request(
+      'DELETE',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
   Future<Response<PaginatedResponseOfCrawlLinkDto>> _apiCrawlLinksGet({
     int? page,
     int? limit,
@@ -269,17 +320,6 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<String>> _apiIptvAtlasProGet() {
-    final Uri $url = Uri.parse('/api/iptv/atlas-pro');
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-    );
-    return client.send<String, String>($request);
-  }
-
-  @override
   Future<Response<List<ScheduledJob>>> _apiJobsGet() {
     final Uri $url = Uri.parse('/api/jobs');
     final Request $request = Request(
@@ -391,6 +431,33 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
+  Future<Response<List<IProvider>>> _apiProvidersAllGet() {
+    final Uri $url = Uri.parse('/api/providers/all');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<List<IProvider>, IProvider>($request);
+  }
+
+  @override
+  Future<Response<IProvider>> _apiProvidersProviderIdPut({
+    required String? providerId,
+    required UpdateProviderRequest? body,
+  }) {
+    final Uri $url = Uri.parse('/api/providers/${providerId}');
+    final $body = body;
+    final Request $request = Request(
+      'PUT',
+      $url,
+      client.baseUrl,
+      body: $body,
+    );
+    return client.send<IProvider, IProvider>($request);
+  }
+
+  @override
   Future<Response<List<ISearchFilter>>> _apiProvidersProviderIdSearchFiltersGet({
     required String? providerId,
     String? mediaCategory,
@@ -420,6 +487,41 @@ final class _$Jellybot extends Jellybot {
       body: $body,
     );
     return client.send<PaginatedResponseOfProviderSearchItemDto, PaginatedResponseOfProviderSearchItemDto>($request);
+  }
+
+  @override
+  Future<Response<LiveTvSourceResult>> _apiSettingsLiveTvSourceGet() {
+    final Uri $url = Uri.parse('/api/settings/live-tv-source');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<LiveTvSourceResult, LiveTvSourceResult>($request);
+  }
+
+  @override
+  Future<Response<LiveTvSourceResult>> _apiSettingsLiveTvSourcePut({required UpdateLiveTvSourceRequest? body}) {
+    final Uri $url = Uri.parse('/api/settings/live-tv-source');
+    final $body = body;
+    final Request $request = Request(
+      'PUT',
+      $url,
+      client.baseUrl,
+      body: $body,
+    );
+    return client.send<LiveTvSourceResult, LiveTvSourceResult>($request);
+  }
+
+  @override
+  Future<Response<List<String>>> _apiSettingsLiveTvSourceCountriesGet() {
+    final Uri $url = Uri.parse('/api/settings/live-tv-source/countries');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<List<String>, String>($request);
   }
 
   @override

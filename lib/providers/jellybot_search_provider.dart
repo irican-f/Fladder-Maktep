@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/models/jellybot/jellybot_search_state.dart';
+import 'package:fladder/models/jellybot/jellybot_url_matcher.dart';
 import 'package:fladder/providers/jellybot_api_provider.dart';
 
 part 'jellybot_search_provider.g.dart';
@@ -34,29 +37,57 @@ Future<List<ISearchFilter>> jellybotSearchFilters(
   return response.body!;
 }
 
-/// Set of crawl-link `fullUrl` values currently added by the user — backs the
-/// "Already in your library" badge on search-result cards. Paginated through
-/// in pages of 200 to avoid huge payloads on libraries with many links.
-/// Invalidate after a successful add to refresh the badging.
+/// Normalized URL keys (see [normalizeCrawlUrlKey]) of every crawl link the
+/// server knows — backs the "already added" badge on search-result cards.
+/// Page 0 is fetched first to learn totalPages, remaining pages concurrently.
+/// Invalidated after every successful add (and on 409s) to refresh badging.
 @Riverpod(keepAlive: true)
 Future<Set<String>> addedCrawlLinkUrls(Ref ref) async {
   final api = ref.watch(jellybotApiProvider);
-  final urls = <String>{};
-  var page = 0;
-  while (true) {
-    final response = await api.apiCrawlLinksGet(page: page, limit: 200);
-    if (!response.isSuccessful || response.body == null) {
-      break;
-    }
-    final body = response.body!;
+  final keys = <String>{};
+
+  void collect(PaginatedResponseOfCrawlLinkDto body) {
     for (final item in body.items ?? const <CrawlLinkDto>[]) {
-      final url = item.fullUrl;
-      if (url != null && url.isNotEmpty) urls.add(url);
+      final key = normalizeCrawlUrlKey(item.relativeUrl) ?? normalizeCrawlUrlKey(item.fullUrl);
+      if (key != null) {
+        keys.add(key);
+      }
     }
-    if ((body.currentPage ?? 0) + 1 >= (body.totalPages ?? 0)) break;
-    page++;
   }
-  return urls;
+
+  Future<PaginatedResponseOfCrawlLinkDto?> fetchPage(int page) async {
+    try {
+      final response = await api.apiCrawlLinksGet(page: page, limit: 200);
+      if (response.isSuccessful) {
+        return response.body;
+      }
+    } catch (e) {
+      log('Failed to fetch crawl-links page $page', error: e);
+    }
+    return null;
+  }
+
+  final first = await fetchPage(0);
+  if (first == null) {
+    return keys;
+  }
+  collect(first);
+
+  // Fetch the remaining pages concurrently, but in bounded chunks so a large
+  // library doesn't fan out hundreds of simultaneous requests, and one flaky
+  // page only loses its own slice instead of the whole set.
+  const chunkSize = 6;
+  final totalPages = first.totalPages ?? 1;
+  for (var start = 1; start < totalPages; start += chunkSize) {
+    final end = (start + chunkSize) > totalPages ? totalPages : (start + chunkSize);
+    final bodies = await Future.wait([for (var page = start; page < end; page++) fetchPage(page)]);
+    for (final body in bodies) {
+      if (body != null) {
+        collect(body);
+      }
+    }
+  }
+  return keys;
 }
 
 /// Notifier holding the current search-request params (in `_state`) and the

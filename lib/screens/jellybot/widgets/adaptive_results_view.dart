@@ -7,14 +7,12 @@ import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
 class AdaptiveResultsView extends StatelessWidget {
   final List<ProviderSearchItemDto> items;
   final IProvider? provider;
-  final String? addingItemUrl;
   final void Function(ProviderSearchItemDto) onAdd;
 
   const AdaptiveResultsView({
     super.key,
     required this.items,
     required this.provider,
-    required this.addingItemUrl,
     required this.onAdd,
   });
 
@@ -38,8 +36,7 @@ class AdaptiveResultsView extends StatelessWidget {
             (context, index) => SearchResultCard(
               item: items[index],
               provider: provider,
-              isAdding: addingItemUrl == items[index].url,
-              onAdd: addingItemUrl != null ? null : () => onAdd(items[index]),
+              onAdd: () => onAdd(items[index]),
             ),
             childCount: items.length,
           ),
@@ -60,8 +57,7 @@ class AdaptiveResultsView extends StatelessWidget {
           (context, index) => SearchResultCard(
             item: items[index],
             provider: provider,
-            isAdding: addingItemUrl == items[index].url,
-            onAdd: addingItemUrl != null ? null : () => onAdd(items[index]),
+            onAdd: () => onAdd(items[index]),
           ),
           childCount: items.length,
         ),

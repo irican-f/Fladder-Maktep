@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/providers/jellybot_api_provider.dart';
+import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/screens/shared/nested_scaffold.dart';
 import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
 import 'package:fladder/util/localization_helper.dart';
@@ -102,9 +103,7 @@ class _JellybotDownloadsPageState extends ConsumerState<JellybotDownloadsPage> {
       await api.apiDownloadsDelete(url: download.url);
       _loadDownloads();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.localized.jellybotDownloadCancelled)),
-        );
+        FladderSnack.show(context.localized.jellybotDownloadCancelled, context: context);
       }
     } catch (e) {
       debugPrint('Error cancelling download: $e');
