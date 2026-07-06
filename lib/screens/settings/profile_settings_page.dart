@@ -20,6 +20,7 @@ import 'package:fladder/screens/settings/settings_list_tile.dart';
 import 'package:fladder/screens/settings/settings_scaffold.dart';
 import 'package:fladder/screens/settings/widgets/home_preferences_editors.dart';
 import 'package:fladder/screens/settings/widgets/password_reset_dialog.dart';
+import 'package:fladder/screens/settings/widgets/preferred_audio_track_setting.dart';
 import 'package:fladder/screens/settings/widgets/seerr_connection_dialog.dart';
 import 'package:fladder/screens/settings/widgets/settings_label_divider.dart';
 import 'package:fladder/screens/settings/widgets/settings_list_group.dart';
@@ -161,6 +162,14 @@ class _UserSettingsPageState extends ConsumerState<ProfileSettingsPage> with Wid
               label: Text(context.localized.password),
               onTap: () => openPasswordResetDialog(context),
             ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ...settingsListGroup(
+          context,
+          SettingsLabelDivider(label: context.localized.audio(1)),
+          [
+            const PreferredAudioTrackSetting(),
           ],
         ),
         const SizedBox(height: 16),

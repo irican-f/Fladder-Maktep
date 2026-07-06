@@ -39,6 +39,20 @@ abstract class BasePlayer {
   Future<Uint8List?> takeScreenshot();
   Future<int> setSubtitleTrack(SubStreamModel? model, PlaybackModel playbackModel);
   Future<int> setAudioTrack(AudioStreamModel? model, PlaybackModel playbackModel);
+
+  /// Whether this backend can report the tracks it is actually using
+  /// ([appliedAudioStreamIndex]/[appliedSubStreamIndex]) — lets callers skip
+  /// post-load verification entirely on backends that never can.
+  bool get supportsTrackVerification => false;
+
+  /// Jellyfin stream index of the audio track the player is *actually*
+  /// using, or null when the backend can't tell (then nothing is verified).
+  Future<int?> appliedAudioStreamIndex(PlaybackModel playbackModel) async => null;
+
+  /// Jellyfin stream index of the subtitle track the player is *actually*
+  /// using, or null when the backend can't tell (then nothing is verified).
+  Future<int?> appliedSubStreamIndex(PlaybackModel playbackModel) async => null;
+
   Future<void> resetTracksToAuto() async {}
   void applySubtitleSettings(SubtitleSettingsModel settings) {}
 

@@ -14,6 +14,7 @@ import 'package:fladder/models/syncplay/syncplay_models.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/settings/video_player_settings_provider.dart';
 import 'package:fladder/providers/syncplay/syncplay_provider.dart';
+import 'package:fladder/providers/track_preferences_provider.dart';
 import 'package:fladder/src/video_player_helper.g.dart' show PlaybackChangeSource, SyncPlayCommandType;
 import 'package:fladder/wrappers/media_control_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -332,6 +333,11 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
   }) async {
     final oldPlaybackModel = ref.read(playBackModel);
 
+    // Maktep: a new item starts a fresh manual-subtitle-override session.
+    if (oldPlaybackModel?.item.id != model.item.id) {
+      ref.read(manualSubtitleOverrideProvider.notifier).reset();
+    }
+
     if (_isSyncPlayActive) {
       // Null the old playback model BEFORE state.stop() so its
       // 1-second-delayed POST /Sessions/Playing/Stopped is suppressed
@@ -432,6 +438,9 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
               positionTicks: loadPositionTicks,
             );
       }
+      if (newPlaybackModel.playerHandlesTrackSelection) {
+        unawaited(_verifyAppliedTracks(newPlaybackModel));
+      }
       return true;
     } catch (e, stackTrace) {
       ref.read(syncPlayProvider.notifier).setPlayerBufferingState(false);
@@ -446,6 +455,48 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
     } finally {
       _isLoadingForSyncPlay = false;
     }
+  }
+
+  /// After a load where the player applies track selection itself
+  /// (direct/offline playback), compare the model's selection with the
+  /// tracks mpv actually ended up using — mpv auto-selects by its own rules
+  /// when our selection couldn't be applied — and reconcile the model so
+  /// the UI reflects reality instead of the request.
+  Future<void> _verifyAppliedTracks(PlaybackModel model) async {
+    if (!state.supportsTrackVerification) {
+      return;
+    }
+    // Wait (bounded) for the new media to be loaded — buffering done and
+    // duration known; playback may legitimately still be paused (e.g. a
+    // SyncPlay load holding for Unpause). mpv's aid/sid stay 'auto' until
+    // the file is loaded.
+    for (var attempt = 0; attempt < 40; attempt++) {
+      if (!identical(ref.read(playBackModel), model)) return;
+      if (!playbackState.buffering && playbackState.duration > Duration.zero) break;
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+    }
+
+    final current = ref.read(playBackModel);
+    if (current == null || !identical(current, model)) return;
+    final streams = current.mediaStreams;
+    if (streams == null) return;
+
+    final actualAudio = await state.appliedAudioStreamIndex(current);
+    final actualSub = await state.appliedSubStreamIndex(current);
+
+    final audioChanged = actualAudio != null && actualAudio != (streams.defaultAudioStreamIndex ?? -1);
+    final subChanged = actualSub != null && actualSub != (streams.defaultSubStreamIndex ?? -1);
+    if (!audioChanged && !subChanged) return;
+
+    developer.log('Track selection drift — reconciling UI with player '
+        '(audio: ${streams.defaultAudioStreamIndex} -> $actualAudio, '
+        'subtitle: ${streams.defaultSubStreamIndex} -> $actualSub)');
+    final reconciled = current.updateMediaStreams(streams.copyWith(
+      defaultAudioStreamIndex: audioChanged ? actualAudio : null,
+      defaultSubStreamIndex: subChanged ? actualSub : null,
+    ));
+    // Only swap the model if playback hasn't moved on in the meantime.
+    ref.read(playBackModel.notifier).update((state) => identical(state, current) ? reconciled : state);
   }
 
   Future<bool> loadAudioPlaybackItem(

@@ -112,6 +112,28 @@ class User extends _$User {
     }
   }
 
+  void updateAudioLanguagePreference(String? language) async {
+    final currentUserConfiguration = state?.userConfiguration;
+    if (currentUserConfiguration == null) return;
+
+    final normalizedLanguage = language?.trim().toLowerCase();
+    final updated = currentUserConfiguration.copyWithWrapped(
+      audioLanguagePreference:
+          Wrapped<String?>.value((normalizedLanguage?.isEmpty ?? true) ? null : normalizedLanguage),
+    );
+    final newUserConfiguration = await api.updateUserConfiguration(updated);
+    if (newUserConfiguration != null) {
+      userState = state?.copyWith(userConfiguration: newUserConfiguration);
+    }
+  }
+
+  void setPreferOriginalAudio(bool value) {
+    final userSettings = state?.userSettings?.copyWith(preferOriginalAudio: value);
+    if (userSettings != null) {
+      updateCustomConfig(userSettings);
+    }
+  }
+
   void setBackwardSpeed(int value) {
     final userSettings = state?.userSettings?.copyWith(skipBackDuration: Duration(seconds: value));
     if (userSettings != null) {

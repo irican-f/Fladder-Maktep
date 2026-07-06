@@ -11,6 +11,7 @@ import 'package:fladder/providers/pip_provider.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/settings/video_player_settings_provider.dart';
 import 'package:fladder/providers/syncplay/syncplay_provider.dart';
+import 'package:fladder/providers/track_preferences_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/providers/video_player_provider.dart';
 import 'package:fladder/screens/shared/default_title_bar.dart';
@@ -1090,6 +1091,8 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
 
   void _setSubtitleTrack(SubStreamModel subModel, PlaybackModel? playbackModel, dynamic player) async {
     if (playbackModel == null) return;
+    // Maktep: a manual subtitle toggle wins over smart re-evaluation.
+    ref.read(manualSubtitleOverrideProvider.notifier).markManualSubtitle();
     final newModel = await playbackModel.setSubtitle(subModel, player);
     ref.read(playBackModel.notifier).update((state) => newModel);
     if (newModel != null) {

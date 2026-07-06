@@ -46,6 +46,15 @@ class OfflinePlaybackModel extends PlaybackModel {
   @override
   ItemBaseModel? get previousVideo => queue.previousOrNull(item);
 
+  // Transcoded downloads are server-muxed single-track files whose stream
+  // metadata still describes the original media — positional track mapping
+  // (and thus verification) would mislabel what's playing.
+  @override
+  bool get playerHandlesTrackSelection => syncedItem.transcodeDownloadModel == null;
+
+  @override
+  OfflinePlaybackModel updateMediaStreams(MediaStreamsModel mediaStreams) => copyWith(mediaStreams: () => mediaStreams);
+
   @override
   List<SubStreamModel> get subStreams => [SubStreamModel.no(), ...syncedItem.subtitles];
 

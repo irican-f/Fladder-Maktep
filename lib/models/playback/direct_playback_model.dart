@@ -33,6 +33,12 @@ class DirectPlaybackModel extends PlaybackModel {
   });
 
   @override
+  bool get playerHandlesTrackSelection => true;
+
+  @override
+  DirectPlaybackModel updateMediaStreams(MediaStreamsModel mediaStreams) => copyWith(mediaStreams: () => mediaStreams);
+
+  @override
   List<SubStreamModel> get subStreams => [SubStreamModel.no(), ...mediaStreams?.subStreams ?? []];
 
   List<QueueItem> get itemsInQueue =>

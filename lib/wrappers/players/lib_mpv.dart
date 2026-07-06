@@ -19,6 +19,7 @@ import 'package:fladder/models/settings/subtitle_settings_model.dart';
 import 'package:fladder/models/settings/video_player_settings.dart';
 import 'package:fladder/providers/settings/subtitle_settings_provider.dart';
 import 'package:fladder/screens/video_player/video_player.dart' as video_screen;
+import 'package:fladder/util/mpv_track_mapping.dart';
 import 'package:fladder/util/subtitle_position_calculator.dart';
 import 'package:fladder/wrappers/players/base_player.dart';
 import 'package:fladder/wrappers/players/player_states.dart';
@@ -437,6 +438,31 @@ class LibMPV extends BasePlayer {
   @override
   Future<void> seek(Duration position) async => _player?.seek(position);
 
+  /// mpv populates `track-list` asynchronously after `open()` returns, so a
+  /// selection made right after [loadVideo] (the initial track selection at
+  /// playback start) would look up a still-empty list, silently no-op and
+  /// leave mpv on its own auto-selected (or sticky previous) track while the
+  /// UI shows the Jellyfin selection. Wait (bounded) for real tracks first.
+  /// No-op on web: media-kit there never populates internal tracks and only
+  /// accepts uri/no/auto tracks anyway.
+  Future<void> _waitForTrackList(bool Function() populated) async {
+    final player = _player;
+    if (kIsWeb || player == null || populated()) return;
+    final completer = Completer<void>();
+    final subscription = player.stream.tracks.listen((_) {
+      if (populated() && !completer.isCompleted) {
+        completer.complete();
+      }
+    });
+    try {
+      await completer.future.timeout(const Duration(seconds: 5));
+    } on TimeoutException {
+      // Fall through — callers already treat a missing track as a no-op.
+    } finally {
+      await subscription.cancel();
+    }
+  }
+
   @override
   Future<int> setAudioTrack(AudioStreamModel? model, PlaybackModel playbackModel) async {
     final wantedAudioStream = model ?? playbackModel.defaultAudioStream;
@@ -444,11 +470,25 @@ class LibMPV extends BasePlayer {
     if (wantedAudioStream.index == AudioStreamModel.no().index) {
       await _player?.setAudioTrack(mpv.AudioTrack.no());
     } else {
-      final internalTracks = audioTracks.getRange(2, audioTracks.length).toList();
+      if (!wantedAudioStream.isExternal && playbackModel.playerHandlesTrackSelection) {
+        await _waitForTrackList(() => audioTracks.length > 2);
+      }
+      // skip (unlike getRange) never throws if the player was disposed
+      // mid-wait and the track list collapsed under us.
+      final internalTracks = audioTracks.skip(2).toList();
       final audioTrack =
           internalTracks.elementAtOrNull((playbackModel.audioStreams?.indexOf(wantedAudioStream) ?? -1) - 1);
       if (audioTrack != null) {
         await _player?.setAudioTrack(audioTrack);
+      } else if (!kIsWeb && !wantedAudioStream.isExternal && playbackModel.playerHandlesTrackSelection) {
+        // Nothing was applied and this playback relies on the player for
+        // track selection — report the unchanged selection instead of the
+        // requested one so the UI keeps showing what is actually playing.
+        // Not on web, and not for external streams: there the optimistic
+        // index is what makes shouldReload fall back to a server-transcoded
+        // stream carrying the requested track.
+        log('LibMPV: no mpv audio track for stream ${wantedAudioStream.index}, keeping previous selection');
+        return playbackModel.mediaStreams?.defaultAudioStreamIndex ?? -1;
       }
     }
     return wantedAudioStream.index;
@@ -466,15 +506,48 @@ class LibMPV extends BasePlayer {
       return -1;
     }
     _currentSubtitleCodec = wantedSubtitle.codec;
-    final internalTrack = subTracks.getRange(2, subTracks.length).toList();
+    if (!wantedSubtitle.isExternal && playbackModel.playerHandlesTrackSelection) {
+      await _waitForTrackList(() => subTracks.length > 2);
+    }
+    final internalTrack = subTracks.skip(2).toList();
     final index = playbackModel.subStreams?.sublist(1).indexWhere((element) => element.id == wantedSubtitle.id);
     final subTrack = internalTrack.elementAtOrNull(index ?? -1);
     if (wantedSubtitle.isExternal && wantedSubtitle.url != null && subTrack == null) {
       await _player?.setSubtitleTrack(mpv.SubtitleTrack.uri(wantedSubtitle.url!));
     } else if (subTrack != null) {
       await _player?.setSubtitleTrack(subTrack);
+    } else if (!kIsWeb && !wantedSubtitle.isExternal && playbackModel.playerHandlesTrackSelection) {
+      // See setAudioTrack — don't report a track the player isn't using.
+      // External subs without a stream url (delivery = Encode) rely on the
+      // optimistic index to trigger the shouldReload transcode fallback.
+      log('LibMPV: no mpv subtitle track for stream ${wantedSubtitle.index}, keeping previous selection');
+      return playbackModel.mediaStreams?.defaultSubStreamIndex ?? -1;
     }
     return wantedSubtitle.index;
+  }
+
+  @override
+  bool get supportsTrackVerification => !kIsWeb;
+
+  @override
+  Future<int?> appliedAudioStreamIndex(PlaybackModel playbackModel) async =>
+      mapMpvAudioIdToStreamIndex(await _selectedTrackId('aid'), playbackModel.mediaStreams?.audioStreams ?? []);
+
+  @override
+  Future<int?> appliedSubStreamIndex(PlaybackModel playbackModel) async =>
+      mapMpvSubIdToStreamIndex(await _selectedTrackId('sid'), playbackModel.mediaStreams?.subStreams ?? []);
+
+  /// Reads mpv's actual `aid`/`sid`. media-kit only mirrors tracks set
+  /// through its own API, so this is the only way to observe mpv's own
+  /// (auto-selected or sticky) choice.
+  Future<String?> _selectedTrackId(String property) async {
+    final player = _player;
+    if (kIsWeb || player == null || player.platform is! mpv.NativePlayer) return null;
+    try {
+      return await (player.platform as dynamic).getProperty(property);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override

@@ -362,6 +362,7 @@ class SubStreamModel extends AudioAndSubStreamModel {
   String title;
   String? url;
   bool supportsExternalStream;
+  final bool isForced;
   SubStreamModel({
     required super.name,
     required this.id,
@@ -374,6 +375,7 @@ class SubStreamModel extends AudioAndSubStreamModel {
     required super.isExternal,
     required super.index,
     this.supportsExternalStream = false,
+    this.isForced = false,
   });
 
   SubStreamModel.no({
@@ -388,6 +390,7 @@ class SubStreamModel extends AudioAndSubStreamModel {
     super.isExternal = false,
     super.index = -1,
     this.supportsExternalStream = false,
+    this.isForced = false,
   });
 
   String label(BuildContext context) {
@@ -426,6 +429,7 @@ class SubStreamModel extends AudioAndSubStreamModel {
       url: subStreamUrl,
       isExternal: stream.isExternal ?? false,
       index: stream.index ?? -1,
+      isForced: stream.isForced ?? false,
     );
   }
 
@@ -441,6 +445,7 @@ class SubStreamModel extends AudioAndSubStreamModel {
     bool? isExternal,
     int? index,
     bool? supportsExternalStream,
+    bool? isForced,
   }) {
     return SubStreamModel(
       name: name ?? this.name,
@@ -454,6 +459,7 @@ class SubStreamModel extends AudioAndSubStreamModel {
       isDefault: isDefault ?? this.isDefault,
       isExternal: isExternal ?? this.isExternal,
       index: index ?? this.index,
+      isForced: isForced ?? this.isForced,
     );
   }
 
@@ -470,6 +476,7 @@ class SubStreamModel extends AudioAndSubStreamModel {
       'isExternal': isExternal,
       'isDefault': isDefault,
       'index': index,
+      'isForced': isForced,
     };
   }
 
@@ -486,6 +493,7 @@ class SubStreamModel extends AudioAndSubStreamModel {
       isDefault: map['isDefault'] ?? false,
       isExternal: map['isExternal'] ?? false,
       index: map['index'] ?? -1,
+      isForced: map['isForced'] ?? false,
     );
   }
 

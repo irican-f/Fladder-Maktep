@@ -35,6 +35,7 @@ import 'package:fladder/providers/service_provider.dart';
 import 'package:fladder/providers/settings/video_player_settings_provider.dart';
 import 'package:fladder/providers/sync_provider.dart';
 import 'package:fladder/providers/syncplay/syncplay_provider.dart';
+import 'package:fladder/providers/track_preferences_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/providers/video_player_provider.dart';
 import 'package:fladder/util/bitrate_helper.dart';
@@ -42,6 +43,7 @@ import 'package:fladder/util/duration_extensions.dart';
 import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/util/map_bool_helper.dart';
 import 'package:fladder/util/streams_selection.dart';
+import 'package:fladder/util/track_preferences.dart';
 import 'package:fladder/wrappers/media_control_wrapper.dart';
 import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -128,6 +130,17 @@ class PlaybackModel {
   Future<PlaybackModel>? setSubtitle(SubStreamModel? model, MediaControlsWrapper player) => throw UnimplementedError();
 
   Future<PlaybackModel>? setAudio(AudioStreamModel? model, MediaControlsWrapper player) => throw UnimplementedError();
+
+  /// True when audio/subtitle selection is applied client-side by the local
+  /// player (direct/offline playback). Server-driven playback (transcode)
+  /// fulfills selections by reloading a server-muxed stream instead, so the
+  /// player-side track lookup is only best-effort there. Models returning
+  /// true must also implement [updateMediaStreams].
+  bool get playerHandlesTrackSelection => false;
+
+  /// Replace [mediaStreams] without going through the player — used to
+  /// reconcile the model with the tracks the player actually selected.
+  PlaybackModel updateMediaStreams(MediaStreamsModel mediaStreams) => throw UnimplementedError();
 
   Future<PlaybackModel>? setQualityOption(Map<Bitrate, bool> map) => throw UnimplementedError();
 
@@ -283,6 +296,29 @@ class PlaybackModelHelper {
     final syncedItems = children.where((element) => element.videoFile.existsSync()).toList();
     final itemQueue = syncedItems.map((e) => e.itemModel).nonNulls;
 
+    // Maktep: preferred-track engine for offline playback — gate, see
+    // [shouldApplyTrackPreferences] (offline playback is never Live TV).
+    MediaStreamsModel? offlineStreams = item.streamModel ?? syncedItemModel.streamModel;
+    if (shouldApplyTrackPreferences(isFreshPlayback: oldModel == null) && offlineStreams != null) {
+      final trackPrefs = ref.read(trackPreferencesProvider);
+      final audioIndex = selectPreferredAudioIndex(
+        audioStreams: offlineStreams.audioStreams,
+        fallbackIndex: offlineStreams.defaultAudioStreamIndex,
+        prefs: trackPrefs,
+      );
+      final audioStream = offlineStreams.audioStreams.firstWhereOrNull((s) => s.index == audioIndex);
+      final subIndex = selectPreferredSubtitleIndex(
+        selectedAudio: audioStream,
+        subStreams: offlineStreams.subStreams,
+        fallbackIndex: offlineStreams.defaultSubStreamIndex,
+        prefs: trackPrefs,
+      );
+      offlineStreams = offlineStreams.copyWith(
+        defaultAudioStreamIndex: audioIndex,
+        defaultSubStreamIndex: subIndex,
+      );
+    }
+
     return OfflinePlaybackModel(
       item: syncedItemModel,
       syncedItem: syncedItem,
@@ -293,7 +329,7 @@ class PlaybackModelHelper {
       playbackQueue: oldModel?.playbackQueue,
       queueSource: queueSource ?? oldModel?.queueSource,
       syncedQueue: children,
-      mediaStreams: item.streamModel ?? syncedItemModel.streamModel,
+      mediaStreams: offlineStreams,
     );
   }
 
@@ -437,17 +473,43 @@ class PlaybackModelHelper {
           newStreamModel?.subStreams,
           newStreamModel?.defaultSubStreamIndex);
 
+      // Maktep: gate — see [shouldApplyTrackPreferences].
+      final applyTrackPrefs = shouldApplyTrackPreferences(
+        isFreshPlayback: oldModel == null,
+        isLiveTv: type == PlaybackType.tv,
+      );
+      final trackPrefs = ref.read(trackPreferencesProvider);
+      final preferredAudioIndex = applyTrackPrefs
+          ? selectPreferredAudioIndex(
+              audioStreams: newStreamModel?.audioStreams ?? [],
+              fallbackIndex: audioStreamIndex,
+              prefs: trackPrefs,
+            )
+          : audioStreamIndex;
+      final preferredAudioStream = newStreamModel?.audioStreams.firstWhereOrNull((s) => s.index == preferredAudioIndex);
+      final preferredSubIndex = applyTrackPrefs
+          ? selectPreferredSubtitleIndex(
+              selectedAudio: preferredAudioStream,
+              subStreams: newStreamModel?.subStreams ?? [],
+              fallbackIndex: subStreamIndex,
+              prefs: trackPrefs,
+            )
+          : subStreamIndex;
+
 //Native player does not allow for loading external subtitles with transcoding
       final isNativePlayer =
           ref.read(videoPlayerSettingsProvider.select((value) => value.wantedPlayer == PlayerOptions.nativePlayer));
-      final isExternalSub = newStreamModel?.currentSubStream?.isExternal == true;
+      // Maktep: judge burn-in against the sub stream actually requested below,
+      // not the item's server default.
+      final chosenSubStream = newStreamModel?.subStreams.firstWhereOrNull((s) => s.index == preferredSubIndex);
+      final isExternalSub = (chosenSubStream ?? newStreamModel?.currentSubStream)?.isExternal == true;
 
       final Response<PlaybackInfoResponse> response = await api.itemsItemIdPlaybackInfoPost(
         itemId: item.id,
         body: PlaybackInfoDto(
           startTimeTicks: startPosition?.toRuntimeTicks,
-          audioStreamIndex: audioStreamIndex,
-          subtitleStreamIndex: subStreamIndex,
+          audioStreamIndex: preferredAudioIndex,
+          subtitleStreamIndex: preferredSubIndex,
           enableTranscoding: true,
           autoOpenLiveStream: true,
           deviceProfile: type != PlaybackType.tv ? ref.read(videoProfileProvider) : null,
@@ -473,8 +535,8 @@ class PlaybackModelHelper {
       }
 
       final mediaStreamsWithUrls = MediaStreamsModel.fromMediaStreamsList(playbackInfo.mediaSources, ref).copyWith(
-        defaultAudioStreamIndex: audioStreamIndex,
-        defaultSubStreamIndex: subStreamIndex,
+        defaultAudioStreamIndex: preferredAudioIndex,
+        defaultSubStreamIndex: preferredSubIndex,
       );
 
       final mediaSegments = await api.mediaSegmentsGet(id: item.id);

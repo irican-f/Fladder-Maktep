@@ -15,6 +15,7 @@ import 'package:fladder/models/playback/transcode_playback_model.dart';
 import 'package:fladder/models/settings/video_player_settings.dart';
 import 'package:fladder/providers/settings/video_player_settings_provider.dart';
 import 'package:fladder/providers/syncplay/syncplay_provider.dart';
+import 'package:fladder/providers/track_preferences_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/providers/video_player_provider.dart';
 import 'package:fladder/screens/collections/add_to_collection.dart';
@@ -29,6 +30,7 @@ import 'package:fladder/util/list_padding.dart';
 import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/util/map_bool_helper.dart';
 import 'package:fladder/util/refresh_state.dart';
+import 'package:fladder/util/smart_subtitle_reevaluation.dart';
 import 'package:fladder/util/string_extensions.dart';
 import 'package:fladder/widgets/shared/enum_selection.dart';
 import 'package:fladder/widgets/shared/fladder_slider.dart';
@@ -424,6 +426,8 @@ Future<void> showSubSelection(BuildContext context) {
                       : null,
                   onTap: () async {
                     Future<void> doSwitch() async {
+                      // Maktep: a manual subtitle pick wins over smart re-evaluation.
+                      ref.read(manualSubtitleOverrideProvider.notifier).markManualSubtitle();
                       final newModel = await playbackModel.setSubtitle(subModel, player);
                       ref.read(playBackModel.notifier).update((state) => newModel);
                       if (newModel != null) {
@@ -477,10 +481,12 @@ Future<void> showAudioSelection(BuildContext context) {
                     onTap: () async {
                       Future<void> doSwitch() async {
                         final newModel = await playbackModel.setAudio(audioStream, player);
-                        ref.read(playBackModel.notifier).update((state) => newModel);
-                        if (newModel != null) {
+                        // Maktep: smart subtitles follow the audio switch.
+                        final modelWithSubs = await applySmartSubtitleReevaluation(ref, newModel, audioStream, player);
+                        ref.read(playBackModel.notifier).update((state) => modelWithSubs);
+                        if (modelWithSubs != null) {
                           await ref.read(playbackModelHelper).shouldReload(
-                                newModel,
+                                modelWithSubs,
                                 isLocalTrackSwitch: true,
                               );
                         }

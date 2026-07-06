@@ -85,6 +85,7 @@ abstract class UserSettings with _$UserSettings {
   factory UserSettings({
     @Default(Duration(seconds: 30)) Duration skipForwardDuration,
     @Default(Duration(seconds: 10)) Duration skipBackDuration,
+    @Default(false) bool preferOriginalAudio,
   }) = _UserSettings;
 
   factory UserSettings.fromJson(Map<String, dynamic> json) => _$UserSettingsFromJson(json);

@@ -20,6 +20,7 @@ import 'package:fladder/providers/live_tv_provider.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/settings/subtitle_settings_provider.dart';
 import 'package:fladder/providers/settings/video_player_settings_provider.dart';
+import 'package:fladder/providers/track_preferences_provider.dart';
 import 'package:fladder/providers/video_player_provider.dart';
 import 'package:fladder/providers/window_title_provider.dart';
 import 'package:fladder/src/video_player_helper.g.dart' hide PlaybackState;
@@ -560,6 +561,14 @@ class MediaControlsWrapper extends BaseAudioHandler implements VideoPlayerContro
   Future<int> setSubtitleTrack(SubStreamModel? model, PlaybackModel playbackModel) async =>
       await _player?.setSubtitleTrack(model, playbackModel) ?? -1;
 
+  bool get supportsTrackVerification => _player?.supportsTrackVerification ?? false;
+
+  Future<int?> appliedAudioStreamIndex(PlaybackModel playbackModel) async =>
+      await _player?.appliedAudioStreamIndex(playbackModel);
+
+  Future<int?> appliedSubStreamIndex(PlaybackModel playbackModel) async =>
+      await _player?.appliedSubStreamIndex(playbackModel);
+
   Future<void> resetTracksToAuto() async => _player?.resetTracksToAuto();
 
   Future<void> setVolume(double volume) async => _player?.setVolume(volume);
@@ -598,6 +607,9 @@ class MediaControlsWrapper extends BaseAudioHandler implements VideoPlayerContro
   void onStop() => stop();
 
   @override
+  // Maktep: native-player audio switches intentionally do NOT re-run the
+  // smart subtitle rule (spec: native mid-playback switches are out of
+  // scope) — only the in-app options sheet re-evaluates.
   void swapAudioTrack(int value) async {
     final playbackModel = ref.read(playBackModel);
     final newModel = await playbackModel?.setAudio(
@@ -613,6 +625,9 @@ class MediaControlsWrapper extends BaseAudioHandler implements VideoPlayerContro
 
   @override
   void swapSubtitleTrack(int value) async {
+    // Maktep: a manual subtitle pick from the native player wins over smart
+    // re-evaluation.
+    ref.read(manualSubtitleOverrideProvider.notifier).markManualSubtitle();
     final playbackModel = ref.read(playBackModel);
     final newModel = await playbackModel?.setSubtitle(
         playbackModel.subStreams?.firstWhere((element) => element.index == value), this);
