@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:desktop_multi_window/desktop_multi_window.dart';
@@ -9,7 +8,6 @@ import 'package:fladder/util/application_info.dart';
 import 'package:fladder/util/fladder_config.dart';
 import 'package:fladder/util/svg_utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,8 +41,7 @@ Future<AppBootstrapResult> bootstrapApplication(List<String> args) async {
   final crashProvider = CrashLogNotifier();
 
   if (kIsWeb) {
-    final configString = await rootBundle.loadString('config/config.json');
-    FladderConfig.fromJson(jsonDecode(configString) as Map<String, dynamic>);
+    await FladderConfig.loadBundledConfig();
   }
 
   await SvgUtils.preCacheSVGs();

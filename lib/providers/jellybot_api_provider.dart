@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:chopper/chopper.dart';
@@ -57,8 +58,35 @@ class JellybotApi extends _$JellybotApi {
       baseUrl: Uri.parse(baseUrl),
       httpClient: _createHttpClient(),
       interceptors: [
+        const _AccessTokenInterceptor(),
+        // Level.headers would log the access tokens — keep at basic.
         HttpLoggingInterceptor(level: Level.basic),
       ],
+    );
+  }
+}
+
+/// Adds the Pangolin access-token headers from config.json to every request.
+///
+/// Reads [FladderConfig] per request rather than at client build time: config.json
+/// loads in a post-frame callback on non-web platforms, and keepAlive watchers
+/// (e.g. addedCrawlLinkUrlsProvider) can pin this client alive from before that
+/// load until process exit.
+class _AccessTokenInterceptor implements Interceptor {
+  const _AccessTokenInterceptor();
+
+  @override
+  FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) {
+    final tokenId = FladderConfig.jellybotAccessTokenId;
+    final token = FladderConfig.jellybotAccessToken;
+    if (tokenId == null || token == null) {
+      return chain.proceed(chain.request);
+    }
+    return chain.proceed(
+      applyHeaders(chain.request, {
+        'P-Access-Token-Id': tokenId,
+        'P-Access-Token': token,
+      }),
     );
   }
 }

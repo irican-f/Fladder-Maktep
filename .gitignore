@@ -80,6 +80,9 @@ Output
 lib/l10n/generated
 android/build/reports/problems/
 
+# Local config overlay (private credentials, bundled into local builds only)
+config/config.local.json
+
 # Release manager (private credentials + per-release notes)
 tools/release_manager.config.local.json
 tools/changelogs/*.md
