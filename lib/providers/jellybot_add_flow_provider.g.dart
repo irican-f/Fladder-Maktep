@@ -6,7 +6,7 @@ part of 'jellybot_add_flow_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$jellybotAddFlowHash() => r'6b60cc2de50fbbbd02e933d0248ae6b302659b54';
+String _$jellybotAddFlowHash() => r'be47a2e369677a9ffac962789b6281d6bce43958';
 
 /// Drives the add-link flow: extract → (season) → (duplicate) → confirm →
 /// commit. State is null when no flow is active. The sheet

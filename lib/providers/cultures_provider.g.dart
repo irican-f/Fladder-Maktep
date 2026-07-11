@@ -6,16 +6,14 @@ part of 'cultures_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$culturesHash() => r'1bd25040c704823a87960f55eb7fbf03e0c9fa1b';
+String _$culturesHash() => r'9b4a41e056c94c80c48467c788b490d80a5ea0b6';
 
 /// See also [Cultures].
 @ProviderFor(Cultures)
-final culturesProvider =
-    AutoDisposeNotifierProvider<Cultures, List<CultureDto>>.internal(
+final culturesProvider = AutoDisposeNotifierProvider<Cultures, List<CultureDto>>.internal(
   Cultures.new,
   name: r'culturesProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$culturesHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$culturesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
