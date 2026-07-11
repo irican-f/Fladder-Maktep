@@ -32,6 +32,9 @@ Future<void> showAddFlowSheet(BuildContext context, WidgetRef ref, ProviderSearc
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
+      // Root navigator: the jellybot pages live in the nested home-shell
+      // navigator, whose overlay paints below the phone bottom navigation bar.
+      useRootNavigator: true,
       builder: (_) => const AddFlowSheet(),
     );
   } else {
