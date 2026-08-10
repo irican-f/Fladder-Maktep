@@ -9,6 +9,7 @@ import TVGuideModel
 import VideoPlayerApi
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.core.net.toUri
 import androidx.core.os.postDelayed
 import androidx.media3.common.MediaItem
@@ -110,6 +111,14 @@ class VideoPlayerImplementation(
 
                 player?.stop()
                 player?.clearMediaItems()
+
+                // Arm the track-application gate BEFORE prepare(). ExoPlayer can
+                // deliver onTracksChanged as soon as the new media is prepared; if
+                // this still read `true` from the previous item, that callback
+                // skipped applying tracks and the previous item's selection —
+                // including a disabled audio renderer — carried over.
+                subsInitialized = false
+
                 player?.setMediaItem(mediaItem)
                 player?.prepare()
 
@@ -119,7 +128,6 @@ class VideoPlayerImplementation(
                 }
                 player?.playWhenReady = play
                 callback(Result.success(true))
-                subsInitialized = false
                 return@postDelayed
             } catch (e: Exception) {
                 println("Error playing video $e")
@@ -187,23 +195,49 @@ fun guessSubtitleMimeType(fileName: String): String = when {
     else -> MimeTypes.APPLICATION_SUBRIP
 }
 
+const val TRACK_LOG_TAG = "FladderTracks"
+
 fun ExoPlayer.properlySetSubAndAudioTracks(playableData: PlayableData) {
     if (playableData.mediaInfo.playbackType == PlaybackType.TV) {
         // In TV mode, do not set tracks here as they are handled differently
         return
     }
     try {
+        // Both lists carry a leading "none" sentinel at position 0, so a real
+        // track sits at listIndex - 1. Position -1 means the requested stream
+        // index is absent from the list entirely — that is NOT a request to
+        // disable the track, and must never be treated as one.
         val currentSubIndex = playableData.defaultSubtrack
         val indexOfSubtitleTrack =
             playableData.subtitleTracks.indexOfFirst { it.index == currentSubIndex }
         val internalSubTracks = this.getSubtitleTracks()
 
         val wantedSubIndex = indexOfSubtitleTrack - 1
-        if (wantedSubIndex < 0) {
-            clearSubtitleTrack()
-        } else {
-            enableSubtitles()
-            setInternalSubtitleTrack(internalSubTracks[wantedSubIndex])
+        when {
+            indexOfSubtitleTrack < 0 -> {
+                // Unresolvable: leave whatever the player picked rather than
+                // silently dropping subtitles.
+                Log.w(
+                    TRACK_LOG_TAG,
+                    "subtitle stream $currentSubIndex not present in ${playableData.subtitleTracks.map { it.index }} " +
+                        "— keeping player default instead of disabling"
+                )
+            }
+
+            wantedSubIndex < 0 -> clearSubtitleTrack()
+
+            wantedSubIndex >= internalSubTracks.size -> {
+                Log.w(
+                    TRACK_LOG_TAG,
+                    "subtitle slot $wantedSubIndex out of range (player exposes ${internalSubTracks.size}) " +
+                        "— keeping player default"
+                )
+            }
+
+            else -> {
+                enableSubtitles()
+                setInternalSubtitleTrack(internalSubTracks[wantedSubIndex])
+            }
         }
 
         val currentAudioIndex = playableData.defaultAudioTrack
@@ -212,13 +246,42 @@ fun ExoPlayer.properlySetSubAndAudioTracks(playableData: PlayableData) {
         val internalAudioTracks = this.getAudioTracks()
 
         val wantedAudioIndex = indexOfAudioTrack - 1
-        if (wantedAudioIndex < 0) {
-            clearAudioTrack()
-        } else {
-            clearAudioTrack(false)
-            setInternalAudioTrack(internalAudioTracks[wantedAudioIndex])
+        when {
+            indexOfAudioTrack < 0 -> {
+                // The requested stream index is not in this item's audio list.
+                // Happens when the index was resolved against the item's own
+                // streams but the PlaybackInfo response returned a different
+                // set (transcoding, another media-source version). Disabling
+                // the renderer here is what produced "next episode has no
+                // sound"; keep the player's own choice audible instead.
+                Log.w(
+                    TRACK_LOG_TAG,
+                    "audio stream $currentAudioIndex not present in ${playableData.audioTracks.map { it.index }} " +
+                        "— falling back to player default instead of muting"
+                )
+                clearAudioTrack(false)
+            }
+
+            wantedAudioIndex < 0 -> clearAudioTrack() // explicit "no audio"
+
+            wantedAudioIndex >= internalAudioTracks.size -> {
+                // Jellyfin metadata lists more audio streams than the player
+                // actually exposes (common when the server transcodes down to
+                // a single track). Enable audio and let ExoPlayer choose.
+                Log.w(
+                    TRACK_LOG_TAG,
+                    "audio slot $wantedAudioIndex out of range (player exposes ${internalAudioTracks.size}) " +
+                        "— falling back to player default instead of muting"
+                )
+                clearAudioTrack(false)
+            }
+
+            else -> {
+                clearAudioTrack(false)
+                setInternalAudioTrack(internalAudioTracks[wantedAudioIndex])
+            }
         }
     } catch (e: Exception) {
-        e.printStackTrace()
+        Log.e(TRACK_LOG_TAG, "failed to apply track selection", e)
     }
 }
