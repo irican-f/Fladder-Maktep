@@ -14,6 +14,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$LibraryFilterModel implements DiagnosticableTreeMixin {
+  String get searchQuery;
   Map<String, bool> get genres;
   Map<ItemFilter, bool> get itemFilters;
   @StudioEncoder()
@@ -28,13 +29,15 @@ mixin _$LibraryFilterModel implements DiagnosticableTreeMixin {
   bool get hideEmptyShows;
   bool? get recursive;
   GroupBy get groupBy;
+  bool get isDefault;
 
   /// Create a copy of LibraryFilterModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $LibraryFilterModelCopyWith<LibraryFilterModel> get copyWith =>
-      _$LibraryFilterModelCopyWithImpl<LibraryFilterModel>(this as LibraryFilterModel, _$identity);
+      _$LibraryFilterModelCopyWithImpl<LibraryFilterModel>(
+          this as LibraryFilterModel, _$identity);
 
   /// Serializes this LibraryFilterModel to a JSON map.
   Map<String, dynamic> toJson();
@@ -43,6 +46,7 @@ mixin _$LibraryFilterModel implements DiagnosticableTreeMixin {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
       ..add(DiagnosticsProperty('type', 'LibraryFilterModel'))
+      ..add(DiagnosticsProperty('searchQuery', searchQuery))
       ..add(DiagnosticsProperty('genres', genres))
       ..add(DiagnosticsProperty('itemFilters', itemFilters))
       ..add(DiagnosticsProperty('studios', studios))
@@ -55,22 +59,25 @@ mixin _$LibraryFilterModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('favourites', favourites))
       ..add(DiagnosticsProperty('hideEmptyShows', hideEmptyShows))
       ..add(DiagnosticsProperty('recursive', recursive))
-      ..add(DiagnosticsProperty('groupBy', groupBy));
+      ..add(DiagnosticsProperty('groupBy', groupBy))
+      ..add(DiagnosticsProperty('isDefault', isDefault));
   }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'LibraryFilterModel(genres: $genres, itemFilters: $itemFilters, studios: $studios, tags: $tags, years: $years, officialRatings: $officialRatings, types: $types, sortingOption: $sortingOption, sortOrder: $sortOrder, favourites: $favourites, hideEmptyShows: $hideEmptyShows, recursive: $recursive, groupBy: $groupBy)';
+    return 'LibraryFilterModel(searchQuery: $searchQuery, genres: $genres, itemFilters: $itemFilters, studios: $studios, tags: $tags, years: $years, officialRatings: $officialRatings, types: $types, sortingOption: $sortingOption, sortOrder: $sortOrder, favourites: $favourites, hideEmptyShows: $hideEmptyShows, recursive: $recursive, groupBy: $groupBy, isDefault: $isDefault)';
   }
 }
 
 /// @nodoc
 abstract mixin class $LibraryFilterModelCopyWith<$Res> {
-  factory $LibraryFilterModelCopyWith(LibraryFilterModel value, $Res Function(LibraryFilterModel) _then) =
+  factory $LibraryFilterModelCopyWith(
+          LibraryFilterModel value, $Res Function(LibraryFilterModel) _then) =
       _$LibraryFilterModelCopyWithImpl;
   @useResult
   $Res call(
-      {Map<String, bool> genres,
+      {String searchQuery,
+      Map<String, bool> genres,
       Map<ItemFilter, bool> itemFilters,
       @StudioEncoder() Map<Studio, bool> studios,
       Map<String, bool> tags,
@@ -82,11 +89,13 @@ abstract mixin class $LibraryFilterModelCopyWith<$Res> {
       bool? favourites,
       bool hideEmptyShows,
       bool? recursive,
-      GroupBy groupBy});
+      GroupBy groupBy,
+      bool isDefault});
 }
 
 /// @nodoc
-class _$LibraryFilterModelCopyWithImpl<$Res> implements $LibraryFilterModelCopyWith<$Res> {
+class _$LibraryFilterModelCopyWithImpl<$Res>
+    implements $LibraryFilterModelCopyWith<$Res> {
   _$LibraryFilterModelCopyWithImpl(this._self, this._then);
 
   final LibraryFilterModel _self;
@@ -97,6 +106,7 @@ class _$LibraryFilterModelCopyWithImpl<$Res> implements $LibraryFilterModelCopyW
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? searchQuery = null,
     Object? genres = null,
     Object? itemFilters = null,
     Object? studios = null,
@@ -110,8 +120,13 @@ class _$LibraryFilterModelCopyWithImpl<$Res> implements $LibraryFilterModelCopyW
     Object? hideEmptyShows = null,
     Object? recursive = freezed,
     Object? groupBy = null,
+    Object? isDefault = null,
   }) {
     return _then(_self.copyWith(
+      searchQuery: null == searchQuery
+          ? _self.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String,
       genres: null == genres
           ? _self.genres
           : genres // ignore: cast_nullable_to_non_nullable
@@ -164,6 +179,10 @@ class _$LibraryFilterModelCopyWithImpl<$Res> implements $LibraryFilterModelCopyW
           ? _self.groupBy
           : groupBy // ignore: cast_nullable_to_non_nullable
               as GroupBy,
+      isDefault: null == isDefault
+          ? _self.isDefault
+          : isDefault // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -262,6 +281,7 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
+            String searchQuery,
             Map<String, bool> genres,
             Map<ItemFilter, bool> itemFilters,
             @StudioEncoder() Map<Studio, bool> studios,
@@ -274,7 +294,8 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
             bool? favourites,
             bool hideEmptyShows,
             bool? recursive,
-            GroupBy groupBy)?
+            GroupBy groupBy,
+            bool isDefault)?
         $default, {
     required TResult orElse(),
   }) {
@@ -282,6 +303,7 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
     switch (_that) {
       case _LibraryFilterModel() when $default != null:
         return $default(
+            _that.searchQuery,
             _that.genres,
             _that.itemFilters,
             _that.studios,
@@ -294,7 +316,8 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
             _that.favourites,
             _that.hideEmptyShows,
             _that.recursive,
-            _that.groupBy);
+            _that.groupBy,
+            _that.isDefault);
       case _:
         return orElse();
     }
@@ -316,6 +339,7 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
+            String searchQuery,
             Map<String, bool> genres,
             Map<ItemFilter, bool> itemFilters,
             @StudioEncoder() Map<Studio, bool> studios,
@@ -328,13 +352,15 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
             bool? favourites,
             bool hideEmptyShows,
             bool? recursive,
-            GroupBy groupBy)
+            GroupBy groupBy,
+            bool isDefault)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _LibraryFilterModel():
         return $default(
+            _that.searchQuery,
             _that.genres,
             _that.itemFilters,
             _that.studios,
@@ -347,7 +373,8 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
             _that.favourites,
             _that.hideEmptyShows,
             _that.recursive,
-            _that.groupBy);
+            _that.groupBy,
+            _that.isDefault);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -368,6 +395,7 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
+            String searchQuery,
             Map<String, bool> genres,
             Map<ItemFilter, bool> itemFilters,
             @StudioEncoder() Map<Studio, bool> studios,
@@ -380,13 +408,15 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
             bool? favourites,
             bool hideEmptyShows,
             bool? recursive,
-            GroupBy groupBy)?
+            GroupBy groupBy,
+            bool isDefault)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _LibraryFilterModel() when $default != null:
         return $default(
+            _that.searchQuery,
             _that.genres,
             _that.itemFilters,
             _that.studios,
@@ -399,7 +429,8 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
             _that.favourites,
             _that.hideEmptyShows,
             _that.recursive,
-            _that.groupBy);
+            _that.groupBy,
+            _that.isDefault);
       case _:
         return null;
     }
@@ -408,9 +439,11 @@ extension LibraryFilterModelPatterns on LibraryFilterModel {
 
 /// @nodoc
 @JsonSerializable()
-class _LibraryFilterModel extends LibraryFilterModel with DiagnosticableTreeMixin {
+class _LibraryFilterModel extends LibraryFilterModel
+    with DiagnosticableTreeMixin {
   const _LibraryFilterModel(
-      {final Map<String, bool> genres = const {},
+      {this.searchQuery = "",
+      final Map<String, bool> genres = const {},
       final Map<ItemFilter, bool> itemFilters = const {
         ItemFilter.isplayed: false,
         ItemFilter.isunplayed: false,
@@ -438,10 +471,11 @@ class _LibraryFilterModel extends LibraryFilterModel with DiagnosticableTreeMixi
       },
       this.sortingOption = SortingOptions.sortName,
       this.sortOrder = SortingOrder.ascending,
-      this.favourites = false,
+      this.favourites,
       this.hideEmptyShows = true,
-      this.recursive = true,
-      this.groupBy = GroupBy.none})
+      this.recursive = false,
+      this.groupBy = GroupBy.none,
+      this.isDefault = false})
       : _genres = genres,
         _itemFilters = itemFilters,
         _studios = studios,
@@ -450,8 +484,12 @@ class _LibraryFilterModel extends LibraryFilterModel with DiagnosticableTreeMixi
         _officialRatings = officialRatings,
         _types = types,
         super._();
-  factory _LibraryFilterModel.fromJson(Map<String, dynamic> json) => _$LibraryFilterModelFromJson(json);
+  factory _LibraryFilterModel.fromJson(Map<String, dynamic> json) =>
+      _$LibraryFilterModelFromJson(json);
 
+  @override
+  @JsonKey()
+  final String searchQuery;
   final Map<String, bool> _genres;
   @override
   @JsonKey()
@@ -523,7 +561,6 @@ class _LibraryFilterModel extends LibraryFilterModel with DiagnosticableTreeMixi
   @JsonKey()
   final SortingOrder sortOrder;
   @override
-  @JsonKey()
   final bool? favourites;
   @override
   @JsonKey()
@@ -534,6 +571,9 @@ class _LibraryFilterModel extends LibraryFilterModel with DiagnosticableTreeMixi
   @override
   @JsonKey()
   final GroupBy groupBy;
+  @override
+  @JsonKey()
+  final bool isDefault;
 
   /// Create a copy of LibraryFilterModel
   /// with the given fields replaced by the non-null parameter values.
@@ -554,6 +594,7 @@ class _LibraryFilterModel extends LibraryFilterModel with DiagnosticableTreeMixi
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     properties
       ..add(DiagnosticsProperty('type', 'LibraryFilterModel'))
+      ..add(DiagnosticsProperty('searchQuery', searchQuery))
       ..add(DiagnosticsProperty('genres', genres))
       ..add(DiagnosticsProperty('itemFilters', itemFilters))
       ..add(DiagnosticsProperty('studios', studios))
@@ -566,23 +607,27 @@ class _LibraryFilterModel extends LibraryFilterModel with DiagnosticableTreeMixi
       ..add(DiagnosticsProperty('favourites', favourites))
       ..add(DiagnosticsProperty('hideEmptyShows', hideEmptyShows))
       ..add(DiagnosticsProperty('recursive', recursive))
-      ..add(DiagnosticsProperty('groupBy', groupBy));
+      ..add(DiagnosticsProperty('groupBy', groupBy))
+      ..add(DiagnosticsProperty('isDefault', isDefault));
   }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'LibraryFilterModel(genres: $genres, itemFilters: $itemFilters, studios: $studios, tags: $tags, years: $years, officialRatings: $officialRatings, types: $types, sortingOption: $sortingOption, sortOrder: $sortOrder, favourites: $favourites, hideEmptyShows: $hideEmptyShows, recursive: $recursive, groupBy: $groupBy)';
+    return 'LibraryFilterModel(searchQuery: $searchQuery, genres: $genres, itemFilters: $itemFilters, studios: $studios, tags: $tags, years: $years, officialRatings: $officialRatings, types: $types, sortingOption: $sortingOption, sortOrder: $sortOrder, favourites: $favourites, hideEmptyShows: $hideEmptyShows, recursive: $recursive, groupBy: $groupBy, isDefault: $isDefault)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$LibraryFilterModelCopyWith<$Res> implements $LibraryFilterModelCopyWith<$Res> {
-  factory _$LibraryFilterModelCopyWith(_LibraryFilterModel value, $Res Function(_LibraryFilterModel) _then) =
+abstract mixin class _$LibraryFilterModelCopyWith<$Res>
+    implements $LibraryFilterModelCopyWith<$Res> {
+  factory _$LibraryFilterModelCopyWith(
+          _LibraryFilterModel value, $Res Function(_LibraryFilterModel) _then) =
       __$LibraryFilterModelCopyWithImpl;
   @override
   @useResult
   $Res call(
-      {Map<String, bool> genres,
+      {String searchQuery,
+      Map<String, bool> genres,
       Map<ItemFilter, bool> itemFilters,
       @StudioEncoder() Map<Studio, bool> studios,
       Map<String, bool> tags,
@@ -594,11 +639,13 @@ abstract mixin class _$LibraryFilterModelCopyWith<$Res> implements $LibraryFilte
       bool? favourites,
       bool hideEmptyShows,
       bool? recursive,
-      GroupBy groupBy});
+      GroupBy groupBy,
+      bool isDefault});
 }
 
 /// @nodoc
-class __$LibraryFilterModelCopyWithImpl<$Res> implements _$LibraryFilterModelCopyWith<$Res> {
+class __$LibraryFilterModelCopyWithImpl<$Res>
+    implements _$LibraryFilterModelCopyWith<$Res> {
   __$LibraryFilterModelCopyWithImpl(this._self, this._then);
 
   final _LibraryFilterModel _self;
@@ -609,6 +656,7 @@ class __$LibraryFilterModelCopyWithImpl<$Res> implements _$LibraryFilterModelCop
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? searchQuery = null,
     Object? genres = null,
     Object? itemFilters = null,
     Object? studios = null,
@@ -622,8 +670,13 @@ class __$LibraryFilterModelCopyWithImpl<$Res> implements _$LibraryFilterModelCop
     Object? hideEmptyShows = null,
     Object? recursive = freezed,
     Object? groupBy = null,
+    Object? isDefault = null,
   }) {
     return _then(_LibraryFilterModel(
+      searchQuery: null == searchQuery
+          ? _self.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String,
       genres: null == genres
           ? _self._genres
           : genres // ignore: cast_nullable_to_non_nullable
@@ -676,6 +729,10 @@ class __$LibraryFilterModelCopyWithImpl<$Res> implements _$LibraryFilterModelCop
           ? _self.groupBy
           : groupBy // ignore: cast_nullable_to_non_nullable
               as GroupBy,
+      isDefault: null == isDefault
+          ? _self.isDefault
+          : isDefault // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }

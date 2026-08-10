@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fladder/models/settings/client_settings_model.dart';
+import 'package:fladder/providers/dashboard_mode_provider.dart';
 import 'package:fladder/providers/jellybot_live_tv_provider.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/sync_provider.dart';
@@ -74,6 +75,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final canDownload = ref.watch(showSyncButtonProviderProvider);
+    final isMusicDashboardMode = ref.watch(musicDashboardModeProvider);
     final destinations = HomeTabs.values
         .map((e) {
           switch (e) {
@@ -125,20 +127,22 @@ class HomeScreen extends ConsumerWidget {
                 );
               }
             case HomeTabs.library:
-              return DestinationModel(
-                label: context.localized.library(0),
-                icon: Icon(e.icon),
-                selectedIcon: Icon(e.selectedIcon),
-                route: const LibraryRoute(),
-                action: () => e.navigate(context),
-                floatingActionButton: AdaptiveFab(
-                  context: context,
-                  title: context.localized.search,
-                  key: Key(e.name.capitalize()),
-                  onPressed: () => context.router.navigate(LibrarySearchRoute()),
-                  child: const Icon(IconsaxPlusLinear.search_status),
-                ),
-              );
+              if (!isMusicDashboardMode) {
+                return DestinationModel(
+                  label: context.localized.library(0),
+                  icon: Icon(e.icon),
+                  selectedIcon: Icon(e.selectedIcon),
+                  route: const LibraryRoute(),
+                  action: () => e.navigate(context),
+                  floatingActionButton: AdaptiveFab(
+                    context: context,
+                    title: context.localized.search,
+                    key: Key(e.name.capitalize()),
+                    onPressed: () => context.router.navigate(LibrarySearchRoute()),
+                    child: const Icon(IconsaxPlusLinear.search_status),
+                  ),
+                );
+              }
             case HomeTabs.jellybot:
               return DestinationModel(
                 label: context.localized.jellybot,

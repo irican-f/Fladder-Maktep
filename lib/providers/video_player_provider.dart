@@ -75,6 +75,7 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
   }
 
   Future<void> init() async {
+    await state.stop();
     await state.dispose();
     await state.init();
 
@@ -280,7 +281,7 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
     mediaState.update(
       (state) => state.copyWith(playing: event),
     );
-    ref.read(playBackModel)?.updatePlaybackPosition(currentState.position, currentState.playing, ref);
+    ref.read(playBackModel)?.updatePlaybackPosition(currentState.position, event, ref);
   }
 
   Future<void> updatePosition(Duration event) async {

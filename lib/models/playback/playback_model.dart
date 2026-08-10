@@ -378,7 +378,7 @@ class PlaybackModelHelper {
         if (firstItemIsSynced) PlaybackType.offline,
       };
 
-      final isOffline = ref.read(connectivityStatusProvider.select((value) => value == ConnectionState.offline));
+      final isOffline = ref.read(offlineStateProvider);
 
       if (firstItemToPlay is AudioModel && firstItemIsSynced) {
         final offlinePlayback = await _createOfflinePlaybackModel(

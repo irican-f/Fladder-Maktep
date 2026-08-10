@@ -10,10 +10,12 @@ String _$updateAlistHash() => r'5d9f49b913eb5c3d00e41a9223a76c82c44c5f52';
 
 /// See also [UpdateAlist].
 @ProviderFor(UpdateAlist)
-final updateAlistProvider = NotifierProvider<UpdateAlist, UpdatesModelAlist>.internal(
+final updateAlistProvider =
+    NotifierProvider<UpdateAlist, UpdatesModelAlist>.internal(
   UpdateAlist.new,
   name: r'updateAlistProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$updateAlistHash,
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$updateAlistHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

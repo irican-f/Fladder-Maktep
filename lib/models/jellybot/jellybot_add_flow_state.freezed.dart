@@ -33,7 +33,8 @@ mixin _$JellybotAddFlowState {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $JellybotAddFlowStateCopyWith<JellybotAddFlowState> get copyWith =>
-      _$JellybotAddFlowStateCopyWithImpl<JellybotAddFlowState>(this as JellybotAddFlowState, _$identity);
+      _$JellybotAddFlowStateCopyWithImpl<JellybotAddFlowState>(
+          this as JellybotAddFlowState, _$identity);
 
   @override
   String toString() {
@@ -43,7 +44,8 @@ mixin _$JellybotAddFlowState {
 
 /// @nodoc
 abstract mixin class $JellybotAddFlowStateCopyWith<$Res> {
-  factory $JellybotAddFlowStateCopyWith(JellybotAddFlowState value, $Res Function(JellybotAddFlowState) _then) =
+  factory $JellybotAddFlowStateCopyWith(JellybotAddFlowState value,
+          $Res Function(JellybotAddFlowState) _then) =
       _$JellybotAddFlowStateCopyWithImpl;
   @useResult
   $Res call(
@@ -63,7 +65,8 @@ abstract mixin class $JellybotAddFlowStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$JellybotAddFlowStateCopyWithImpl<$Res> implements $JellybotAddFlowStateCopyWith<$Res> {
+class _$JellybotAddFlowStateCopyWithImpl<$Res>
+    implements $JellybotAddFlowStateCopyWith<$Res> {
   _$JellybotAddFlowStateCopyWithImpl(this._self, this._then);
 
   final JellybotAddFlowState _self;
@@ -436,7 +439,8 @@ class _JellybotAddFlowState implements JellybotAddFlowState {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   _$JellybotAddFlowStateCopyWith<_JellybotAddFlowState> get copyWith =>
-      __$JellybotAddFlowStateCopyWithImpl<_JellybotAddFlowState>(this, _$identity);
+      __$JellybotAddFlowStateCopyWithImpl<_JellybotAddFlowState>(
+          this, _$identity);
 
   @override
   String toString() {
@@ -445,8 +449,10 @@ class _JellybotAddFlowState implements JellybotAddFlowState {
 }
 
 /// @nodoc
-abstract mixin class _$JellybotAddFlowStateCopyWith<$Res> implements $JellybotAddFlowStateCopyWith<$Res> {
-  factory _$JellybotAddFlowStateCopyWith(_JellybotAddFlowState value, $Res Function(_JellybotAddFlowState) _then) =
+abstract mixin class _$JellybotAddFlowStateCopyWith<$Res>
+    implements $JellybotAddFlowStateCopyWith<$Res> {
+  factory _$JellybotAddFlowStateCopyWith(_JellybotAddFlowState value,
+          $Res Function(_JellybotAddFlowState) _then) =
       __$JellybotAddFlowStateCopyWithImpl;
   @override
   @useResult
@@ -467,7 +473,8 @@ abstract mixin class _$JellybotAddFlowStateCopyWith<$Res> implements $JellybotAd
 }
 
 /// @nodoc
-class __$JellybotAddFlowStateCopyWithImpl<$Res> implements _$JellybotAddFlowStateCopyWith<$Res> {
+class __$JellybotAddFlowStateCopyWithImpl<$Res>
+    implements _$JellybotAddFlowStateCopyWith<$Res> {
   __$JellybotAddFlowStateCopyWithImpl(this._self, this._then);
 
   final _JellybotAddFlowState _self;

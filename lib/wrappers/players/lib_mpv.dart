@@ -421,10 +421,16 @@ class LibMPV extends BasePlayer {
   }
 
   @override
-  Future<void> pause() async => _startPlaybackFade(false);
+  Future<void> pause() async {
+    setState(lastState.update(playing: false));
+    _startPlaybackFade(false);
+  }
 
   @override
-  Future<void> play() async => _startPlaybackFade(true);
+  Future<void> play() async {
+    setState(lastState.update(playing: true));
+    _startPlaybackFade(true);
+  }
 
   @override
   Future<void> playOrPause() async {
@@ -470,14 +476,19 @@ class LibMPV extends BasePlayer {
     if (wantedAudioStream.index == AudioStreamModel.no().index) {
       await _player?.setAudioTrack(mpv.AudioTrack.no());
     } else {
-      if (!wantedAudioStream.isExternal && playbackModel.playerHandlesTrackSelection) {
-        await _waitForTrackList(() => audioTracks.length > 2);
+      final index = (playbackModel.audioStreams?.indexOf(wantedAudioStream) ?? -1) - 1;
+      if (index >= 0 && !wantedAudioStream.isExternal && playbackModel.playerHandlesTrackSelection) {
+        // Wait for the wanted entry specifically, not just "any internal
+        // track": mpv keeps `auto` + `no` at the head of the list, so the
+        // track we want lands at audioTracks[index + 2]. Settling for the
+        // first internal track is what made files with several
+        // default-flagged streams start on the wrong one.
+        await _waitForTrackList(() => audioTracks.length > index + 2);
       }
       // skip (unlike getRange) never throws if the player was disposed
       // mid-wait and the track list collapsed under us.
       final internalTracks = audioTracks.skip(2).toList();
-      final audioTrack =
-          internalTracks.elementAtOrNull((playbackModel.audioStreams?.indexOf(wantedAudioStream) ?? -1) - 1);
+      final audioTrack = internalTracks.elementAtOrNull(index);
       if (audioTrack != null) {
         await _player?.setAudioTrack(audioTrack);
       } else if (!kIsWeb && !wantedAudioStream.isExternal && playbackModel.playerHandlesTrackSelection) {
@@ -506,12 +517,13 @@ class LibMPV extends BasePlayer {
       return -1;
     }
     _currentSubtitleCodec = wantedSubtitle.codec;
-    if (!wantedSubtitle.isExternal && playbackModel.playerHandlesTrackSelection) {
-      await _waitForTrackList(() => subTracks.length > 2);
+    final index = playbackModel.subStreams?.sublist(1).indexWhere((element) => element.id == wantedSubtitle.id) ?? -1;
+    if (index >= 0 && !wantedSubtitle.isExternal && playbackModel.playerHandlesTrackSelection) {
+      // See setAudioTrack — wait for subTracks[index + 2] specifically.
+      await _waitForTrackList(() => subTracks.length > index + 2);
     }
     final internalTrack = subTracks.skip(2).toList();
-    final index = playbackModel.subStreams?.sublist(1).indexWhere((element) => element.id == wantedSubtitle.id);
-    final subTrack = internalTrack.elementAtOrNull(index ?? -1);
+    final subTrack = internalTrack.elementAtOrNull(index);
     if (wantedSubtitle.isExternal && wantedSubtitle.url != null && subTrack == null) {
       await _player?.setSubtitleTrack(mpv.SubtitleTrack.uri(wantedSubtitle.url!));
     } else if (subTrack != null) {

@@ -2,10 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:auto_route/auto_route.dart';
-
 import 'package:fladder/screens/shared/default_title_bar.dart';
-import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
 
 class FladderAppBar extends StatelessWidget implements PreferredSize {
   final double height;
@@ -25,22 +22,16 @@ class FladderAppBar extends StatelessWidget implements PreferredSize {
     // Web has no native window chrome — drop the desktop branch so the slot
     // collapses to height 0 and the body isn't covered by an opaque AppBar
     // strip at the top.
-    if (AdaptiveLayout.of(context).isDesktop && !kIsWeb) {
+    if (isDesktop && !kIsWeb) {
       return PreferredSize(
-          preferredSize: Size(double.infinity, height),
-          child: SizedBox(
-            height: height,
-            child: Row(
-              children: [
-                if (automaticallyImplyLeading && context.router.canPop()) const BackButton(),
-                Expanded(
-                  child: DefaultTitleBar(
-                    label: label,
-                  ),
-                )
-              ],
-            ),
-          ));
+        preferredSize: Size(double.infinity, height),
+        child: SizedBox(
+          height: height,
+          child: DefaultTitleBar(
+            label: label,
+          ),
+        ),
+      );
     } else {
       return AppBar(
         toolbarHeight: 0,

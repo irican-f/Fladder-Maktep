@@ -10,10 +10,13 @@ String _$jellybotProvidersHash() => r'b5a7b3a357318938349ccac25ef3a1714c335880';
 
 /// See also [jellybotProviders].
 @ProviderFor(jellybotProviders)
-final jellybotProvidersProvider = AutoDisposeFutureProvider<List<IProvider>>.internal(
+final jellybotProvidersProvider =
+    AutoDisposeFutureProvider<List<IProvider>>.internal(
   jellybotProviders,
   name: r'jellybotProvidersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotProvidersHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$jellybotProvidersHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -21,7 +24,8 @@ final jellybotProvidersProvider = AutoDisposeFutureProvider<List<IProvider>>.int
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef JellybotProvidersRef = AutoDisposeFutureProviderRef<List<IProvider>>;
-String _$jellybotSearchFiltersHash() => r'65e3dbf40d3d960dd23c3643ce580fcd60c5b43c';
+String _$jellybotSearchFiltersHash() =>
+    r'65e3dbf40d3d960dd23c3643ce580fcd60c5b43c';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -49,7 +53,8 @@ class _SystemHash {
 const jellybotSearchFiltersProvider = JellybotSearchFiltersFamily();
 
 /// See also [jellybotSearchFilters].
-class JellybotSearchFiltersFamily extends Family<AsyncValue<List<ISearchFilter>>> {
+class JellybotSearchFiltersFamily
+    extends Family<AsyncValue<List<ISearchFilter>>> {
   /// See also [jellybotSearchFilters].
   const JellybotSearchFiltersFamily();
 
@@ -82,14 +87,16 @@ class JellybotSearchFiltersFamily extends Family<AsyncValue<List<ISearchFilter>>
   static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
 
   @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies => _allTransitiveDependencies;
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
 
   @override
   String? get name => r'jellybotSearchFiltersProvider';
 }
 
 /// See also [jellybotSearchFilters].
-class JellybotSearchFiltersProvider extends AutoDisposeFutureProvider<List<ISearchFilter>> {
+class JellybotSearchFiltersProvider
+    extends AutoDisposeFutureProvider<List<ISearchFilter>> {
   /// See also [jellybotSearchFilters].
   JellybotSearchFiltersProvider(
     String providerId,
@@ -102,9 +109,13 @@ class JellybotSearchFiltersProvider extends AutoDisposeFutureProvider<List<ISear
           ),
           from: jellybotSearchFiltersProvider,
           name: r'jellybotSearchFiltersProvider',
-          debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotSearchFiltersHash,
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$jellybotSearchFiltersHash,
           dependencies: JellybotSearchFiltersFamily._dependencies,
-          allTransitiveDependencies: JellybotSearchFiltersFamily._allTransitiveDependencies,
+          allTransitiveDependencies:
+              JellybotSearchFiltersFamily._allTransitiveDependencies,
           providerId: providerId,
           category: category,
         );
@@ -125,7 +136,8 @@ class JellybotSearchFiltersProvider extends AutoDisposeFutureProvider<List<ISear
 
   @override
   Override overrideWith(
-    FutureOr<List<ISearchFilter>> Function(JellybotSearchFiltersRef provider) create,
+    FutureOr<List<ISearchFilter>> Function(JellybotSearchFiltersRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -149,7 +161,9 @@ class JellybotSearchFiltersProvider extends AutoDisposeFutureProvider<List<ISear
 
   @override
   bool operator ==(Object other) {
-    return other is JellybotSearchFiltersProvider && other.providerId == providerId && other.category == category;
+    return other is JellybotSearchFiltersProvider &&
+        other.providerId == providerId &&
+        other.category == category;
   }
 
   @override
@@ -164,7 +178,8 @@ class JellybotSearchFiltersProvider extends AutoDisposeFutureProvider<List<ISear
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin JellybotSearchFiltersRef on AutoDisposeFutureProviderRef<List<ISearchFilter>> {
+mixin JellybotSearchFiltersRef
+    on AutoDisposeFutureProviderRef<List<ISearchFilter>> {
   /// The parameter `providerId` of this provider.
   String get providerId;
 
@@ -172,17 +187,20 @@ mixin JellybotSearchFiltersRef on AutoDisposeFutureProviderRef<List<ISearchFilte
   MediaCategory get category;
 }
 
-class _JellybotSearchFiltersProviderElement extends AutoDisposeFutureProviderElement<List<ISearchFilter>>
+class _JellybotSearchFiltersProviderElement
+    extends AutoDisposeFutureProviderElement<List<ISearchFilter>>
     with JellybotSearchFiltersRef {
   _JellybotSearchFiltersProviderElement(super.provider);
 
   @override
   String get providerId => (origin as JellybotSearchFiltersProvider).providerId;
   @override
-  MediaCategory get category => (origin as JellybotSearchFiltersProvider).category;
+  MediaCategory get category =>
+      (origin as JellybotSearchFiltersProvider).category;
 }
 
-String _$addedCrawlLinkUrlsHash() => r'5500d47642e8b11a68190db0cd4ff1c3faf09e82';
+String _$addedCrawlLinkUrlsHash() =>
+    r'5500d47642e8b11a68190db0cd4ff1c3faf09e82';
 
 /// Normalized URL keys (see [normalizeCrawlUrlKey]) of every crawl link the
 /// server knows — backs the "already added" badge on search-result cards.
@@ -194,7 +212,9 @@ String _$addedCrawlLinkUrlsHash() => r'5500d47642e8b11a68190db0cd4ff1c3faf09e82'
 final addedCrawlLinkUrlsProvider = FutureProvider<Set<String>>.internal(
   addedCrawlLinkUrls,
   name: r'addedCrawlLinkUrlsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$addedCrawlLinkUrlsHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$addedCrawlLinkUrlsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
@@ -202,7 +222,8 @@ final addedCrawlLinkUrlsProvider = FutureProvider<Set<String>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AddedCrawlLinkUrlsRef = FutureProviderRef<Set<String>>;
-String _$jellybotSearchControllerHash() => r'6c37dfef0e60a5a2899bb5b460903b1567a1f9e7';
+String _$jellybotSearchControllerHash() =>
+    r'6c37dfef0e60a5a2899bb5b460903b1567a1f9e7';
 
 /// Notifier holding the current search-request params (in `_state`) and the
 /// search response in its `AsyncValue<PaginatedResponseOfProviderSearchItemDto?>`.
@@ -214,15 +235,19 @@ String _$jellybotSearchControllerHash() => r'6c37dfef0e60a5a2899bb5b460903b1567a
 ///
 /// Copied from [JellybotSearchController].
 @ProviderFor(JellybotSearchController)
-final jellybotSearchControllerProvider =
-    AutoDisposeAsyncNotifierProvider<JellybotSearchController, PaginatedResponseOfProviderSearchItemDto?>.internal(
+final jellybotSearchControllerProvider = AutoDisposeAsyncNotifierProvider<
+    JellybotSearchController,
+    PaginatedResponseOfProviderSearchItemDto?>.internal(
   JellybotSearchController.new,
   name: r'jellybotSearchControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotSearchControllerHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$jellybotSearchControllerHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$JellybotSearchController = AutoDisposeAsyncNotifier<PaginatedResponseOfProviderSearchItemDto?>;
+typedef _$JellybotSearchController
+    = AutoDisposeAsyncNotifier<PaginatedResponseOfProviderSearchItemDto?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

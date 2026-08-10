@@ -54,7 +54,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<ApiClientDto>> _apiApiClientsPost({required CreateApiClientRequest? body}) {
+  Future<Response<ApiClientDto>> _apiApiClientsPost(
+      {required CreateApiClientRequest? body}) {
     final Uri $url = Uri.parse('/api/api-clients');
     final $body = body;
     final Request $request = Request(
@@ -83,7 +84,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<dynamic>> _apiApiClientsApiClientIdDelete({required String? apiClientId}) {
+  Future<Response<dynamic>> _apiApiClientsApiClientIdDelete(
+      {required String? apiClientId}) {
     final Uri $url = Uri.parse('/api/api-clients/${apiClientId}');
     final Request $request = Request(
       'DELETE',
@@ -117,11 +119,13 @@ final class _$Jellybot extends Jellybot {
       client.baseUrl,
       parameters: $params,
     );
-    return client.send<PaginatedResponseOfCrawlLinkDto, PaginatedResponseOfCrawlLinkDto>($request);
+    return client.send<PaginatedResponseOfCrawlLinkDto,
+        PaginatedResponseOfCrawlLinkDto>($request);
   }
 
   @override
-  Future<Response<ExtractMediaResponse>> _apiCrawlLinksPost({required ExtractMediaRequest? body}) {
+  Future<Response<ExtractMediaResponse>> _apiCrawlLinksPost(
+      {required ExtractMediaRequest? body}) {
     final Uri $url = Uri.parse('/api/crawl-links');
     final $body = body;
     final Request $request = Request(
@@ -147,7 +151,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<ExtractMediaResponse>> _apiCrawlLinksSelectSeasonPost({required SelectSeasonRequest? body}) {
+  Future<Response<ExtractMediaResponse>> _apiCrawlLinksSelectSeasonPost(
+      {required SelectSeasonRequest? body}) {
     final Uri $url = Uri.parse('/api/crawl-links/select-season');
     final $body = body;
     final Request $request = Request(
@@ -160,7 +165,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<CrawlLinkDto>> _apiCrawlLinksConfirmAddPost({required ExtractMediaConfirmationRequest? body}) {
+  Future<Response<CrawlLinkDto>> _apiCrawlLinksConfirmAddPost(
+      {required ExtractMediaConfirmationRequest? body}) {
     final Uri $url = Uri.parse('/api/crawl-links/confirm-add');
     final $body = body;
     final Request $request = Request(
@@ -205,8 +211,10 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<List<String>>> _apiCrawlLinksCrawlLinkIdDisabledHostsGet({required String? crawlLinkId}) {
-    final Uri $url = Uri.parse('/api/crawl-links/${crawlLinkId}/disabled-hosts');
+  Future<Response<List<String>>> _apiCrawlLinksCrawlLinkIdDisabledHostsGet(
+      {required String? crawlLinkId}) {
+    final Uri $url =
+        Uri.parse('/api/crawl-links/${crawlLinkId}/disabled-hosts');
     final Request $request = Request(
       'GET',
       $url,
@@ -220,7 +228,8 @@ final class _$Jellybot extends Jellybot {
     required String? crawlLinkId,
     required UpdateDisabledHostsRequest? body,
   }) {
-    final Uri $url = Uri.parse('/api/crawl-links/${crawlLinkId}/disabled-hosts');
+    final Uri $url =
+        Uri.parse('/api/crawl-links/${crawlLinkId}/disabled-hosts');
     final $body = body;
     final Request $request = Request(
       'PUT',
@@ -243,7 +252,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<List<String>>> _apiCrawlLinksGlobalDisabledHostsPut({required UpdateDisabledHostsRequest? body}) {
+  Future<Response<List<String>>> _apiCrawlLinksGlobalDisabledHostsPut(
+      {required UpdateDisabledHostsRequest? body}) {
     final Uri $url = Uri.parse('/api/crawl-links/global-disabled-hosts');
     final $body = body;
     final Request $request = Request(
@@ -307,7 +317,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<dynamic>> _apiInvitesPost({required MediaServerInviteRequest? body}) {
+  Future<Response<dynamic>> _apiInvitesPost(
+      {required MediaServerInviteRequest? body}) {
     final Uri $url = Uri.parse('/api/invites');
     final $body = body;
     final Request $request = Request(
@@ -368,7 +379,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<DebridLinkResult>> _apiMediaDebridLinkPost({required DebridLinkRequest? body}) {
+  Future<Response<DebridLinkResult>> _apiMediaDebridLinkPost(
+      {required DebridLinkRequest? body}) {
     final Uri $url = Uri.parse('/api/media/debrid-link');
     final $body = body;
     final Request $request = Request(
@@ -394,7 +406,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<RemoveCorruptedFileResult>> _apiMediaCorruptedFilePost({required RemoveCorruptedFileRequest? body}) {
+  Future<Response<RemoveCorruptedFileResult>> _apiMediaCorruptedFilePost(
+      {required RemoveCorruptedFileRequest? body}) {
     final Uri $url = Uri.parse('/api/media/corrupted-file');
     final $body = body;
     final Request $request = Request(
@@ -403,7 +416,8 @@ final class _$Jellybot extends Jellybot {
       client.baseUrl,
       body: $body,
     );
-    return client.send<RemoveCorruptedFileResult, RemoveCorruptedFileResult>($request);
+    return client
+        .send<RemoveCorruptedFileResult, RemoveCorruptedFileResult>($request);
   }
 
   @override
@@ -420,7 +434,9 @@ final class _$Jellybot extends Jellybot {
   @override
   Future<Response<List<IProvider>>> _apiProvidersGet({bool? searchEnabled}) {
     final Uri $url = Uri.parse('/api/providers');
-    final Map<String, dynamic> $params = <String, dynamic>{'searchEnabled': searchEnabled};
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'searchEnabled': searchEnabled
+    };
     final Request $request = Request(
       'GET',
       $url,
@@ -458,12 +474,15 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<List<ISearchFilter>>> _apiProvidersProviderIdSearchFiltersGet({
+  Future<Response<List<ISearchFilter>>>
+      _apiProvidersProviderIdSearchFiltersGet({
     required String? providerId,
     String? mediaCategory,
   }) {
     final Uri $url = Uri.parse('/api/providers/${providerId}/search-filters');
-    final Map<String, dynamic> $params = <String, dynamic>{'mediaCategory': mediaCategory};
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'mediaCategory': mediaCategory
+    };
     final Request $request = Request(
       'GET',
       $url,
@@ -474,7 +493,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<PaginatedResponseOfProviderSearchItemDto>> _apiProvidersProviderIdSearchPost({
+  Future<Response<PaginatedResponseOfProviderSearchItemDto>>
+      _apiProvidersProviderIdSearchPost({
     required String? providerId,
     required ApiMediaSearchRequest? body,
   }) {
@@ -486,7 +506,8 @@ final class _$Jellybot extends Jellybot {
       client.baseUrl,
       body: $body,
     );
-    return client.send<PaginatedResponseOfProviderSearchItemDto, PaginatedResponseOfProviderSearchItemDto>($request);
+    return client.send<PaginatedResponseOfProviderSearchItemDto,
+        PaginatedResponseOfProviderSearchItemDto>($request);
   }
 
   @override
@@ -501,7 +522,8 @@ final class _$Jellybot extends Jellybot {
   }
 
   @override
-  Future<Response<LiveTvSourceResult>> _apiSettingsLiveTvSourcePut({required UpdateLiveTvSourceRequest? body}) {
+  Future<Response<LiveTvSourceResult>> _apiSettingsLiveTvSourcePut(
+      {required UpdateLiveTvSourceRequest? body}) {
     final Uri $url = Uri.parse('/api/settings/live-tv-source');
     final $body = body;
     final Request $request = Request(

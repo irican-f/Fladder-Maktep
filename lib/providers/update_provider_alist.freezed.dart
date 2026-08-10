@@ -116,7 +116,9 @@ extension UpdatesModelAlistPatterns on UpdatesModelAlist {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(List<ReleaseInfo> lastRelease, Map<String, AlistReleaseExtras> extras)? $default, {
+    TResult Function(List<ReleaseInfo> lastRelease,
+            Map<String, AlistReleaseExtras> extras)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
@@ -143,7 +145,9 @@ extension UpdatesModelAlistPatterns on UpdatesModelAlist {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(List<ReleaseInfo> lastRelease, Map<String, AlistReleaseExtras> extras) $default,
+    TResult Function(List<ReleaseInfo> lastRelease,
+            Map<String, AlistReleaseExtras> extras)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
@@ -168,7 +172,9 @@ extension UpdatesModelAlistPatterns on UpdatesModelAlist {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(List<ReleaseInfo> lastRelease, Map<String, AlistReleaseExtras> extras)? $default,
+    TResult? Function(List<ReleaseInfo> lastRelease,
+            Map<String, AlistReleaseExtras> extras)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
@@ -184,7 +190,8 @@ extension UpdatesModelAlistPatterns on UpdatesModelAlist {
 
 class _UpdatesModelAlist extends UpdatesModelAlist {
   const _UpdatesModelAlist(
-      {final List<ReleaseInfo> lastRelease = const [], final Map<String, AlistReleaseExtras> extras = const {}})
+      {final List<ReleaseInfo> lastRelease = const [],
+      final Map<String, AlistReleaseExtras> extras = const {}})
       : _lastRelease = lastRelease,
         _extras = extras,
         super._();
