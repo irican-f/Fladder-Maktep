@@ -50,8 +50,7 @@ mixin _$VideoPlayerSettingsModel implements DiagnosticableTreeMixin {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $VideoPlayerSettingsModelCopyWith<VideoPlayerSettingsModel> get copyWith =>
-      _$VideoPlayerSettingsModelCopyWithImpl<VideoPlayerSettingsModel>(
-          this as VideoPlayerSettingsModel, _$identity);
+      _$VideoPlayerSettingsModelCopyWithImpl<VideoPlayerSettingsModel>(this as VideoPlayerSettingsModel, _$identity);
 
   /// Serializes this VideoPlayerSettingsModel to a JSON map.
   Map<String, dynamic> toJson();
@@ -80,12 +79,10 @@ mixin _$VideoPlayerSettingsModel implements DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('enableSpeedBoost', enableSpeedBoost))
       ..add(DiagnosticsProperty('speedBoostRate', speedBoostRate))
       ..add(DiagnosticsProperty('enableDoubleTapSeek', enableDoubleTapSeek))
-      ..add(DiagnosticsProperty(
-          'enableAdvancedVideoOptions', enableAdvancedVideoOptions))
+      ..add(DiagnosticsProperty('enableAdvancedVideoOptions', enableAdvancedVideoOptions))
       ..add(DiagnosticsProperty('enableEdgeGestures', enableEdgeGestures))
       ..add(DiagnosticsProperty('reverseEdgeGestures', reverseEdgeGestures))
-      ..add(
-          DiagnosticsProperty('enablePictureInPicture', enablePictureInPicture))
+      ..add(DiagnosticsProperty('enablePictureInPicture', enablePictureInPicture))
       ..add(DiagnosticsProperty('enableReplayGain', enableReplayGain))
       ..add(DiagnosticsProperty('replayGainVolumeLevel', replayGainVolumeLevel))
       ..add(DiagnosticsProperty('enablePlayPauseFade', enablePlayPauseFade))
@@ -102,8 +99,8 @@ mixin _$VideoPlayerSettingsModel implements DiagnosticableTreeMixin {
 
 /// @nodoc
 abstract mixin class $VideoPlayerSettingsModelCopyWith<$Res> {
-  factory $VideoPlayerSettingsModelCopyWith(VideoPlayerSettingsModel value,
-          $Res Function(VideoPlayerSettingsModel) _then) =
+  factory $VideoPlayerSettingsModelCopyWith(
+          VideoPlayerSettingsModel value, $Res Function(VideoPlayerSettingsModel) _then) =
       _$VideoPlayerSettingsModelCopyWithImpl;
   @useResult
   $Res call(
@@ -140,8 +137,7 @@ abstract mixin class $VideoPlayerSettingsModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$VideoPlayerSettingsModelCopyWithImpl<$Res>
-    implements $VideoPlayerSettingsModelCopyWith<$Res> {
+class _$VideoPlayerSettingsModelCopyWithImpl<$Res> implements $VideoPlayerSettingsModelCopyWith<$Res> {
   _$VideoPlayerSettingsModelCopyWithImpl(this._self, this._then);
 
   final VideoPlayerSettingsModel _self;
@@ -650,8 +646,7 @@ extension VideoPlayerSettingsModelPatterns on VideoPlayerSettingsModel {
 
 /// @nodoc
 @JsonSerializable()
-class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel
-    with DiagnosticableTreeMixin {
+class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel with DiagnosticableTreeMixin {
   _VideoPlayerSettingsModel(
       {this.screenBrightness,
       this.videoFit = BoxFit.contain,
@@ -667,8 +662,7 @@ class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel
       this.maxHomeBitrate = Bitrate.original,
       this.maxInternetBitrate = Bitrate.original,
       this.audioDevice,
-      final Map<MediaSegmentType, SegmentSkip> segmentSkipSettings =
-          defaultSegmentSkipValues,
+      final Map<MediaSegmentType, SegmentSkip> segmentSkipSettings = defaultSegmentSkipValues,
       final Map<VideoHotKeys, KeyCombination> hotKeys = const {},
       this.screensaver = Screensaver.logo,
       this.enableSpeedBoost = false,
@@ -688,8 +682,7 @@ class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel
         _segmentSkipSettings = segmentSkipSettings,
         _hotKeys = hotKeys,
         super._();
-  factory _VideoPlayerSettingsModel.fromJson(Map<String, dynamic> json) =>
-      _$VideoPlayerSettingsModelFromJson(json);
+  factory _VideoPlayerSettingsModel.fromJson(Map<String, dynamic> json) => _$VideoPlayerSettingsModelFromJson(json);
 
   @override
   final double? screenBrightness;
@@ -721,8 +714,7 @@ class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel
   Set<DeviceOrientation>? get allowedOrientations {
     final value = _allowedOrientations;
     if (value == null) return null;
-    if (_allowedOrientations is EqualUnmodifiableSetView)
-      return _allowedOrientations;
+    if (_allowedOrientations is EqualUnmodifiableSetView) return _allowedOrientations;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableSetView(value);
   }
@@ -742,8 +734,7 @@ class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel
   @override
   @JsonKey()
   Map<MediaSegmentType, SegmentSkip> get segmentSkipSettings {
-    if (_segmentSkipSettings is EqualUnmodifiableMapView)
-      return _segmentSkipSettings;
+    if (_segmentSkipSettings is EqualUnmodifiableMapView) return _segmentSkipSettings;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableMapView(_segmentSkipSettings);
   }
@@ -806,8 +797,7 @@ class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   _$VideoPlayerSettingsModelCopyWith<_VideoPlayerSettingsModel> get copyWith =>
-      __$VideoPlayerSettingsModelCopyWithImpl<_VideoPlayerSettingsModel>(
-          this, _$identity);
+      __$VideoPlayerSettingsModelCopyWithImpl<_VideoPlayerSettingsModel>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
@@ -840,12 +830,10 @@ class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel
       ..add(DiagnosticsProperty('enableSpeedBoost', enableSpeedBoost))
       ..add(DiagnosticsProperty('speedBoostRate', speedBoostRate))
       ..add(DiagnosticsProperty('enableDoubleTapSeek', enableDoubleTapSeek))
-      ..add(DiagnosticsProperty(
-          'enableAdvancedVideoOptions', enableAdvancedVideoOptions))
+      ..add(DiagnosticsProperty('enableAdvancedVideoOptions', enableAdvancedVideoOptions))
       ..add(DiagnosticsProperty('enableEdgeGestures', enableEdgeGestures))
       ..add(DiagnosticsProperty('reverseEdgeGestures', reverseEdgeGestures))
-      ..add(
-          DiagnosticsProperty('enablePictureInPicture', enablePictureInPicture))
+      ..add(DiagnosticsProperty('enablePictureInPicture', enablePictureInPicture))
       ..add(DiagnosticsProperty('enableReplayGain', enableReplayGain))
       ..add(DiagnosticsProperty('replayGainVolumeLevel', replayGainVolumeLevel))
       ..add(DiagnosticsProperty('enablePlayPauseFade', enablePlayPauseFade))
@@ -861,10 +849,9 @@ class _VideoPlayerSettingsModel extends VideoPlayerSettingsModel
 }
 
 /// @nodoc
-abstract mixin class _$VideoPlayerSettingsModelCopyWith<$Res>
-    implements $VideoPlayerSettingsModelCopyWith<$Res> {
-  factory _$VideoPlayerSettingsModelCopyWith(_VideoPlayerSettingsModel value,
-          $Res Function(_VideoPlayerSettingsModel) _then) =
+abstract mixin class _$VideoPlayerSettingsModelCopyWith<$Res> implements $VideoPlayerSettingsModelCopyWith<$Res> {
+  factory _$VideoPlayerSettingsModelCopyWith(
+          _VideoPlayerSettingsModel value, $Res Function(_VideoPlayerSettingsModel) _then) =
       __$VideoPlayerSettingsModelCopyWithImpl;
   @override
   @useResult
@@ -902,8 +889,7 @@ abstract mixin class _$VideoPlayerSettingsModelCopyWith<$Res>
 }
 
 /// @nodoc
-class __$VideoPlayerSettingsModelCopyWithImpl<$Res>
-    implements _$VideoPlayerSettingsModelCopyWith<$Res> {
+class __$VideoPlayerSettingsModelCopyWithImpl<$Res> implements _$VideoPlayerSettingsModelCopyWith<$Res> {
   __$VideoPlayerSettingsModelCopyWithImpl(this._self, this._then);
 
   final _VideoPlayerSettingsModel _self;

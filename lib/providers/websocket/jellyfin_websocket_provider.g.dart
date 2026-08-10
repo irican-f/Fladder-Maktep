@@ -6,8 +6,7 @@ part of 'jellyfin_websocket_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$jellyfinWebSocketControllerHash() =>
-    r'00896a5d9767b6479efff0b4a21465e7dc402b8d';
+String _$jellyfinWebSocketControllerHash() => r'00896a5d9767b6479efff0b4a21465e7dc402b8d';
 
 /// App-level shared Jellyfin WebSocket.
 ///
@@ -18,13 +17,11 @@ String _$jellyfinWebSocketControllerHash() =>
 ///
 /// Copied from [JellyfinWebSocketController].
 @ProviderFor(JellyfinWebSocketController)
-final jellyfinWebSocketControllerProvider = NotifierProvider<
-    JellyfinWebSocketController, WebSocketConnectionState>.internal(
+final jellyfinWebSocketControllerProvider =
+    NotifierProvider<JellyfinWebSocketController, WebSocketConnectionState>.internal(
   JellyfinWebSocketController.new,
   name: r'jellyfinWebSocketControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$jellyfinWebSocketControllerHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellyfinWebSocketControllerHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

@@ -28,8 +28,7 @@ mixin _$JellybotSearchState {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $JellybotSearchStateCopyWith<JellybotSearchState> get copyWith =>
-      _$JellybotSearchStateCopyWithImpl<JellybotSearchState>(
-          this as JellybotSearchState, _$identity);
+      _$JellybotSearchStateCopyWithImpl<JellybotSearchState>(this as JellybotSearchState, _$identity);
 
   @override
   String toString() {
@@ -39,8 +38,7 @@ mixin _$JellybotSearchState {
 
 /// @nodoc
 abstract mixin class $JellybotSearchStateCopyWith<$Res> {
-  factory $JellybotSearchStateCopyWith(
-          JellybotSearchState value, $Res Function(JellybotSearchState) _then) =
+  factory $JellybotSearchStateCopyWith(JellybotSearchState value, $Res Function(JellybotSearchState) _then) =
       _$JellybotSearchStateCopyWithImpl;
   @useResult
   $Res call(
@@ -55,8 +53,7 @@ abstract mixin class $JellybotSearchStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$JellybotSearchStateCopyWithImpl<$Res>
-    implements $JellybotSearchStateCopyWith<$Res> {
+class _$JellybotSearchStateCopyWithImpl<$Res> implements $JellybotSearchStateCopyWith<$Res> {
   _$JellybotSearchStateCopyWithImpl(this._self, this._then);
 
   final JellybotSearchState _self;
@@ -206,30 +203,16 @@ extension JellybotSearchStatePatterns on JellybotSearchState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String query,
-            MediaCategory category,
-            IProvider? provider,
-            Map<String, String> selectedFilters,
-            bool exactMatch,
-            double? minScore,
-            int page,
-            int pageSize)?
+    TResult Function(String query, MediaCategory category, IProvider? provider, Map<String, String> selectedFilters,
+            bool exactMatch, double? minScore, int page, int pageSize)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _JellybotSearchState() when $default != null:
-        return $default(
-            _that.query,
-            _that.category,
-            _that.provider,
-            _that.selectedFilters,
-            _that.exactMatch,
-            _that.minScore,
-            _that.page,
-            _that.pageSize);
+        return $default(_that.query, _that.category, _that.provider, _that.selectedFilters, _that.exactMatch,
+            _that.minScore, _that.page, _that.pageSize);
       case _:
         return orElse();
     }
@@ -250,29 +233,15 @@ extension JellybotSearchStatePatterns on JellybotSearchState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String query,
-            MediaCategory category,
-            IProvider? provider,
-            Map<String, String> selectedFilters,
-            bool exactMatch,
-            double? minScore,
-            int page,
-            int pageSize)
+    TResult Function(String query, MediaCategory category, IProvider? provider, Map<String, String> selectedFilters,
+            bool exactMatch, double? minScore, int page, int pageSize)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _JellybotSearchState():
-        return $default(
-            _that.query,
-            _that.category,
-            _that.provider,
-            _that.selectedFilters,
-            _that.exactMatch,
-            _that.minScore,
-            _that.page,
-            _that.pageSize);
+        return $default(_that.query, _that.category, _that.provider, _that.selectedFilters, _that.exactMatch,
+            _that.minScore, _that.page, _that.pageSize);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -292,29 +261,15 @@ extension JellybotSearchStatePatterns on JellybotSearchState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String query,
-            MediaCategory category,
-            IProvider? provider,
-            Map<String, String> selectedFilters,
-            bool exactMatch,
-            double? minScore,
-            int page,
-            int pageSize)?
+    TResult? Function(String query, MediaCategory category, IProvider? provider, Map<String, String> selectedFilters,
+            bool exactMatch, double? minScore, int page, int pageSize)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _JellybotSearchState() when $default != null:
-        return $default(
-            _that.query,
-            _that.category,
-            _that.provider,
-            _that.selectedFilters,
-            _that.exactMatch,
-            _that.minScore,
-            _that.page,
-            _that.pageSize);
+        return $default(_that.query, _that.category, _that.provider, _that.selectedFilters, _that.exactMatch,
+            _that.minScore, _that.page, _that.pageSize);
       case _:
         return null;
     }
@@ -371,8 +326,7 @@ class _JellybotSearchState extends JellybotSearchState {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   _$JellybotSearchStateCopyWith<_JellybotSearchState> get copyWith =>
-      __$JellybotSearchStateCopyWithImpl<_JellybotSearchState>(
-          this, _$identity);
+      __$JellybotSearchStateCopyWithImpl<_JellybotSearchState>(this, _$identity);
 
   @override
   String toString() {
@@ -381,10 +335,8 @@ class _JellybotSearchState extends JellybotSearchState {
 }
 
 /// @nodoc
-abstract mixin class _$JellybotSearchStateCopyWith<$Res>
-    implements $JellybotSearchStateCopyWith<$Res> {
-  factory _$JellybotSearchStateCopyWith(_JellybotSearchState value,
-          $Res Function(_JellybotSearchState) _then) =
+abstract mixin class _$JellybotSearchStateCopyWith<$Res> implements $JellybotSearchStateCopyWith<$Res> {
+  factory _$JellybotSearchStateCopyWith(_JellybotSearchState value, $Res Function(_JellybotSearchState) _then) =
       __$JellybotSearchStateCopyWithImpl;
   @override
   @useResult
@@ -400,8 +352,7 @@ abstract mixin class _$JellybotSearchStateCopyWith<$Res>
 }
 
 /// @nodoc
-class __$JellybotSearchStateCopyWithImpl<$Res>
-    implements _$JellybotSearchStateCopyWith<$Res> {
+class __$JellybotSearchStateCopyWithImpl<$Res> implements _$JellybotSearchStateCopyWith<$Res> {
   __$JellybotSearchStateCopyWithImpl(this._self, this._then);
 
   final _JellybotSearchState _self;

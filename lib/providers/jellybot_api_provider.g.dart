@@ -10,12 +10,10 @@ String _$jellybotApiHash() => r'81f85a749ee957ab45a4d8bacff5c8512f85a2c7';
 
 /// See also [JellybotApi].
 @ProviderFor(JellybotApi)
-final jellybotApiProvider =
-    AutoDisposeNotifierProvider<JellybotApi, Jellybot>.internal(
+final jellybotApiProvider = AutoDisposeNotifierProvider<JellybotApi, Jellybot>.internal(
   JellybotApi.new,
   name: r'jellybotApiProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotApiHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotApiHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

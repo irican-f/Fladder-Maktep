@@ -19,13 +19,10 @@ String _$jellybotAddFlowHash() => r'be47a2e369677a9ffac962789b6281d6bce43958';
 ///
 /// Copied from [JellybotAddFlow].
 @ProviderFor(JellybotAddFlow)
-final jellybotAddFlowProvider =
-    NotifierProvider<JellybotAddFlow, JellybotAddFlowState?>.internal(
+final jellybotAddFlowProvider = NotifierProvider<JellybotAddFlow, JellybotAddFlowState?>.internal(
   JellybotAddFlow.new,
   name: r'jellybotAddFlowProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$jellybotAddFlowHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotAddFlowHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
