@@ -353,6 +353,15 @@ Future<void> main(List<String> args) async {
         '--delete-conflicting-outputs',
       ]);
       if (bcode != 0) exit(bcode);
+
+      // Code generators format their output with their own DartFormatter and
+      // ignore formatter.page_width in analysis_options.yaml, so they emit at
+      // the 80-column default. Left alone that rewraps every generated file
+      // and fails the format gate in .github/workflows/checks.yaml, which
+      // checks at 120. Reformatting here keeps a release self-consistent
+      // instead of depending on whoever ran it remembering to do so.
+      final fcode = await runProcess('dart', ['format', 'lib']);
+      if (fcode != 0) exit(fcode);
     }
     if (platforms.contains('android')) {
       final code = await runProcess('flutter', [

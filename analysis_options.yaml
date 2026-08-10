@@ -1,5 +1,12 @@
 include: package:lints/recommended.yaml
 
+# Keep `dart format` at the width CI checks (.github/workflows/checks.yaml).
+# Without this, anything that formats without an explicit -l 120 — notably
+# build_runner's generated output — rewraps the whole tree at the default 80
+# and fails the format gate.
+formatter:
+  page_width: 120
+
 analyzer:
   exclude:
     - build/**
