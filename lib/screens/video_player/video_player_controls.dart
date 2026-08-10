@@ -158,9 +158,14 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
                     onVerticalDragStart: initInputDevice == InputDevice.touch ? _handleVerticalDragStart : null,
                     onVerticalDragUpdate: initInputDevice == InputDevice.touch ? _handleVerticalDragUpdate : null,
                     onVerticalDragEnd: initInputDevice == InputDevice.touch ? _handleVerticalDragEnd : null,
-                    //better play/pause handling on Desktop (works with dragging on click)
-                    onHorizontalDragDown:
-                        initInputDevice == InputDevice.pointer ? (details) => player.playOrPause() : null,
+                    // Do NOT add a pointer play/pause handler on pointer-down here
+                    // (upstream #986 used onHorizontalDragDown). Flutter invokes the
+                    // drag recognizer's onDown immediately on pointer-down, before the
+                    // gesture arena resolves, so a plain click toggled twice: once on
+                    // press and again via onTap on release — pausing and instantly
+                    // resuming. Toggling lives on onTap above, which also routes through
+                    // userPlayOrPause so a pause propagates to the SyncPlay group;
+                    // player.playOrPause() bypasses SyncPlay entirely.
                   ),
                 ),
                 if (subtitleWidget != null) subtitleWidget,
