@@ -63,8 +63,15 @@ class PlaybackQueueState {
 
   ItemBaseModel? _nextInQueue(String currentPlayingId) {
     if (queue.isEmpty) return null;
-    final anchorId = mainQueueCurrentId ?? currentPlayingId;
-    final idx = queue.indexWhere((e) => e.id == anchorId);
+    // The item actually playing wins over mainQueueCurrentId whenever it is in
+    // the main queue. The anchor can drift behind the real position (e.g.
+    // advanceTo leaves it on the previous item when the target is not part of
+    // this queue); trusting it then returns queue[anchor + 1] — which is the
+    // episode already playing — and "advancing" restarts it from zero.
+    // The anchor stays the fallback for items outside the queue, such as
+    // playback started from the next-up queue.
+    final playingIdx = queue.indexWhere((e) => e.id == currentPlayingId);
+    final idx = playingIdx >= 0 ? playingIdx : queue.indexWhere((e) => e.id == mainQueueCurrentId);
     if (idx < 0) return repeatMode == AudioRepeatMode.all ? queue.first : null;
     if (idx + 1 < queue.length) return queue[idx + 1];
     if (repeatMode == AudioRepeatMode.all) return queue.first;
