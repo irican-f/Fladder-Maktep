@@ -41,8 +41,7 @@ void main() {
     // player "advanced" by restarting it from zero.
     test('a stale anchor must not make nextItem return the CURRENT episode', () {
       final q = PlaybackQueueState.fromQueue(season, initialItemId: 'E3');
-      expect(q.nextItem('E4')?.id, 'E5',
-          reason: 'the item actually playing wins over a drifted anchor');
+      expect(q.nextItem('E4')?.id, 'E5', reason: 'the item actually playing wins over a drifted anchor');
     });
 
     test('anchor is only a fallback when the playing item is outside the queue', () {

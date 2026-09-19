@@ -7,8 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class FakeAlistDownloadClient implements AlistDownloadClient {
-  final StreamController<AlistDownloadEvent> _controller =
-      StreamController<AlistDownloadEvent>.broadcast();
+  final StreamController<AlistDownloadEvent> _controller = StreamController<AlistDownloadEvent>.broadcast();
   String? lastTaskId;
   String? lastUrl;
   bool cancelled = false;
@@ -31,10 +30,8 @@ class FakeAlistDownloadClient implements AlistDownloadClient {
   }
 
   void emitProgress(double p) => _controller.add(AlistDownloadEvent.progress(p));
-  void emitComplete(String path) =>
-      _controller.add(AlistDownloadEvent.complete(path));
-  void emitFailure(String reason) =>
-      _controller.add(AlistDownloadEvent.failed(reason));
+  void emitComplete(String path) => _controller.add(AlistDownloadEvent.complete(path));
+  void emitFailure(String reason) => _controller.add(AlistDownloadEvent.failed(reason));
 }
 
 class _CapturingInstaller {
@@ -80,8 +77,7 @@ void main() {
 
     fakeClient.emitProgress(0.5);
     await Future.delayed(Duration.zero);
-    expect(container.read(updateDownloaderProvider).kind,
-        UpdateDownloadStateKind.downloading);
+    expect(container.read(updateDownloaderProvider).kind, UpdateDownloadStateKind.downloading);
     expect(container.read(updateDownloaderProvider).progress, 0.5);
 
     final tmp = await Directory.systemTemp.createTemp('alist-dl-');
@@ -89,8 +85,7 @@ void main() {
     fakeClient.emitComplete(f.path);
     await Future.delayed(Duration.zero);
 
-    expect(container.read(updateDownloaderProvider).kind,
-        UpdateDownloadStateKind.ready);
+    expect(container.read(updateDownloaderProvider).kind, UpdateDownloadStateKind.ready);
     expect(container.read(updateDownloaderProvider).filePath, f.path);
 
     await tmp.delete(recursive: true);
@@ -129,8 +124,7 @@ void main() {
     await Future.delayed(Duration.zero);
 
     expect(fakeClient.cancelled, isTrue);
-    expect(container.read(updateDownloaderProvider).kind,
-        UpdateDownloadStateKind.idle);
+    expect(container.read(updateDownloaderProvider).kind, UpdateDownloadStateKind.idle);
   });
 
   test('install transitions ready -> installing -> done on success', () async {
@@ -149,8 +143,7 @@ void main() {
 
     await notifier.install();
     expect(installer.installedPath, f.path);
-    expect(container.read(updateDownloaderProvider).kind,
-        UpdateDownloadStateKind.done);
+    expect(container.read(updateDownloaderProvider).kind, UpdateDownloadStateKind.done);
 
     await tmp.delete(recursive: true);
   });

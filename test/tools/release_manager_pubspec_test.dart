@@ -63,8 +63,7 @@ void main() {
     });
 
     test('rejects unknown level', () {
-      expect(() => bumpPubspecVersion(_samplePubspec, 'epoch'),
-          throwsArgumentError);
+      expect(() => bumpPubspecVersion(_samplePubspec, 'epoch'), throwsArgumentError);
     });
   });
 }

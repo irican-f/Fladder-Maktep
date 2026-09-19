@@ -70,10 +70,21 @@ _UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => _UserSettings
           ? const Duration(seconds: 10)
           : Duration(microseconds: (json['skipBackDuration'] as num).toInt()),
       preferOriginalAudio: json['preferOriginalAudio'] as bool? ?? false,
+      libraryFilters:
+          json['libraryFilters'] == null ? const [] : const LibraryFiltersConverter().fromJson(json['libraryFilters']),
+      filterSortOrder: json['filterSortOrder'] == null
+          ? const {}
+          : const FilterSortOrderConverter().fromJson(json['filterSortOrder']),
+      pDashboardSorting: json['pDashboardSorting'] == null
+          ? const {}
+          : const DashboardSortingConverter().fromJson(json['pDashboardSorting']),
     );
 
 Map<String, dynamic> _$UserSettingsToJson(_UserSettings instance) => <String, dynamic>{
       'skipForwardDuration': instance.skipForwardDuration.inMicroseconds,
       'skipBackDuration': instance.skipBackDuration.inMicroseconds,
       'preferOriginalAudio': instance.preferOriginalAudio,
+      'libraryFilters': const LibraryFiltersConverter().toJson(instance.libraryFilters),
+      'filterSortOrder': const FilterSortOrderConverter().toJson(instance.filterSortOrder),
+      'pDashboardSorting': const DashboardSortingConverter().toJson(instance.pDashboardSorting),
     };

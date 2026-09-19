@@ -151,4 +151,7 @@ class _TranslationsMessgener extends messenger.TranslationsPigeon {
 
   @override
   String syncPlayCommandSyncing() => context.localized.syncPlayCommandSyncing;
+
+  @override
+  String syncPlayStateWaiting() => context.localized.syncPlayStateWaiting;
 }

@@ -20,8 +20,8 @@ mixin _$ControlServerModel {
   String get cachePath;
   String get metaDataPath;
   bool get quickConnectEnabled;
-  int get maxConcurrentLibraryScan;
-  int get maxImageDecodingThreads;
+  int? get maxConcurrentLibraryScan;
+  int? get maxImageDecodingThreads;
 
   /// Create a copy of ControlServerModel
   /// with the given fields replaced by the non-null parameter values.
@@ -48,8 +48,8 @@ abstract mixin class $ControlServerModelCopyWith<$Res> {
       String cachePath,
       String metaDataPath,
       bool quickConnectEnabled,
-      int maxConcurrentLibraryScan,
-      int maxImageDecodingThreads});
+      int? maxConcurrentLibraryScan,
+      int? maxImageDecodingThreads});
 }
 
 /// @nodoc
@@ -70,8 +70,8 @@ class _$ControlServerModelCopyWithImpl<$Res> implements $ControlServerModelCopyW
     Object? cachePath = null,
     Object? metaDataPath = null,
     Object? quickConnectEnabled = null,
-    Object? maxConcurrentLibraryScan = null,
-    Object? maxImageDecodingThreads = null,
+    Object? maxConcurrentLibraryScan = freezed,
+    Object? maxImageDecodingThreads = freezed,
   }) {
     return _then(_self.copyWith(
       name: null == name
@@ -98,14 +98,14 @@ class _$ControlServerModelCopyWithImpl<$Res> implements $ControlServerModelCopyW
           ? _self.quickConnectEnabled
           : quickConnectEnabled // ignore: cast_nullable_to_non_nullable
               as bool,
-      maxConcurrentLibraryScan: null == maxConcurrentLibraryScan
+      maxConcurrentLibraryScan: freezed == maxConcurrentLibraryScan
           ? _self.maxConcurrentLibraryScan
           : maxConcurrentLibraryScan // ignore: cast_nullable_to_non_nullable
-              as int,
-      maxImageDecodingThreads: null == maxImageDecodingThreads
+              as int?,
+      maxImageDecodingThreads: freezed == maxImageDecodingThreads
           ? _self.maxImageDecodingThreads
           : maxImageDecodingThreads // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }
@@ -210,8 +210,8 @@ extension ControlServerModelPatterns on ControlServerModel {
             String cachePath,
             String metaDataPath,
             bool quickConnectEnabled,
-            int maxConcurrentLibraryScan,
-            int maxImageDecodingThreads)?
+            int? maxConcurrentLibraryScan,
+            int? maxImageDecodingThreads)?
         $default, {
     required TResult orElse(),
   }) {
@@ -247,8 +247,8 @@ extension ControlServerModelPatterns on ControlServerModel {
             String cachePath,
             String metaDataPath,
             bool quickConnectEnabled,
-            int maxConcurrentLibraryScan,
-            int maxImageDecodingThreads)
+            int? maxConcurrentLibraryScan,
+            int? maxImageDecodingThreads)
         $default,
   ) {
     final _that = this;
@@ -282,8 +282,8 @@ extension ControlServerModelPatterns on ControlServerModel {
             String cachePath,
             String metaDataPath,
             bool quickConnectEnabled,
-            int maxConcurrentLibraryScan,
-            int maxImageDecodingThreads)?
+            int? maxConcurrentLibraryScan,
+            int? maxImageDecodingThreads)?
         $default,
   ) {
     final _that = this;
@@ -307,8 +307,8 @@ class _ControlServerModel implements ControlServerModel {
       this.cachePath = "",
       this.metaDataPath = "",
       this.quickConnectEnabled = false,
-      this.maxConcurrentLibraryScan = 1,
-      this.maxImageDecodingThreads = 1})
+      this.maxConcurrentLibraryScan,
+      this.maxImageDecodingThreads})
       : _availableLanguages = availableLanguages;
 
   @override
@@ -336,11 +336,9 @@ class _ControlServerModel implements ControlServerModel {
   @JsonKey()
   final bool quickConnectEnabled;
   @override
-  @JsonKey()
-  final int maxConcurrentLibraryScan;
+  final int? maxConcurrentLibraryScan;
   @override
-  @JsonKey()
-  final int maxImageDecodingThreads;
+  final int? maxImageDecodingThreads;
 
   /// Create a copy of ControlServerModel
   /// with the given fields replaced by the non-null parameter values.
@@ -369,8 +367,8 @@ abstract mixin class _$ControlServerModelCopyWith<$Res> implements $ControlServe
       String cachePath,
       String metaDataPath,
       bool quickConnectEnabled,
-      int maxConcurrentLibraryScan,
-      int maxImageDecodingThreads});
+      int? maxConcurrentLibraryScan,
+      int? maxImageDecodingThreads});
 }
 
 /// @nodoc
@@ -391,8 +389,8 @@ class __$ControlServerModelCopyWithImpl<$Res> implements _$ControlServerModelCop
     Object? cachePath = null,
     Object? metaDataPath = null,
     Object? quickConnectEnabled = null,
-    Object? maxConcurrentLibraryScan = null,
-    Object? maxImageDecodingThreads = null,
+    Object? maxConcurrentLibraryScan = freezed,
+    Object? maxImageDecodingThreads = freezed,
   }) {
     return _then(_ControlServerModel(
       name: null == name
@@ -419,14 +417,14 @@ class __$ControlServerModelCopyWithImpl<$Res> implements _$ControlServerModelCop
           ? _self.quickConnectEnabled
           : quickConnectEnabled // ignore: cast_nullable_to_non_nullable
               as bool,
-      maxConcurrentLibraryScan: null == maxConcurrentLibraryScan
+      maxConcurrentLibraryScan: freezed == maxConcurrentLibraryScan
           ? _self.maxConcurrentLibraryScan
           : maxConcurrentLibraryScan // ignore: cast_nullable_to_non_nullable
-              as int,
-      maxImageDecodingThreads: null == maxImageDecodingThreads
+              as int?,
+      maxImageDecodingThreads: freezed == maxImageDecodingThreads
           ? _self.maxImageDecodingThreads
           : maxImageDecodingThreads // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }

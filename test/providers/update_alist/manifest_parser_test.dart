@@ -47,8 +47,7 @@ void main() {
     test('keeps only allowed download keys (android, windows_installer)', () {
       final result = parseAlistManifest(_validManifest, currentVersion: '0.10.3');
 
-      expect(result.releases[0].downloads.keys,
-          unorderedEquals(['android', 'windows_installer']));
+      expect(result.releases[0].downloads.keys, unorderedEquals(['android', 'windows_installer']));
       expect(result.releases[0].downloads['android'], contains('Fladder-Android.apk'));
     });
 

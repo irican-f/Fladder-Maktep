@@ -54,8 +54,7 @@ void main() {
   });
 
   test('loadReleaseManagerConfig throws on missing required field', () async {
-    final f = File('${tmp.path}/c.json')
-      ..writeAsStringSync(jsonEncode({'alistDavUrl': 'x'}));
+    final f = File('${tmp.path}/c.json')..writeAsStringSync(jsonEncode({'alistDavUrl': 'x'}));
 
     expect(() => loadReleaseManagerConfig(f), throwsFormatException);
   });

@@ -18,6 +18,7 @@ mixin _$HomeSettingsModel {
   Set<ViewSize> get layoutStates;
   HomeBanner get homeBanner;
   HomeCarouselSettings get carouselSettings;
+  @JsonKey(unknownEnumValue: HomeNextUp.separate)
   HomeNextUp get nextUp;
 
   /// Create a copy of HomeSettingsModel
@@ -46,7 +47,7 @@ abstract mixin class $HomeSettingsModelCopyWith<$Res> {
       Set<ViewSize> layoutStates,
       HomeBanner homeBanner,
       HomeCarouselSettings carouselSettings,
-      HomeNextUp nextUp});
+      @JsonKey(unknownEnumValue: HomeNextUp.separate) HomeNextUp nextUp});
 }
 
 /// @nodoc
@@ -186,7 +187,7 @@ extension HomeSettingsModelPatterns on HomeSettingsModel {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(Set<LayoutMode> screenLayouts, Set<ViewSize> layoutStates, HomeBanner homeBanner,
-            HomeCarouselSettings carouselSettings, HomeNextUp nextUp)?
+            HomeCarouselSettings carouselSettings, @JsonKey(unknownEnumValue: HomeNextUp.separate) HomeNextUp nextUp)?
         $default, {
     required TResult orElse(),
   }) {
@@ -216,7 +217,7 @@ extension HomeSettingsModelPatterns on HomeSettingsModel {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(Set<LayoutMode> screenLayouts, Set<ViewSize> layoutStates, HomeBanner homeBanner,
-            HomeCarouselSettings carouselSettings, HomeNextUp nextUp)
+            HomeCarouselSettings carouselSettings, @JsonKey(unknownEnumValue: HomeNextUp.separate) HomeNextUp nextUp)
         $default,
   ) {
     final _that = this;
@@ -244,7 +245,7 @@ extension HomeSettingsModelPatterns on HomeSettingsModel {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(Set<LayoutMode> screenLayouts, Set<ViewSize> layoutStates, HomeBanner homeBanner,
-            HomeCarouselSettings carouselSettings, HomeNextUp nextUp)?
+            HomeCarouselSettings carouselSettings, @JsonKey(unknownEnumValue: HomeNextUp.separate) HomeNextUp nextUp)?
         $default,
   ) {
     final _that = this;
@@ -266,7 +267,7 @@ class _HomeSettingsModel extends HomeSettingsModel {
       final Set<ViewSize> layoutStates = const {...ViewSize.values},
       this.homeBanner = HomeBanner.carousel,
       this.carouselSettings = HomeCarouselSettings.combined,
-      this.nextUp = HomeNextUp.separate})
+      @JsonKey(unknownEnumValue: HomeNextUp.separate) this.nextUp = HomeNextUp.separate})
       : _screenLayouts = screenLayouts,
         _layoutStates = layoutStates,
         super._();
@@ -297,7 +298,7 @@ class _HomeSettingsModel extends HomeSettingsModel {
   @JsonKey()
   final HomeCarouselSettings carouselSettings;
   @override
-  @JsonKey()
+  @JsonKey(unknownEnumValue: HomeNextUp.separate)
   final HomeNextUp nextUp;
 
   /// Create a copy of HomeSettingsModel
@@ -332,7 +333,7 @@ abstract mixin class _$HomeSettingsModelCopyWith<$Res> implements $HomeSettingsM
       Set<ViewSize> layoutStates,
       HomeBanner homeBanner,
       HomeCarouselSettings carouselSettings,
-      HomeNextUp nextUp});
+      @JsonKey(unknownEnumValue: HomeNextUp.separate) HomeNextUp nextUp});
 }
 
 /// @nodoc

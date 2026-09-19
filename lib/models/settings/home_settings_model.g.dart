@@ -15,7 +15,8 @@ _HomeSettingsModel _$HomeSettingsModelFromJson(Map<String, dynamic> json) => _Ho
       homeBanner: $enumDecodeNullable(_$HomeBannerEnumMap, json['homeBanner']) ?? HomeBanner.carousel,
       carouselSettings:
           $enumDecodeNullable(_$HomeCarouselSettingsEnumMap, json['carouselSettings']) ?? HomeCarouselSettings.combined,
-      nextUp: $enumDecodeNullable(_$HomeNextUpEnumMap, json['nextUp']) ?? HomeNextUp.separate,
+      nextUp: $enumDecodeNullable(_$HomeNextUpEnumMap, json['nextUp'], unknownValue: HomeNextUp.separate) ??
+          HomeNextUp.separate,
     );
 
 Map<String, dynamic> _$HomeSettingsModelToJson(_HomeSettingsModel instance) => <String, dynamic>{
@@ -53,7 +54,6 @@ const _$HomeCarouselSettingsEnumMap = {
 };
 
 const _$HomeNextUpEnumMap = {
-  HomeNextUp.off: 'off',
   HomeNextUp.nextUp: 'nextUp',
   HomeNextUp.cont: 'cont',
   HomeNextUp.combined: 'combined',

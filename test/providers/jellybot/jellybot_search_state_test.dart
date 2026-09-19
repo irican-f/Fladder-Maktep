@@ -53,8 +53,7 @@ void main() {
     test('setCategory resets page and clears selectedFilters', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
-      final controller =
-          container.read(jellybotSearchControllerProvider.notifier);
+      final controller = container.read(jellybotSearchControllerProvider.notifier);
 
       controller.setSelectedFilters({'quality': '1080p'});
       controller.setPage(3);
@@ -69,8 +68,7 @@ void main() {
     test('setProvider clears selectedFilters and resets page', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
-      final controller =
-          container.read(jellybotSearchControllerProvider.notifier);
+      final controller = container.read(jellybotSearchControllerProvider.notifier);
 
       controller.setSelectedFilters({'quality': '1080p'});
       controller.setPage(2);
@@ -84,12 +82,10 @@ void main() {
       expect(s.page, 0);
     });
 
-    test('setQuery only updates query and resets page (does not clear filters)',
-        () {
+    test('setQuery only updates query and resets page (does not clear filters)', () {
       final container = ProviderContainer();
       addTearDown(container.dispose);
-      final controller =
-          container.read(jellybotSearchControllerProvider.notifier);
+      final controller = container.read(jellybotSearchControllerProvider.notifier);
 
       controller.setSelectedFilters({'quality': '1080p'});
       controller.setPage(3);
@@ -106,12 +102,10 @@ void main() {
         '(auto-search guard)', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
-      final controller =
-          container.read(jellybotSearchControllerProvider.notifier);
+      final controller = container.read(jellybotSearchControllerProvider.notifier);
 
       // Await build() to settle to AsyncData(null).
-      final initialValue =
-          await container.read(jellybotSearchControllerProvider.future);
+      final initialValue = await container.read(jellybotSearchControllerProvider.future);
       expect(initialValue, isNull);
 
       controller.setProvider(
@@ -127,8 +121,7 @@ void main() {
       final after = container.read(jellybotSearchControllerProvider);
       expect(
         after,
-        isA<AsyncData<PaginatedResponseOfProviderSearchItemDto?>>()
-            .having((a) => a.value, 'value', isNull),
+        isA<AsyncData<PaginatedResponseOfProviderSearchItemDto?>>().having((a) => a.value, 'value', isNull),
       );
     });
   });

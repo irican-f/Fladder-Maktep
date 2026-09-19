@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:async/async.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart' as mpv;
@@ -15,6 +16,7 @@ import 'package:fladder/models/item_base_model.dart';
 import 'package:fladder/models/items/audio_model.dart';
 import 'package:fladder/models/items/media_streams_model.dart';
 import 'package:fladder/models/playback/playback_model.dart';
+import 'package:fladder/models/playback/transcode_playback_model.dart';
 import 'package:fladder/models/settings/subtitle_settings_model.dart';
 import 'package:fladder/models/settings/video_player_settings.dart';
 import 'package:fladder/providers/settings/subtitle_settings_provider.dart';
@@ -48,6 +50,25 @@ class LibMPV extends BasePlayer {
   int _crossfadeGeneration = 0;
   Timer? _fadeTimer;
   Duration get playPauseFadeDuration => const Duration(milliseconds: 175);
+  AudioSession? _audioSession;
+
+  bool _musicPaused = false;
+  bool _musicPlaybackMode = false;
+
+  void setMusicPlaybackMode(bool enabled) {
+    _musicPlaybackMode = enabled;
+    if (!enabled) _musicPaused = false;
+    setState(lastState);
+  }
+
+  Future<void> setupAudioSession() async {
+    _audioSession = await AudioSession.instance;
+    await _audioSession?.configure(const AudioSessionConfiguration.music());
+  }
+
+  Future<void> updateSettings(VideoPlayerSettingsModel settings) async {
+    _settings = settings;
+  }
 
   @override
   Future<void> init(VideoPlayerSettingsModel settings) async {
@@ -78,12 +99,18 @@ class LibMPV extends BasePlayer {
     if (_player?.platform is mpv.NativePlayer) {
       final nativePlayer = _player!.platform as dynamic;
       await nativePlayer.setProperty('force-seekable', 'yes');
-      await nativePlayer.setProperty('gapless-audio', 'weak');
+      await nativePlayer.setProperty('gapless-audio', 'yes');
+      await nativePlayer.setProperty('cache', 'yes');
+      await nativePlayer.setProperty('demuxer-max-bytes', '150M');
+      await nativePlayer.setProperty('network-timeout', '60');
+      await nativePlayer.setProperty('stream-buffer-size', '4M');
+      await nativePlayer.setProperty('prefetch-playlist', 'yes');
 
       if (defaultTargetPlatform == TargetPlatform.android) {
-        // Use audiotrack as it is generally more stable on modern Android
         await nativePlayer.setProperty('ao', 'audiotrack');
       }
+
+      setupAudioSession();
     }
 
     await _applyReplayGainSettings();
@@ -91,6 +118,7 @@ class LibMPV extends BasePlayer {
 
   @override
   Future<void> dispose() async {
+    unawaited(_audioSession?.setActive(false));
     _fadeTimer?.cancel();
     _fadeTimer = null;
     _crossfadeGeneration++;
@@ -105,8 +133,11 @@ class LibMPV extends BasePlayer {
   }
 
   void setState(PlayerState state) {
-    lastState = state;
-    _stateController.add(state);
+    final newState = state.update(
+      playing: _musicPlaybackMode ? !_musicPaused : state.playing,
+    );
+    lastState = newState;
+    _stateController.add(newState);
   }
 
   void _cancelPlayerStreams() {
@@ -298,7 +329,7 @@ class LibMPV extends BasePlayer {
     if (item is AudioModel) {
       final gain = item.normalizationGain;
       if (gain != null && !gain.isNaN && !gain.isInfinite) {
-        gainDb = gain.clamp(-60.0, 20.0).toDouble();
+        gainDb = gain.clamp(-60.0, 0).toDouble();
       }
     }
     await _applyReplayGainSettings(trackGainDb: gainDb);
@@ -366,11 +397,17 @@ class LibMPV extends BasePlayer {
   }
 
   @override
-  Future<void> open(BuildContext context) async => Navigator.of(context, rootNavigator: true).push(
-        MaterialPageRoute(
-          builder: (context) => const video_screen.VideoPlayer(),
-        ),
-      );
+  Future<void> open(BuildContext context) async {
+    final route = MaterialPageRoute<void>(
+      settings: const RouteSettings(name: videoPlayerRouteName),
+      builder: (context) => const video_screen.VideoPlayer(),
+    );
+    playerRoute = route;
+    await Navigator.of(context, rootNavigator: true).push(route);
+    if (identical(playerRoute, route)) {
+      playerRoute = null;
+    }
+  }
 
   List<mpv.SubtitleTrack> get subTracks => _player?.state.tracks.subtitle ?? [];
   mpv.SubtitleTrack get subtitleTrack => _player?.state.track.subtitle ?? mpv.SubtitleTrack.no();
@@ -422,13 +459,17 @@ class LibMPV extends BasePlayer {
 
   @override
   Future<void> pause() async {
+    _musicPaused = true;
     setState(lastState.update(playing: false));
+    unawaited(_audioSession?.setActive(false));
     _startPlaybackFade(false);
   }
 
   @override
   Future<void> play() async {
+    _musicPaused = false;
     setState(lastState.update(playing: true));
+    unawaited(_audioSession?.setActive(true));
     _startPlaybackFade(true);
   }
 
@@ -443,6 +484,10 @@ class LibMPV extends BasePlayer {
 
   @override
   Future<void> seek(Duration position) async => _player?.seek(position);
+
+  /// media-kit's real state; [lastState] only mirrors [_musicPaused].
+  @override
+  bool get isPlaying => _player?.state.playing ?? lastState.playing;
 
   /// mpv populates `track-list` asynchronously after `open()` returns, so a
   /// selection made right after [loadVideo] (the initial track selection at
@@ -475,6 +520,9 @@ class LibMPV extends BasePlayer {
     if (wantedAudioStream == null) return -1;
     if (wantedAudioStream.index == AudioStreamModel.no().index) {
       await _player?.setAudioTrack(mpv.AudioTrack.no());
+    } else if (playbackModel is TranscodePlaybackModel) {
+      // The server picks the audio track for a transcode; the reload applies it.
+      return wantedAudioStream.index;
     } else {
       final index = (playbackModel.audioStreams?.indexOf(wantedAudioStream) ?? -1) - 1;
       if (index >= 0 && !wantedAudioStream.isExternal && playbackModel.playerHandlesTrackSelection) {
@@ -517,6 +565,11 @@ class LibMPV extends BasePlayer {
       return -1;
     }
     _currentSubtitleCodec = wantedSubtitle.codec;
+    // A non-external subtitle on a transcode is burned in by the server: there is no selectable track, and
+    // waiting for one only stalls the caller for the whole `_awaitTrack` timeout before the reload.
+    if (playbackModel is TranscodePlaybackModel && !wantedSubtitle.isExternal) {
+      return wantedSubtitle.index;
+    }
     final index = playbackModel.subStreams?.sublist(1).indexWhere((element) => element.id == wantedSubtitle.id) ?? -1;
     if (index >= 0 && !wantedSubtitle.isExternal && playbackModel.playerHandlesTrackSelection) {
       // See setAudioTrack — wait for subTracks[index + 2] specifically.
@@ -590,7 +643,10 @@ class LibMPV extends BasePlayer {
   Stream<int> get playlistIndexStream => _player?.stream.playlist.map((p) => p.index) ?? const Stream<int>.empty();
 
   @override
-  Future<void> stop() async => _player?.stop();
+  Future<void> stop() async {
+    unawaited(_audioSession?.setActive(false));
+    return _player?.stop();
+  }
 
   @override
   Future<Uint8List?> takeScreenshot() async {

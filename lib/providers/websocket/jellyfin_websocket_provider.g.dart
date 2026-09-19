@@ -6,14 +6,10 @@ part of 'jellyfin_websocket_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$jellyfinWebSocketControllerHash() => r'00896a5d9767b6479efff0b4a21465e7dc402b8d';
+String _$jellyfinWebSocketControllerHash() => r'd78eb59948bb7cb509b3e0c88386d87119f66076';
 
-/// App-level shared Jellyfin WebSocket.
-///
-/// Owns a single [JellyfinWebSocket], connects when a user is
-/// authenticated, and re-broadcasts the socket's streams through
-/// long-lived controllers so consumers stay subscribed transparently
-/// across account switches / socket rebuilds.
+/// Owns a single [JellyfinWebSocket], connects when a user is authenticated, and re-broadcasts its
+/// streams through long-lived controllers so consumers survive account switches / socket rebuilds.
 ///
 /// Copied from [JellyfinWebSocketController].
 @ProviderFor(JellyfinWebSocketController)
