@@ -156,6 +156,8 @@ dependencies:
   uuid: any
   web: ^1.1.2
 dependency_overrides:
+  # smtc_windows 1.1.0 ships codegen 2.11.1; FRB refuses a newer runtime at startup.
+  flutter_rust_bridge: 2.11.1
   pip:
     git:
       url: https://github.com/DonutWare/pip.git
