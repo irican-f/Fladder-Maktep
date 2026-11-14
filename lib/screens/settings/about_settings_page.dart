@@ -1,3 +1,5 @@
+import 'package:material_ui/material_ui.dart';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -12,7 +14,6 @@ import 'package:fladder/screens/shared/media/external_urls.dart';
 import 'package:fladder/util/application_info.dart';
 import 'package:fladder/util/list_padding.dart';
 import 'package:fladder/util/localization_helper.dart';
-import 'package:flutter/material.dart';
 
 class _Socials {
   final String label;
@@ -24,11 +25,11 @@ class _Socials {
 
 const _kUpdateSource = String.fromEnvironment('UPDATE_SOURCE', defaultValue: 'github');
 
-const socials = [
+final socials = [
   _Socials(
     'Discord',
     'https://discord.gg/gk8TTqbGdz',
-    FontAwesomeIcons.discord,
+    FontAwesomeIcons.discord.data,
   ),
   // _Socials(
   //   'Weblate',

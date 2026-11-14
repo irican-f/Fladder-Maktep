@@ -1,25 +1,27 @@
+import 'package:flutter/foundation.dart';
+import 'package:material_ui/material_ui.dart';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
+
 import 'package:fladder/models/settings/client_settings_model.dart';
 import 'package:fladder/providers/dashboard_mode_provider.dart';
 import 'package:fladder/providers/jellybot_live_tv_provider.dart';
-import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/sync_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/providers/window_title_provider.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
 import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
-import 'package:fladder/util/input_handler.dart';
+import 'package:fladder/screens/shared/global_hotkeys.dart';
 import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/util/string_extensions.dart';
 import 'package:fladder/widgets/keyboard/slide_in_keyboard.dart';
 import 'package:fladder/widgets/navigation_scaffold/components/adaptive_fab.dart';
 import 'package:fladder/widgets/navigation_scaffold/components/destination_model.dart';
 import 'package:fladder/widgets/navigation_scaffold/navigation_scaffold.dart';
+import 'package:fladder/widgets/shared/modal_bottom_sheet.dart';
 import 'package:fladder/widgets/syncplay/dashboard_fabs.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
-import 'package:window_manager/window_manager.dart';
 
 enum HomeTabs {
   dashboard,
@@ -32,45 +34,92 @@ enum HomeTabs {
   const HomeTabs();
 
   IconData get icon => switch (this) {
-        HomeTabs.dashboard => IconsaxPlusLinear.home_1,
-        HomeTabs.library => IconsaxPlusLinear.book,
-        HomeTabs.favorites => IconsaxPlusLinear.heart,
-        HomeTabs.sync => IconsaxPlusLinear.cloud,
-        HomeTabs.jellybot => IconsaxPlusLinear.import_3,
-        HomeTabs.jellybotLiveTv => IconsaxPlusLinear.monitor,
-      };
+    HomeTabs.dashboard => IconsaxPlusLinear.home_1,
+    HomeTabs.library => IconsaxPlusLinear.book,
+    HomeTabs.favorites => IconsaxPlusLinear.heart,
+    HomeTabs.sync => IconsaxPlusLinear.cloud,
+    HomeTabs.jellybot => IconsaxPlusLinear.import_3,
+    HomeTabs.jellybotLiveTv => IconsaxPlusLinear.monitor,
+  };
 
   IconData get selectedIcon => switch (this) {
-        HomeTabs.dashboard => IconsaxPlusBold.home_1,
-        HomeTabs.library => IconsaxPlusBold.book,
-        HomeTabs.favorites => IconsaxPlusBold.heart,
-        HomeTabs.sync => IconsaxPlusBold.cloud,
-        HomeTabs.jellybot => IconsaxPlusBold.import_3,
-        HomeTabs.jellybotLiveTv => IconsaxPlusBold.monitor,
-      };
+    HomeTabs.dashboard => IconsaxPlusBold.home_1,
+    HomeTabs.library => IconsaxPlusBold.book,
+    HomeTabs.favorites => IconsaxPlusBold.heart,
+    HomeTabs.sync => IconsaxPlusBold.cloud,
+    HomeTabs.jellybot => IconsaxPlusBold.import_3,
+    HomeTabs.jellybotLiveTv => IconsaxPlusBold.monitor,
+  };
 
-  Future navigate(BuildContext context) => switch (this) {
-        HomeTabs.dashboard => context.router.navigate(const DashboardRoute()),
-        HomeTabs.library => context.router.navigate(const LibraryRoute()),
-        HomeTabs.favorites => context.router.navigate(const FavouritesRoute()),
-        HomeTabs.sync => context.router.navigate(const SyncedRoute()),
-        HomeTabs.jellybot => context.router.navigate(const JellybotRoute()),
-        HomeTabs.jellybotLiveTv => context.router.navigate(const JellybotLiveTvChannelsRoute()),
-      };
+  Future navigate(BuildContext context) {
+    final route = switch (this) {
+      HomeTabs.dashboard => const DashboardRoute(),
+      HomeTabs.library => const LibraryRoute(),
+      HomeTabs.favorites => const FavouritesRoute(),
+      HomeTabs.sync => const SyncedRoute(),
+      HomeTabs.jellybot => const JellybotRoute(),
+      HomeTabs.jellybotLiveTv => const JellybotLiveTvChannelsRoute(),
+    };
+    context.router
+        .innerRouterOf<StackRouter>(HomeRoute.name)
+        ?.popUntil((page) => page.settings.name == DashboardRoute.name || page.settings.name == route.routeName);
+    return context.router.navigate(route);
+  }
 
   String label(BuildContext context) => switch (this) {
-        HomeTabs.dashboard => context.localized.dashboard,
-        HomeTabs.library => context.localized.library(0),
-        HomeTabs.favorites => context.localized.favorites,
-        HomeTabs.sync => context.localized.sync,
-        HomeTabs.jellybot => context.localized.jellybot,
-        HomeTabs.jellybotLiveTv => context.localized.liveTv,
-      };
+    HomeTabs.dashboard => context.localized.dashboard,
+    HomeTabs.library => context.localized.library(0),
+    HomeTabs.favorites => context.localized.favorites,
+    HomeTabs.sync => context.localized.sync,
+    HomeTabs.jellybot => context.localized.jellybot,
+    HomeTabs.jellybotLiveTv => context.localized.liveTv,
+  };
 }
 
 @RoutePage()
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
+
+  Future<void> _showDashboardSwitcher(BuildContext context, WidgetRef ref) async {
+    void switchDashboard(PageRouteInfo route) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          context.router.navigate(route);
+        }
+      });
+    }
+
+    await showBottomSheetPill(
+      context: context,
+      content: (sheetContext, _) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(IconsaxPlusLinear.home_1),
+              title: Text(sheetContext.localized.dashboard),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                ref.read(musicDashboardModeProvider.notifier).state = false;
+                ref.read(windowTitleProvider.notifier).refreshTitle();
+                switchDashboard(const DashboardRoute());
+              },
+            ),
+            ListTile(
+              leading: const Icon(IconsaxPlusLinear.music),
+              title: Text(context.localized.musicDashboard),
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                ref.read(musicDashboardModeProvider.notifier).state = true;
+                ref.read(windowTitleProvider.notifier).refreshTitle();
+                switchDashboard(const DashboardRoute());
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -82,10 +131,12 @@ class HomeScreen extends ConsumerWidget {
             case HomeTabs.dashboard:
               return DestinationModel(
                 label: context.localized.navigationDashboard,
-                icon: Icon(e.icon),
-                selectedIcon: Icon(e.selectedIcon),
+                icon: Icon(isMusicDashboardMode ? IconsaxPlusLinear.music_square : IconsaxPlusLinear.home_1),
+                selectedIcon: Icon(isMusicDashboardMode ? IconsaxPlusBold.music_square : IconsaxPlusBold.home_1),
                 route: const DashboardRoute(),
                 action: () => e.navigate(context),
+                onLongPress: () => _showDashboardSwitcher(context, ref),
+                onSecondaryTapDown: (_) => _showDashboardSwitcher(context, ref),
                 customFab: const DashboardFabs(),
               );
             case HomeTabs.favorites:
@@ -112,12 +163,7 @@ class HomeScreen extends ConsumerWidget {
                     builder: (context, ref, child) {
                       final length = ref.watch(activeDownloadTasksProvider.select((value) => value.length));
                       return length != 0
-                          ? CircleAvatar(
-                              radius: 10,
-                              child: FittedBox(
-                                child: Text(length.toString()),
-                              ),
-                            )
+                          ? CircleAvatar(radius: 10, child: FittedBox(child: Text(length.toString())))
                           : const SizedBox.shrink();
                     },
                   ),
@@ -168,31 +214,8 @@ class HomeScreen extends ConsumerWidget {
         .nonNulls
         .toList();
     return NotificationManagerInitializer(
-      child: InputHandler<GlobalHotKeys>(
-        autoFocus: false,
-        keyMapResult: (result) {
-          switch (result) {
-            case GlobalHotKeys.toggleSideBar:
-              ref.read(clientSettingsProvider.notifier).toggleSideBar();
-              return true;
-            case GlobalHotKeys.search:
-              context.navigateTo(LibrarySearchRoute());
-              return true;
-            case GlobalHotKeys.exit:
-              Future.microtask(() async {
-                final manager = WindowManager.instance;
-                if (await manager.isClosable()) {
-                  manager.close();
-                } else {
-                  FladderSnack.show(context.localized.somethingWentWrong, context: context);
-                }
-              });
-              return true;
-            case GlobalHotKeys.closeWindow:
-              return false;
-          }
-        },
-        keyMap: ref.watch(clientSettingsProvider.select((value) => value.currentShortcuts)),
+      child: GlobalHotkeys(
+        enabledHotkeys: GlobalHotKeys.values.toSet(),
         child: HeroControllerScope(
           controller: HeroController(),
           child: AutoRouter(

@@ -6,68 +6,176 @@ part of 'jellybot_admin_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$jellybotApiClientsHash() => r'57e0df7ed6c68418bb467154ba895e4426af32c1';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Read-side providers for the jellybot admin pages. Mutations live in the
+/// pages themselves (existing section convention) and invalidate these.
+
+@ProviderFor(jellybotApiClients)
+final jellybotApiClientsProvider = JellybotApiClientsProvider._();
 
 /// Read-side providers for the jellybot admin pages. Mutations live in the
 /// pages themselves (existing section convention) and invalidate these.
-///
-/// Copied from [jellybotApiClients].
-@ProviderFor(jellybotApiClients)
-final jellybotApiClientsProvider = AutoDisposeFutureProvider<List<ApiClientDto>>.internal(
-  jellybotApiClients,
-  name: r'jellybotApiClientsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotApiClientsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef JellybotApiClientsRef = AutoDisposeFutureProviderRef<List<ApiClientDto>>;
-String _$jellybotAllProvidersHash() => r'59adabaeefc97c929049ed9192aed2c2715afc63';
+final class JellybotApiClientsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ApiClientDto>>,
+          List<ApiClientDto>,
+          FutureOr<List<ApiClientDto>>
+        >
+    with
+        $FutureModifier<List<ApiClientDto>>,
+        $FutureProvider<List<ApiClientDto>> {
+  /// Read-side providers for the jellybot admin pages. Mutations live in the
+  /// pages themselves (existing section convention) and invalidate these.
+  JellybotApiClientsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'jellybotApiClientsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-/// See also [jellybotAllProviders].
+  @override
+  String debugGetCreateSourceHash() => _$jellybotApiClientsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ApiClientDto>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<ApiClientDto>> create(Ref ref) {
+    return jellybotApiClients(ref);
+  }
+}
+
+String _$jellybotApiClientsHash() =>
+    r'57e0df7ed6c68418bb467154ba895e4426af32c1';
+
 @ProviderFor(jellybotAllProviders)
-final jellybotAllProvidersProvider = AutoDisposeFutureProvider<List<IProvider>>.internal(
-  jellybotAllProviders,
-  name: r'jellybotAllProvidersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotAllProvidersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final jellybotAllProvidersProvider = JellybotAllProvidersProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef JellybotAllProvidersRef = AutoDisposeFutureProviderRef<List<IProvider>>;
-String _$jellybotLiveTvSourceHash() => r'88a734bd0827f83af4a59afaf48d3564600149b2';
+final class JellybotAllProvidersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<IProvider>>,
+          List<IProvider>,
+          FutureOr<List<IProvider>>
+        >
+    with $FutureModifier<List<IProvider>>, $FutureProvider<List<IProvider>> {
+  JellybotAllProvidersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'jellybotAllProvidersProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-/// See also [jellybotLiveTvSource].
+  @override
+  String debugGetCreateSourceHash() => _$jellybotAllProvidersHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<IProvider>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<IProvider>> create(Ref ref) {
+    return jellybotAllProviders(ref);
+  }
+}
+
+String _$jellybotAllProvidersHash() =>
+    r'59adabaeefc97c929049ed9192aed2c2715afc63';
+
 @ProviderFor(jellybotLiveTvSource)
-final jellybotLiveTvSourceProvider = AutoDisposeFutureProvider<LiveTvSourceResult>.internal(
-  jellybotLiveTvSource,
-  name: r'jellybotLiveTvSourceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotLiveTvSourceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final jellybotLiveTvSourceProvider = JellybotLiveTvSourceProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef JellybotLiveTvSourceRef = AutoDisposeFutureProviderRef<LiveTvSourceResult>;
-String _$jellybotLiveTvCountriesHash() => r'dc4154ffa8b26fc1c318e186258fd801d6f26626';
+final class JellybotLiveTvSourceProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<LiveTvSourceResult>,
+          LiveTvSourceResult,
+          FutureOr<LiveTvSourceResult>
+        >
+    with
+        $FutureModifier<LiveTvSourceResult>,
+        $FutureProvider<LiveTvSourceResult> {
+  JellybotLiveTvSourceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'jellybotLiveTvSourceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-/// See also [jellybotLiveTvCountries].
+  @override
+  String debugGetCreateSourceHash() => _$jellybotLiveTvSourceHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<LiveTvSourceResult> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<LiveTvSourceResult> create(Ref ref) {
+    return jellybotLiveTvSource(ref);
+  }
+}
+
+String _$jellybotLiveTvSourceHash() =>
+    r'88a734bd0827f83af4a59afaf48d3564600149b2';
+
 @ProviderFor(jellybotLiveTvCountries)
-final jellybotLiveTvCountriesProvider = AutoDisposeFutureProvider<List<String>>.internal(
-  jellybotLiveTvCountries,
-  name: r'jellybotLiveTvCountriesProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotLiveTvCountriesHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final jellybotLiveTvCountriesProvider = JellybotLiveTvCountriesProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef JellybotLiveTvCountriesRef = AutoDisposeFutureProviderRef<List<String>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class JellybotLiveTvCountriesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<String>>,
+          List<String>,
+          FutureOr<List<String>>
+        >
+    with $FutureModifier<List<String>>, $FutureProvider<List<String>> {
+  JellybotLiveTvCountriesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'jellybotLiveTvCountriesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$jellybotLiveTvCountriesHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<String>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<String>> create(Ref ref) {
+    return jellybotLiveTvCountries(ref);
+  }
+}
+
+String _$jellybotLiveTvCountriesHash() =>
+    r'dc4154ffa8b26fc1c318e186258fd801d6f26626';

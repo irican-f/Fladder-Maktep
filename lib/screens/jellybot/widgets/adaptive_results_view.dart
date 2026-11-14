@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/screens/jellybot/widgets/search_result_card.dart';

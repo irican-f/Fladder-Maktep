@@ -12,7 +12,7 @@ import 'package:fladder/util/position_provider.dart';
 import 'package:fladder/widgets/shared/button_group.dart';
 import 'package:fladder/widgets/shared/fladder_scrollbar.dart';
 import 'package:fladder/widgets/shared/pull_to_refresh.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 

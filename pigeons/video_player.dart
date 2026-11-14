@@ -27,12 +27,7 @@ class SimpleItemModel {
   });
 }
 
-enum PlaybackType {
-  direct,
-  transcoded,
-  offline,
-  tv,
-}
+enum PlaybackType { direct, transcoded, offline, tv }
 
 enum SyncPlayCommandType {
   none,
@@ -49,10 +44,7 @@ class MediaInfo {
   final PlaybackType playbackType;
   final String videoInformation;
 
-  const MediaInfo({
-    required this.playbackType,
-    required this.videoInformation,
-  });
+  const MediaInfo({required this.playbackType, required this.videoInformation});
 }
 
 class PlayableData {
@@ -70,6 +62,9 @@ class PlayableData {
   final SimpleItemModel? nextVideo;
   final MediaInfo mediaInfo;
   final String url;
+  final int? videoWidth;
+  final int? videoHeight;
+  final double? videoFrameRate;
 
   PlayableData({
     required this.currentItem,
@@ -86,16 +81,13 @@ class PlayableData {
     this.nextVideo,
     required this.mediaInfo,
     required this.url,
+    this.videoWidth,
+    this.videoHeight,
+    this.videoFrameRate,
   });
 }
 
-enum MediaSegmentType {
-  commercial,
-  preview,
-  recap,
-  intro,
-  outro,
-}
+enum MediaSegmentType { commercial, preview, recap, intro, outro }
 
 class MediaSegment {
   final MediaSegmentType type;
@@ -103,12 +95,7 @@ class MediaSegment {
   final int start;
   final int end;
 
-  const MediaSegment({
-    required this.type,
-    required this.name,
-    required this.start,
-    required this.end,
-  });
+  const MediaSegment({required this.type, required this.name, required this.start, required this.end});
 }
 
 class AudioTrack {
@@ -154,11 +141,7 @@ class Chapter {
   // Duration in milliseconds
   final int time;
 
-  const Chapter({
-    required this.name,
-    required this.url,
-    required this.time,
-  });
+  const Chapter({required this.name, required this.url, required this.time});
 }
 
 class TrickPlayModel {
@@ -189,7 +172,7 @@ class StartResult {
 
 @HostApi()
 abstract class NativeVideoActivity {
-  @async
+  @asyncCallback
   StartResult launchActivity();
 
   void disposeActivity();
@@ -199,13 +182,13 @@ abstract class NativeVideoActivity {
 
 @HostApi()
 abstract class VideoPlayerApi {
-  @async
+  @asyncCallback
   bool sendPlayableModel(PlayableData playableData);
 
-  @async
+  @asyncCallback
   bool sendTVGuideModel(TVGuideModel guide);
 
-  @async
+  @asyncCallback
   bool open(String url, bool play);
 
   void setLooping(bool looping);
@@ -353,23 +336,30 @@ class GuideProgram {
 
 @FlutterApi()
 abstract class VideoPlayerListenerCallback {
+  @asyncCallback
   void onPlaybackStateChanged(PlaybackState state);
 }
 
 @FlutterApi()
 abstract class VideoPlayerControlsCallback {
+  @asyncCallback
   void loadNextVideo();
 
+  @asyncCallback
   void loadPreviousVideo();
 
+  @asyncCallback
   void onStop();
 
+  @asyncCallback
   void swapSubtitleTrack(int value);
 
+  @asyncCallback
   void swapAudioTrack(int value);
 
+  @asyncCallback
   void loadProgram(GuideChannel selection);
 
-  @async
+  @asyncCallback
   List<GuideProgram> fetchProgramsForChannel(String channelId);
 }

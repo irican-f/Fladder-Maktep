@@ -2,8 +2,9 @@
 Name=Cine Maktep
 StartupWMClass=nl.jknaapen.fladder
 Comment=A Simple Jellyfin Frontend built on top of Flutter.
-Exec=cinemaktep
+Exec=cinemaktep %u
 Icon=nl.jknaapen.fladder
 Terminal=false
 Type=Application
 Categories=AudioVideo;Video;Player;
+MimeType=x-scheme-handler/fladder;

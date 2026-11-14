@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,16 +34,8 @@ class DashboardFabs extends ConsumerWidget {
     ];
 
     return isDualLayout
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 8,
-            children: children,
-          )
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 8,
-            children: children,
-          );
+        ? Column(mainAxisSize: MainAxisSize.min, spacing: 8, children: children)
+        : Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
   }
 }
 
@@ -60,16 +52,12 @@ class _SyncPlayFabButton extends StatelessWidget {
         iconSize: 26,
         tooltip: context.localized.syncPlay,
         onPressed: () => showSyncPlaySheet(context),
-        style: IconButton.styleFrom(
-          backgroundColor: isActive ? Theme.of(context).colorScheme.primaryContainer : null,
-        ),
+        style: IconButton.styleFrom(backgroundColor: isActive ? Theme.of(context).colorScheme.primaryContainer : null),
         icon: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Stack(
             children: [
-              Icon(
-                isActive ? IconsaxPlusBold.people : IconsaxPlusLinear.people,
-              ),
+              Icon(isActive ? IconsaxPlusBold.people : IconsaxPlusLinear.people),
               if (isActive)
                 Positioned(
                   right: 0,
@@ -77,10 +65,7 @@ class _SyncPlayFabButton extends StatelessWidget {
                   child: Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
                   ),
                 ),
             ],

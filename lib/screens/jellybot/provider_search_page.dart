@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
@@ -284,8 +284,8 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
   ) {
     final ctrl = ref.read(jellybotSearchControllerProvider.notifier);
     final state = ctrl.searchState;
-    final providers = providersAsync.valueOrNull ?? const <IProvider>[];
-    final filters = filtersAsync.valueOrNull ?? const <ISearchFilter>[];
+    final providers = providersAsync.value ?? const <IProvider>[];
+    final filters = filtersAsync.value ?? const <ISearchFilter>[];
 
     if (state.provider == null && providers.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

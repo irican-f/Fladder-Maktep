@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show KeepAliveLink;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart';
@@ -26,6 +27,7 @@ class Cultures extends _$Cultures {
     try {
       final api = ref.read(jellyApiProvider);
       final response = await api.localizationCulturesGet();
+      if (!ref.mounted) return;
       final cultures = response.body;
       if (cultures != null && cultures.isNotEmpty) {
         state = cultures;

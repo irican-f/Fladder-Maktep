@@ -1,13 +1,16 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+
 import 'package:background_downloader/background_downloader.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import 'package:fladder/models/syncing/download_stream.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/sync_provider.dart';
 import 'package:fladder/util/localization_helper.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'background_download_provider.g.dart';
 

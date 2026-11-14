@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:async/async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,8 +71,8 @@ class _VideoPlayerSpeedIndicatorState extends ConsumerState<VideoPlayerSpeedIndi
                   Text(
                     context.localized.speedIndicator(currentSpeed),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.white,
-                        ),
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),

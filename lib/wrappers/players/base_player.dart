@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:fladder/models/items/media_streams_model.dart';
 import 'package:fladder/models/playback/playback_model.dart';
@@ -10,6 +10,7 @@ import 'package:fladder/models/settings/video_player_settings.dart';
 import 'package:fladder/wrappers/players/player_states.dart';
 
 const libassFallbackFont = "assets/mp-font.ttf";
+const libassFallbackFontName = "Droid Sans Fallback";
 
 /// Lets the full-screen player route be found and removed from the navigator (SyncPlay leave/kick/stop).
 const String videoPlayerRouteName = 'fladder/video_player';
@@ -25,7 +26,7 @@ abstract class BasePlayer {
   /// Route pushed by [open] for Flutter-rendered players; null for the native activity and once popped.
   Route<void>? playerRoute;
 
-  Future<void> init(VideoPlayerSettingsModel settings);
+  Future<void> init(VideoPlayerSettingsModel settings, {bool lowResourceMode = false});
   Widget? videoWidget(Key key, BoxFit fit);
   Widget? subtitles(bool showOverlay, {GlobalKey? controlsKey});
   Future<void> dispose();
@@ -64,6 +65,7 @@ abstract class BasePlayer {
   Future<int?> appliedSubStreamIndex(PlaybackModel playbackModel) async => null;
 
   Future<void> resetTracksToAuto() async {}
+  Future<void> shiftSubtitleOffset(Duration offset) async {}
   void applySubtitleSettings(SubtitleSettingsModel settings) {}
 
   Uri? isValidUrl(String input) {

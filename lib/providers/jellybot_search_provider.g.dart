@@ -6,203 +6,188 @@ part of 'jellybot_search_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(jellybotProviders)
+final jellybotProvidersProvider = JellybotProvidersProvider._();
+
+final class JellybotProvidersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<IProvider>>,
+          List<IProvider>,
+          FutureOr<List<IProvider>>
+        >
+    with $FutureModifier<List<IProvider>>, $FutureProvider<List<IProvider>> {
+  JellybotProvidersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'jellybotProvidersProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$jellybotProvidersHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<IProvider>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<IProvider>> create(Ref ref) {
+    return jellybotProviders(ref);
+  }
+}
+
 String _$jellybotProvidersHash() => r'b5a7b3a357318938349ccac25ef3a1714c335880';
 
-/// See also [jellybotProviders].
-@ProviderFor(jellybotProviders)
-final jellybotProvidersProvider = AutoDisposeFutureProvider<List<IProvider>>.internal(
-  jellybotProviders,
-  name: r'jellybotProvidersProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotProvidersHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef JellybotProvidersRef = AutoDisposeFutureProviderRef<List<IProvider>>;
-String _$jellybotSearchFiltersHash() => r'65e3dbf40d3d960dd23c3643ce580fcd60c5b43c';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [jellybotSearchFilters].
 @ProviderFor(jellybotSearchFilters)
-const jellybotSearchFiltersProvider = JellybotSearchFiltersFamily();
+final jellybotSearchFiltersProvider = JellybotSearchFiltersFamily._();
 
-/// See also [jellybotSearchFilters].
-class JellybotSearchFiltersFamily extends Family<AsyncValue<List<ISearchFilter>>> {
-  /// See also [jellybotSearchFilters].
-  const JellybotSearchFiltersFamily();
+final class JellybotSearchFiltersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ISearchFilter>>,
+          List<ISearchFilter>,
+          FutureOr<List<ISearchFilter>>
+        >
+    with
+        $FutureModifier<List<ISearchFilter>>,
+        $FutureProvider<List<ISearchFilter>> {
+  JellybotSearchFiltersProvider._({
+    required JellybotSearchFiltersFamily super.from,
+    required (String, MediaCategory) super.argument,
+  }) : super(
+         retry: null,
+         name: r'jellybotSearchFiltersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [jellybotSearchFilters].
-  JellybotSearchFiltersProvider call(
-    String providerId,
-    MediaCategory category,
-  ) {
-    return JellybotSearchFiltersProvider(
-      providerId,
-      category,
-    );
+  @override
+  String debugGetCreateSourceHash() => _$jellybotSearchFiltersHash();
+
+  @override
+  String toString() {
+    return r'jellybotSearchFiltersProvider'
+        ''
+        '$argument';
   }
 
+  @$internal
   @override
-  JellybotSearchFiltersProvider getProviderOverride(
-    covariant JellybotSearchFiltersProvider provider,
-  ) {
-    return call(
-      provider.providerId,
-      provider.category,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  $FutureProviderElement<List<ISearchFilter>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies => _allTransitiveDependencies;
-
-  @override
-  String? get name => r'jellybotSearchFiltersProvider';
-}
-
-/// See also [jellybotSearchFilters].
-class JellybotSearchFiltersProvider extends AutoDisposeFutureProvider<List<ISearchFilter>> {
-  /// See also [jellybotSearchFilters].
-  JellybotSearchFiltersProvider(
-    String providerId,
-    MediaCategory category,
-  ) : this._internal(
-          (ref) => jellybotSearchFilters(
-            ref as JellybotSearchFiltersRef,
-            providerId,
-            category,
-          ),
-          from: jellybotSearchFiltersProvider,
-          name: r'jellybotSearchFiltersProvider',
-          debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotSearchFiltersHash,
-          dependencies: JellybotSearchFiltersFamily._dependencies,
-          allTransitiveDependencies: JellybotSearchFiltersFamily._allTransitiveDependencies,
-          providerId: providerId,
-          category: category,
-        );
-
-  JellybotSearchFiltersProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.providerId,
-    required this.category,
-  }) : super.internal();
-
-  final String providerId;
-  final MediaCategory category;
-
-  @override
-  Override overrideWith(
-    FutureOr<List<ISearchFilter>> Function(JellybotSearchFiltersRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: JellybotSearchFiltersProvider._internal(
-        (ref) => create(ref as JellybotSearchFiltersRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        providerId: providerId,
-        category: category,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<List<ISearchFilter>> createElement() {
-    return _JellybotSearchFiltersProviderElement(this);
+  FutureOr<List<ISearchFilter>> create(Ref ref) {
+    final argument = this.argument as (String, MediaCategory);
+    return jellybotSearchFilters(ref, argument.$1, argument.$2);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is JellybotSearchFiltersProvider && other.providerId == providerId && other.category == category;
+    return other is JellybotSearchFiltersProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, providerId.hashCode);
-    hash = _SystemHash.combine(hash, category.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin JellybotSearchFiltersRef on AutoDisposeFutureProviderRef<List<ISearchFilter>> {
-  /// The parameter `providerId` of this provider.
-  String get providerId;
+String _$jellybotSearchFiltersHash() =>
+    r'65e3dbf40d3d960dd23c3643ce580fcd60c5b43c';
 
-  /// The parameter `category` of this provider.
-  MediaCategory get category;
-}
+final class JellybotSearchFiltersFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<List<ISearchFilter>>,
+          (String, MediaCategory)
+        > {
+  JellybotSearchFiltersFamily._()
+    : super(
+        retry: null,
+        name: r'jellybotSearchFiltersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
 
-class _JellybotSearchFiltersProviderElement extends AutoDisposeFutureProviderElement<List<ISearchFilter>>
-    with JellybotSearchFiltersRef {
-  _JellybotSearchFiltersProviderElement(super.provider);
+  JellybotSearchFiltersProvider call(
+    String providerId,
+    MediaCategory category,
+  ) => JellybotSearchFiltersProvider._(
+    argument: (providerId, category),
+    from: this,
+  );
 
   @override
-  String get providerId => (origin as JellybotSearchFiltersProvider).providerId;
-  @override
-  MediaCategory get category => (origin as JellybotSearchFiltersProvider).category;
+  String toString() => r'jellybotSearchFiltersProvider';
 }
-
-String _$addedCrawlLinkUrlsHash() => r'5500d47642e8b11a68190db0cd4ff1c3faf09e82';
 
 /// Normalized URL keys (see [normalizeCrawlUrlKey]) of every crawl link the
 /// server knows — backs the "already added" badge on search-result cards.
 /// Page 0 is fetched first to learn totalPages, remaining pages concurrently.
 /// Invalidated after every successful add (and on 409s) to refresh badging.
-///
-/// Copied from [addedCrawlLinkUrls].
-@ProviderFor(addedCrawlLinkUrls)
-final addedCrawlLinkUrlsProvider = FutureProvider<Set<String>>.internal(
-  addedCrawlLinkUrls,
-  name: r'addedCrawlLinkUrlsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$addedCrawlLinkUrlsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef AddedCrawlLinkUrlsRef = FutureProviderRef<Set<String>>;
-String _$jellybotSearchControllerHash() => r'6c37dfef0e60a5a2899bb5b460903b1567a1f9e7';
+@ProviderFor(addedCrawlLinkUrls)
+final addedCrawlLinkUrlsProvider = AddedCrawlLinkUrlsProvider._();
+
+/// Normalized URL keys (see [normalizeCrawlUrlKey]) of every crawl link the
+/// server knows — backs the "already added" badge on search-result cards.
+/// Page 0 is fetched first to learn totalPages, remaining pages concurrently.
+/// Invalidated after every successful add (and on 409s) to refresh badging.
+
+final class AddedCrawlLinkUrlsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Set<String>>,
+          Set<String>,
+          FutureOr<Set<String>>
+        >
+    with $FutureModifier<Set<String>>, $FutureProvider<Set<String>> {
+  /// Normalized URL keys (see [normalizeCrawlUrlKey]) of every crawl link the
+  /// server knows — backs the "already added" badge on search-result cards.
+  /// Page 0 is fetched first to learn totalPages, remaining pages concurrently.
+  /// Invalidated after every successful add (and on 409s) to refresh badging.
+  AddedCrawlLinkUrlsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'addedCrawlLinkUrlsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$addedCrawlLinkUrlsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Set<String>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Set<String>> create(Ref ref) {
+    return addedCrawlLinkUrls(ref);
+  }
+}
+
+String _$addedCrawlLinkUrlsHash() =>
+    r'5500d47642e8b11a68190db0cd4ff1c3faf09e82';
 
 /// Notifier holding the current search-request params (in `_state`) and the
 /// search response in its `AsyncValue<PaginatedResponseOfProviderSearchItemDto?>`.
@@ -211,18 +196,83 @@ String _$jellybotSearchControllerHash() => r'6c37dfef0e60a5a2899bb5b460903b1567a
 /// `_maybeAutoSearch` which re-runs the search whenever the query is non-empty.
 /// `setQuery` deliberately does NOT auto-search — the search bar uses an
 /// explicit submit so we don't fire on every keystroke.
-///
-/// Copied from [JellybotSearchController].
-@ProviderFor(JellybotSearchController)
-final jellybotSearchControllerProvider =
-    AutoDisposeAsyncNotifierProvider<JellybotSearchController, PaginatedResponseOfProviderSearchItemDto?>.internal(
-  JellybotSearchController.new,
-  name: r'jellybotSearchControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$jellybotSearchControllerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$JellybotSearchController = AutoDisposeAsyncNotifier<PaginatedResponseOfProviderSearchItemDto?>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(JellybotSearchController)
+final jellybotSearchControllerProvider = JellybotSearchControllerProvider._();
+
+/// Notifier holding the current search-request params (in `_state`) and the
+/// search response in its `AsyncValue<PaginatedResponseOfProviderSearchItemDto?>`.
+///
+/// Filter setters (provider/category/selectedFilters/exactMatch/minScore) call
+/// `_maybeAutoSearch` which re-runs the search whenever the query is non-empty.
+/// `setQuery` deliberately does NOT auto-search — the search bar uses an
+/// explicit submit so we don't fire on every keystroke.
+final class JellybotSearchControllerProvider
+    extends
+        $AsyncNotifierProvider<
+          JellybotSearchController,
+          PaginatedResponseOfProviderSearchItemDto?
+        > {
+  /// Notifier holding the current search-request params (in `_state`) and the
+  /// search response in its `AsyncValue<PaginatedResponseOfProviderSearchItemDto?>`.
+  ///
+  /// Filter setters (provider/category/selectedFilters/exactMatch/minScore) call
+  /// `_maybeAutoSearch` which re-runs the search whenever the query is non-empty.
+  /// `setQuery` deliberately does NOT auto-search — the search bar uses an
+  /// explicit submit so we don't fire on every keystroke.
+  JellybotSearchControllerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'jellybotSearchControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$jellybotSearchControllerHash();
+
+  @$internal
+  @override
+  JellybotSearchController create() => JellybotSearchController();
+}
+
+String _$jellybotSearchControllerHash() =>
+    r'6c37dfef0e60a5a2899bb5b460903b1567a1f9e7';
+
+/// Notifier holding the current search-request params (in `_state`) and the
+/// search response in its `AsyncValue<PaginatedResponseOfProviderSearchItemDto?>`.
+///
+/// Filter setters (provider/category/selectedFilters/exactMatch/minScore) call
+/// `_maybeAutoSearch` which re-runs the search whenever the query is non-empty.
+/// `setQuery` deliberately does NOT auto-search — the search bar uses an
+/// explicit submit so we don't fire on every keystroke.
+
+abstract class _$JellybotSearchController
+    extends $AsyncNotifier<PaginatedResponseOfProviderSearchItemDto?> {
+  FutureOr<PaginatedResponseOfProviderSearchItemDto?> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<PaginatedResponseOfProviderSearchItemDto?>,
+              PaginatedResponseOfProviderSearchItemDto?
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<PaginatedResponseOfProviderSearchItemDto?>,
+                PaginatedResponseOfProviderSearchItemDto?
+              >,
+              AsyncValue<PaginatedResponseOfProviderSearchItemDto?>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

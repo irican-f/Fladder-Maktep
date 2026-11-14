@@ -1,6 +1,8 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 // ignore_for_file: type=lint
+// ignore_for_file: invalid_use_of_protected_member
 // ignore_for_file: unused_element, unnecessary_cast, override_on_non_overriding_member
 // ignore_for_file: strict_raw_type, inference_failure_on_untyped_parameter
 
@@ -27,25 +29,55 @@ class ItemBaseModelMapper extends ClassMapperBase<ItemBaseModel> {
   static String _$id(ItemBaseModel v) => v.id;
   static const Field<ItemBaseModel, String> _f$id = Field('id', _$id);
   static OverviewModel _$overview(ItemBaseModel v) => v.overview;
-  static const Field<ItemBaseModel, OverviewModel> _f$overview = Field('overview', _$overview);
+  static const Field<ItemBaseModel, OverviewModel> _f$overview = Field(
+    'overview',
+    _$overview,
+  );
   static String? _$parentId(ItemBaseModel v) => v.parentId;
-  static const Field<ItemBaseModel, String> _f$parentId = Field('parentId', _$parentId);
+  static const Field<ItemBaseModel, String> _f$parentId = Field(
+    'parentId',
+    _$parentId,
+  );
   static String? _$playlistId(ItemBaseModel v) => v.playlistId;
-  static const Field<ItemBaseModel, String> _f$playlistId = Field('playlistId', _$playlistId);
+  static const Field<ItemBaseModel, String> _f$playlistId = Field(
+    'playlistId',
+    _$playlistId,
+  );
   static ImagesData? _$images(ItemBaseModel v) => v.images;
-  static const Field<ItemBaseModel, ImagesData> _f$images = Field('images', _$images);
+  static const Field<ItemBaseModel, ImagesData> _f$images = Field(
+    'images',
+    _$images,
+  );
   static int? _$childCount(ItemBaseModel v) => v.childCount;
-  static const Field<ItemBaseModel, int> _f$childCount = Field('childCount', _$childCount);
+  static const Field<ItemBaseModel, int> _f$childCount = Field(
+    'childCount',
+    _$childCount,
+  );
   static double? _$primaryRatio(ItemBaseModel v) => v.primaryRatio;
-  static const Field<ItemBaseModel, double> _f$primaryRatio = Field('primaryRatio', _$primaryRatio);
+  static const Field<ItemBaseModel, double> _f$primaryRatio = Field(
+    'primaryRatio',
+    _$primaryRatio,
+  );
   static UserData _$userData(ItemBaseModel v) => v.userData;
-  static const Field<ItemBaseModel, UserData> _f$userData = Field('userData', _$userData);
+  static const Field<ItemBaseModel, UserData> _f$userData = Field(
+    'userData',
+    _$userData,
+  );
   static bool? _$canDownload(ItemBaseModel v) => v.canDownload;
-  static const Field<ItemBaseModel, bool> _f$canDownload = Field('canDownload', _$canDownload);
+  static const Field<ItemBaseModel, bool> _f$canDownload = Field(
+    'canDownload',
+    _$canDownload,
+  );
   static bool? _$canDelete(ItemBaseModel v) => v.canDelete;
-  static const Field<ItemBaseModel, bool> _f$canDelete = Field('canDelete', _$canDelete);
+  static const Field<ItemBaseModel, bool> _f$canDelete = Field(
+    'canDelete',
+    _$canDelete,
+  );
   static dto.BaseItemKind? _$jellyType(ItemBaseModel v) => v.jellyType;
-  static const Field<ItemBaseModel, dto.BaseItemKind> _f$jellyType = Field('jellyType', _$jellyType);
+  static const Field<ItemBaseModel, dto.BaseItemKind> _f$jellyType = Field(
+    'jellyType',
+    _$jellyType,
+  );
 
   @override
   final MappableFields<ItemBaseModel> fields = const {
@@ -67,18 +99,19 @@ class ItemBaseModelMapper extends ClassMapperBase<ItemBaseModel> {
 
   static ItemBaseModel _instantiate(DecodingData data) {
     return ItemBaseModel(
-        name: data.dec(_f$name),
-        id: data.dec(_f$id),
-        overview: data.dec(_f$overview),
-        parentId: data.dec(_f$parentId),
-        playlistId: data.dec(_f$playlistId),
-        images: data.dec(_f$images),
-        childCount: data.dec(_f$childCount),
-        primaryRatio: data.dec(_f$primaryRatio),
-        userData: data.dec(_f$userData),
-        canDownload: data.dec(_f$canDownload),
-        canDelete: data.dec(_f$canDelete),
-        jellyType: data.dec(_f$jellyType));
+      name: data.dec(_f$name),
+      id: data.dec(_f$id),
+      overview: data.dec(_f$overview),
+      parentId: data.dec(_f$parentId),
+      playlistId: data.dec(_f$playlistId),
+      images: data.dec(_f$images),
+      childCount: data.dec(_f$childCount),
+      primaryRatio: data.dec(_f$primaryRatio),
+      userData: data.dec(_f$userData),
+      canDownload: data.dec(_f$canDownload),
+      canDelete: data.dec(_f$canDelete),
+      jellyType: data.dec(_f$jellyType),
+    );
   }
 
   @override
@@ -86,89 +119,104 @@ class ItemBaseModelMapper extends ClassMapperBase<ItemBaseModel> {
 }
 
 mixin ItemBaseModelMappable {
-  ItemBaseModelCopyWith<ItemBaseModel, ItemBaseModel, ItemBaseModel> get copyWith =>
-      _ItemBaseModelCopyWithImpl<ItemBaseModel, ItemBaseModel>(this as ItemBaseModel, $identity, $identity);
+  ItemBaseModelCopyWith<ItemBaseModel, ItemBaseModel, ItemBaseModel>
+  get copyWith => _ItemBaseModelCopyWithImpl<ItemBaseModel, ItemBaseModel>(
+    this as ItemBaseModel,
+    $identity,
+    $identity,
+  );
 }
 
-extension ItemBaseModelValueCopy<$R, $Out> on ObjectCopyWith<$R, ItemBaseModel, $Out> {
+extension ItemBaseModelValueCopy<$R, $Out>
+    on ObjectCopyWith<$R, ItemBaseModel, $Out> {
   ItemBaseModelCopyWith<$R, ItemBaseModel, $Out> get $asItemBaseModel =>
       $base.as((v, t, t2) => _ItemBaseModelCopyWithImpl<$R, $Out>(v, t, t2));
 }
 
-abstract class ItemBaseModelCopyWith<$R, $In extends ItemBaseModel, $Out> implements ClassCopyWith<$R, $In, $Out> {
+abstract class ItemBaseModelCopyWith<$R, $In extends ItemBaseModel, $Out>
+    implements ClassCopyWith<$R, $In, $Out> {
   OverviewModelCopyWith<$R, OverviewModel, OverviewModel> get overview;
   UserDataCopyWith<$R, UserData, UserData> get userData;
-  $R call(
-      {String? name,
-      String? id,
-      OverviewModel? overview,
-      String? parentId,
-      String? playlistId,
-      ImagesData? images,
-      int? childCount,
-      double? primaryRatio,
-      UserData? userData,
-      bool? canDownload,
-      bool? canDelete,
-      dto.BaseItemKind? jellyType});
+  $R call({
+    String? name,
+    String? id,
+    OverviewModel? overview,
+    String? parentId,
+    String? playlistId,
+    ImagesData? images,
+    int? childCount,
+    double? primaryRatio,
+    UserData? userData,
+    bool? canDownload,
+    bool? canDelete,
+    dto.BaseItemKind? jellyType,
+  });
   ItemBaseModelCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
-class _ItemBaseModelCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, ItemBaseModel, $Out>
+class _ItemBaseModelCopyWithImpl<$R, $Out>
+    extends ClassCopyWithBase<$R, ItemBaseModel, $Out>
     implements ItemBaseModelCopyWith<$R, ItemBaseModel, $Out> {
   _ItemBaseModelCopyWithImpl(super.value, super.then, super.then2);
 
   @override
-  late final ClassMapperBase<ItemBaseModel> $mapper = ItemBaseModelMapper.ensureInitialized();
+  late final ClassMapperBase<ItemBaseModel> $mapper =
+      ItemBaseModelMapper.ensureInitialized();
   @override
   OverviewModelCopyWith<$R, OverviewModel, OverviewModel> get overview =>
       $value.overview.copyWith.$chain((v) => call(overview: v));
   @override
-  UserDataCopyWith<$R, UserData, UserData> get userData => $value.userData.copyWith.$chain((v) => call(userData: v));
+  UserDataCopyWith<$R, UserData, UserData> get userData =>
+      $value.userData.copyWith.$chain((v) => call(userData: v));
   @override
-  $R call(
-          {String? name,
-          String? id,
-          OverviewModel? overview,
-          Object? parentId = $none,
-          Object? playlistId = $none,
-          Object? images = $none,
-          Object? childCount = $none,
-          Object? primaryRatio = $none,
-          UserData? userData,
-          Object? canDownload = $none,
-          Object? canDelete = $none,
-          Object? jellyType = $none}) =>
-      $apply(FieldCopyWithData({
-        if (name != null) #name: name,
-        if (id != null) #id: id,
-        if (overview != null) #overview: overview,
-        if (parentId != $none) #parentId: parentId,
-        if (playlistId != $none) #playlistId: playlistId,
-        if (images != $none) #images: images,
-        if (childCount != $none) #childCount: childCount,
-        if (primaryRatio != $none) #primaryRatio: primaryRatio,
-        if (userData != null) #userData: userData,
-        if (canDownload != $none) #canDownload: canDownload,
-        if (canDelete != $none) #canDelete: canDelete,
-        if (jellyType != $none) #jellyType: jellyType
-      }));
+  $R call({
+    String? name,
+    String? id,
+    OverviewModel? overview,
+    Object? parentId = $none,
+    Object? playlistId = $none,
+    Object? images = $none,
+    Object? childCount = $none,
+    Object? primaryRatio = $none,
+    UserData? userData,
+    Object? canDownload = $none,
+    Object? canDelete = $none,
+    Object? jellyType = $none,
+  }) => $apply(
+    FieldCopyWithData({
+      if (name != null) #name: name,
+      if (id != null) #id: id,
+      if (overview != null) #overview: overview,
+      if (parentId != $none) #parentId: parentId,
+      if (playlistId != $none) #playlistId: playlistId,
+      if (images != $none) #images: images,
+      if (childCount != $none) #childCount: childCount,
+      if (primaryRatio != $none) #primaryRatio: primaryRatio,
+      if (userData != null) #userData: userData,
+      if (canDownload != $none) #canDownload: canDownload,
+      if (canDelete != $none) #canDelete: canDelete,
+      if (jellyType != $none) #jellyType: jellyType,
+    }),
+  );
   @override
   ItemBaseModel $make(CopyWithData data) => ItemBaseModel(
-      name: data.get(#name, or: $value.name),
-      id: data.get(#id, or: $value.id),
-      overview: data.get(#overview, or: $value.overview),
-      parentId: data.get(#parentId, or: $value.parentId),
-      playlistId: data.get(#playlistId, or: $value.playlistId),
-      images: data.get(#images, or: $value.images),
-      childCount: data.get(#childCount, or: $value.childCount),
-      primaryRatio: data.get(#primaryRatio, or: $value.primaryRatio),
-      userData: data.get(#userData, or: $value.userData),
-      canDownload: data.get(#canDownload, or: $value.canDownload),
-      canDelete: data.get(#canDelete, or: $value.canDelete),
-      jellyType: data.get(#jellyType, or: $value.jellyType));
+    name: data.get(#name, or: $value.name),
+    id: data.get(#id, or: $value.id),
+    overview: data.get(#overview, or: $value.overview),
+    parentId: data.get(#parentId, or: $value.parentId),
+    playlistId: data.get(#playlistId, or: $value.playlistId),
+    images: data.get(#images, or: $value.images),
+    childCount: data.get(#childCount, or: $value.childCount),
+    primaryRatio: data.get(#primaryRatio, or: $value.primaryRatio),
+    userData: data.get(#userData, or: $value.userData),
+    canDownload: data.get(#canDownload, or: $value.canDownload),
+    canDelete: data.get(#canDelete, or: $value.canDelete),
+    jellyType: data.get(#jellyType, or: $value.jellyType),
+  );
 
   @override
-  ItemBaseModelCopyWith<$R2, ItemBaseModel, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t) =>
-      _ItemBaseModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
+  ItemBaseModelCopyWith<$R2, ItemBaseModel, $Out2> $chain<$R2, $Out2>(
+    Then<$Out2, $R2> t,
+  ) => _ItemBaseModelCopyWithImpl<$R2, $Out2>($value, $cast, t);
 }
+

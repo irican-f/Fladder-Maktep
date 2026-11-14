@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/providers/shared_provider.dart';
 import 'package:fladder/util/fladder_config.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 part 'jellybot_api_provider.g.dart';
 

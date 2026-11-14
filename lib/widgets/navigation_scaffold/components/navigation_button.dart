@@ -1,8 +1,10 @@
+import 'package:material_ui/material_ui.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/widgets/navigation_scaffold/components/side_navigation_bar.dart';
 import 'package:fladder/widgets/shared/item_actions.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class NavigationButton extends ConsumerStatefulWidget {
   final String? label;

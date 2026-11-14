@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
@@ -26,7 +26,7 @@ class SearchResultCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final addedKeys = ref.watch(addedCrawlLinkUrlsProvider).valueOrNull ?? const <String>{};
+    final addedKeys = ref.watch(addedCrawlLinkUrlsProvider).value ?? const <String>{};
     final itemKey = normalizeCrawlUrlKey(item.url);
     final isAlreadyAdded = itemKey != null && addedKeys.contains(itemKey);
     final scheme = Theme.of(context).colorScheme;

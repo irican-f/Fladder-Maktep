@@ -1,6 +1,11 @@
+import 'package:material_ui/material_ui.dart';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
+
 import 'package:fladder/jellyfin/jellyfin_open_api.enums.swagger.dart';
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart' as dto;
 import 'package:fladder/l10n/generated/app_localizations.dart';
@@ -39,9 +44,6 @@ import 'package:fladder/screens/photo_viewer/photo_viewer_screen.dart';
 import 'package:fladder/src/video_player_helper.g.dart' show SimpleItemModel;
 import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/util/string_extensions.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
 
 part 'item_base_model.mapper.dart';
 

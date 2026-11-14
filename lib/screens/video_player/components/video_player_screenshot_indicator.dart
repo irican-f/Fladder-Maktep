@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:async/async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -46,10 +46,7 @@ class VideoPlayerScreenshotIndicatorState extends ConsumerState<VideoPlayerScree
       ref.read(playBackModel.notifier).update((state) => noSubsModel);
 
       if (noSubsModel != null) {
-        await ref.read(playbackModelHelper).shouldReload(
-              noSubsModel,
-              isLocalTrackSwitch: true,
-            );
+        await ref.read(playbackModelHelper).shouldReload(noSubsModel, isLocalTrackSwitch: true);
       }
 
       result = await ref.read(videoPlayerProvider.notifier).takeScreenshot();
@@ -58,10 +55,7 @@ class VideoPlayerScreenshotIndicatorState extends ConsumerState<VideoPlayerScree
       ref.read(playBackModel.notifier).update((state) => restoredModel);
 
       if (restoredModel != null) {
-        await ref.read(playbackModelHelper).shouldReload(
-              restoredModel,
-              isLocalTrackSwitch: true,
-            );
+        await ref.read(playbackModelHelper).shouldReload(restoredModel, isLocalTrackSwitch: true);
       }
     } else {
       result = await ref.read(videoPlayerProvider.notifier).takeScreenshot();
@@ -107,11 +101,11 @@ class VideoPlayerScreenshotIndicatorState extends ConsumerState<VideoPlayerScree
                     Text(
                       screenshotTaken
                           ? isCleanScreenshot
-                              ? context.localized.screenshotCleanTaken
-                              : context.localized.screenshotTaken
+                                ? context.localized.screenshotCleanTaken
+                                : context.localized.screenshotTaken
                           : context.localized.errorTakingScreenshot,
                       style: Theme.of(context).textTheme.bodyMedium,
-                    )
+                    ),
                   ],
                 ),
               ),

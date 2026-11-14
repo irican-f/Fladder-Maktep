@@ -1,4 +1,8 @@
+import 'package:material_ui/material_ui.dart';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:fladder/models/seerr/seerr_dashboard_model.dart';
 import 'package:fladder/providers/seerr_dashboard_provider.dart';
 import 'package:fladder/providers/seerr_user_provider.dart';
@@ -15,8 +19,6 @@ import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/util/sliver_list_padding.dart';
 import 'package:fladder/widgets/navigation_scaffold/components/background_image.dart';
 import 'package:fladder/widgets/shared/pull_to_refresh.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 @RoutePage()
 class SeerrScreen extends ConsumerStatefulWidget {

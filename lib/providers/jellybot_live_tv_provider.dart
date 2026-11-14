@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/providers/jellybot_api_provider.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 part 'jellybot_live_tv_provider.g.dart';
 

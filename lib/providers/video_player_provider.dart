@@ -2,6 +2,12 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:material_ui/material_ui.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:path/path.dart' as p;
+
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/models/item_base_model.dart';
 import 'package:fladder/models/items/item_shared_models.dart';
@@ -12,6 +18,7 @@ import 'package:fladder/models/playback/playback_model.dart';
 import 'package:fladder/models/playback/playback_queue_state.dart';
 import 'package:fladder/models/settings/video_player_settings.dart';
 import 'package:fladder/models/syncplay/syncplay_models.dart';
+import 'package:fladder/providers/low_resource_provider.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/settings/video_player_settings_provider.dart';
 import 'package:fladder/providers/syncplay/buffering_report_debouncer.dart';
@@ -19,9 +26,6 @@ import 'package:fladder/providers/syncplay/syncplay_provider.dart';
 import 'package:fladder/providers/track_preferences_provider.dart';
 import 'package:fladder/src/video_player_helper.g.dart' show PlaybackChangeSource, SyncPlayCommandType;
 import 'package:fladder/wrappers/media_control_wrapper.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
 
 final mediaPlaybackProvider = StateProvider<MediaPlaybackModel>((ref) => MediaPlaybackModel());
 
@@ -86,10 +90,8 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
   /// The backend's real playing state: on media-kit the wrapper's `playing` flag is only the requested one.
   bool get _livePlaying => state.isPlayerPlaying;
 
-  ProviderSubscription<VideoPlayerSettingsModel>? settingsChanged;
   @override
   void dispose() {
-    settingsChanged?.close();
     _syncPlayStateSubscription?.cancel();
     _bufferingDebouncer?.dispose();
     super.dispose();
@@ -110,6 +112,16 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
     developer.log('SyncPlay: player still not playing after repeated play() calls');
   }
 
+  void applySettingsChanged(VideoPlayerSettingsModel settings) {
+    final currentItem = ref.read(playBackModel)?.item;
+    if (currentItem != null) {
+      state.applyReplayGain(
+        currentItem,
+        settings: settings,
+      );
+    }
+  }
+
   Future<void> init() async {
     _playGeneration++;
     await state.stop();
@@ -119,24 +131,12 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
     for (final s in subscriptions) {
       s.cancel();
     }
+    subscriptions.clear();
 
     _bufferingDebouncer?.dispose();
     _bufferingDebouncer = BufferingReportDebouncer(
       onBuffering: () => ref.read(syncPlayProvider.notifier).reportBuffering(),
       onReady: () => ref.read(syncPlayProvider.notifier).reportReady(isPlaying: _livePlaying),
-    );
-
-    settingsChanged = ref.listen(
-      videoPlayerSettingsProvider,
-      (previous, next) {
-        final currentItem = ref.read(playBackModel)?.item;
-        if (currentItem != null) {
-          state.applyReplayGain(
-            currentItem,
-            settings: next,
-          );
-        }
-      },
     );
 
     final subscription = state.stateStream.listen((value) {
@@ -421,19 +421,22 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
         model.item.type == FladderItemType.audio || model.mediaStreams?.videoStreams.isEmpty == true;
 
     try {
-      await state.stop();
+      await state.stop(keepMediaSession: true);
       ref.read(playbackRateProvider.notifier).state = 1.0;
+      ref.read(subtitleTimingOffsetProvider.notifier).state = Duration.zero; //reset subtitle offset on new video
+      final effectiveStartPosition = await model.resolvedStartPosition(startPosition);
       mediaState.update((state) => state.copyWith(
             state: useMinimizedPlayer ? VideoPlayerState.minimized : VideoPlayerState.fullScreen,
             fullScreen: !useMinimizedPlayer,
             buffering: true,
             errorPlaying: false,
             skippedSegments: {},
+            position: effectiveStartPosition,
+            lastPosition: effectiveStartPosition,
           ));
 
       final media = model.media;
       PlaybackModel? newPlaybackModel = model;
-      final effectiveStartPosition = await model.resolvedStartPosition(startPosition);
 
       if (media == null) {
         ref.read(syncPlayProvider.notifier).setPlayerBufferingState(false);
@@ -576,7 +579,10 @@ class VideoPlayerNotifier extends StateNotifier<MediaControlsWrapper> {
     await state.jumpToQueueItem(item);
   }
 
-  Future<void> openPlayer(BuildContext context) async => state.openPlayer(context);
+  Future<void> openPlayer(BuildContext context) async {
+    if (ref.read(lowResourceModeProvider)) PaintingBinding.instance.imageCache.clear();
+    return state.openPlayer(context);
+  }
 
   /// After a load where the player applies track selection itself
   /// (direct/offline playback), compare the model's selection with the

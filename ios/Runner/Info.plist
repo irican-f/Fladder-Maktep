@@ -47,6 +47,27 @@
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
+		<key>UIApplicationSceneManifest</key>
+		<dict>
+			<key>UIApplicationSupportsMultipleScenes</key>
+			<false/>
+			<key>UISceneConfigurations</key>
+			<dict>
+				<key>UIWindowSceneSessionRoleApplication</key>
+				<array>
+					<dict>
+						<key>UISceneClassName</key>
+						<string>UIWindowScene</string>
+						<key>UISceneDelegateClassName</key>
+						<string>FlutterSceneDelegate</string>
+						<key>UISceneConfigurationName</key>
+						<string>flutter</string>
+						<key>UISceneStoryboardFile</key>
+						<string>Main</string>
+					</dict>
+				</array>
+			</dict>
+		</dict>
 
 		<key>UIBackgroundModes</key>
 		<array>
@@ -55,6 +76,8 @@
 		</array>
 
 		<!-- URL scheme for deep linking (example: fladder://details?id=xyz) -->
+		<key>FlutterDeepLinkingEnabled</key>
+		<false/>
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>

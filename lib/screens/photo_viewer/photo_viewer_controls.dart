@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:square_progress_indicator/square_progress_indicator.dart';
@@ -16,6 +15,7 @@ import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
 import 'package:fladder/util/input_handler.dart';
 import 'package:fladder/util/list_padding.dart';
+import 'package:fladder/util/native_window.dart';
 import 'package:fladder/util/throttler.dart';
 import 'package:fladder/widgets/full_screen_helpers/full_screen_wrapper.dart';
 import 'package:fladder/widgets/shared/elevated_icon.dart';
@@ -30,13 +30,17 @@ class PhotoViewerControls extends ConsumerStatefulWidget {
   final int currentIndex;
   final ValueChanged<PhotoModel> onPhotoChanged;
   final Function() openOptions;
-  final ExtendedPageController pageController;
+  final VoidCallback onNext;
+  final VoidCallback onPrevious;
+  final VoidCallback onAdvance;
   final int? totalPhotoCount;
   final Function(bool? value)? toggleOverlay;
   const PhotoViewerControls({
     required this.padding,
     required this.photo,
-    required this.pageController,
+    required this.onNext,
+    required this.onPrevious,
+    required this.onAdvance,
     required this.loadingMoreItems,
     required this.openOptions,
     required this.onPhotoChanged,
@@ -51,43 +55,27 @@ class PhotoViewerControls extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _PhotoViewerControllsState();
 }
 
-class _PhotoViewerControllsState extends ConsumerState<PhotoViewerControls> with WindowListener {
+class _PhotoViewerControllsState extends ConsumerState<PhotoViewerControls> {
+  ListenerId? _windowListener;
   final Throttler throttler = Throttler(duration: const Duration(milliseconds: 130));
-  late int currentPage = widget.pageController.page?.round() ?? 0;
-  double dragUpDelta = 0.0;
 
   final controller = TextEditingController();
   late final timerController = RestartableTimerController(
-      ref.read(photoViewSettingsProvider).timer, const Duration(milliseconds: 32), onTimeout: () {
-    if (widget.pageController.page == widget.itemCount - 1) {
-      widget.pageController.animateToPage(0, duration: const Duration(milliseconds: 250), curve: Curves.easeInOut);
-    } else {
-      widget.pageController.nextPage(duration: const Duration(milliseconds: 250), curve: Curves.easeInOut);
-    }
-  });
-
-  void _resetOnScroll() {
-    if (currentPage != widget.pageController.page?.round()) {
-      currentPage = widget.pageController.page?.round() ?? 0;
-    }
-  }
+      ref.read(photoViewSettingsProvider).timer, const Duration(milliseconds: 32),
+      onTimeout: () => widget.onAdvance());
 
   @override
   void initState() {
     super.initState();
-    windowManager.addListener(this);
-    widget.pageController.addListener(
-      () {
-        _resetOnScroll();
-        timerController.reset();
-      },
-    );
+    _windowListener = currentWindow?.addListener((event) {
+      if (event is WindowMinimizedEvent) timerController.cancel();
+    });
   }
 
   @override
-  void onWindowMinimize() {
-    timerController.cancel();
-    super.onWindowMinimize();
+  void didUpdateWidget(PhotoViewerControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) timerController.reset();
   }
 
   @override
@@ -96,7 +84,7 @@ class _PhotoViewerControllsState extends ConsumerState<PhotoViewerControls> with
     if (context.mounted) {
       fullScreenHelper.closeFullScreen(ref);
     }
-    windowManager.removeListener(this);
+    if (_windowListener != null) currentWindow?.removeListener(_windowListener!);
     super.dispose();
   }
 
@@ -145,7 +133,7 @@ class _PhotoViewerControllsState extends ConsumerState<PhotoViewerControls> with
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               ElevatedIconButton(
-                                onPressed: () => Navigator.of(context).pop(widget.pageController.page?.toInt()),
+                                onPressed: () => Navigator.of(context).pop(widget.currentIndex),
                                 icon: getBackIcon(context),
                               ),
                               const SizedBox(width: 8),
@@ -300,28 +288,22 @@ class _PhotoViewerControllsState extends ConsumerState<PhotoViewerControls> with
         ref.read(photoViewSettingsProvider.notifier).update((state) => state.copyWith(mute: !state.mute));
         return true;
       case VideoHotKeys.seekForward:
-        throttler.run(
-            () => widget.pageController.nextPage(duration: const Duration(milliseconds: 125), curve: Curves.easeInOut));
+        throttler.run(widget.onNext);
         return true;
       case VideoHotKeys.seekBack:
-        throttler.run(() =>
-            widget.pageController.previousPage(duration: const Duration(milliseconds: 125), curve: Curves.easeInOut));
+        throttler.run(widget.onPrevious);
         return true;
       case VideoHotKeys.nextVideo:
-        throttler.run(
-            () => widget.pageController.nextPage(duration: const Duration(milliseconds: 125), curve: Curves.easeInOut));
+        throttler.run(widget.onNext);
         return true;
       case VideoHotKeys.prevVideo:
-        throttler.run(() =>
-            widget.pageController.previousPage(duration: const Duration(milliseconds: 125), curve: Curves.easeInOut));
+        throttler.run(widget.onPrevious);
         return true;
       case VideoHotKeys.nextChapter:
-        throttler.run(
-            () => widget.pageController.nextPage(duration: const Duration(milliseconds: 125), curve: Curves.easeInOut));
+        throttler.run(widget.onNext);
         return true;
       case VideoHotKeys.prevChapter:
-        throttler.run(() =>
-            widget.pageController.previousPage(duration: const Duration(milliseconds: 125), curve: Curves.easeInOut));
+        throttler.run(widget.onPrevious);
         return true;
       default:
         return false;

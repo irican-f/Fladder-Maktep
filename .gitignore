@@ -87,3 +87,4 @@ config/config.local.json
 tools/release_manager.config.local.json
 tools/changelogs/*.md
 !tools/changelogs/README.md
+android/.kotlin/sessions/*

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Compact icon + label pill used for metadata (season, year, provider,
 /// match score…) on jellybot cards and in the add-flow sheet header.

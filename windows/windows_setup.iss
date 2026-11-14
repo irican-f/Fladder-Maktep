@@ -44,6 +44,12 @@ Source: "{#SourcePath}\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Ex
 Name: "{autoprograms}\Cine Maktep"; Filename: "{app}\cinemaktep.exe"
 Name: "{autodesktop}\Cine Maktep"; Filename: "{app}\cinemaktep.exe"; Tasks: desktopicon
 
+[Registry]
+Root: HKA; Subkey: "Software\Classes\fladder"; ValueType: string; ValueName: ""; ValueData: "URL:Fladder"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\fladder"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
+Root: HKA; Subkey: "Software\Classes\fladder\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: """{app}\fladder.exe"",0"
+Root: HKA; Subkey: "Software\Classes\fladder\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\fladder.exe"" ""%1"""
+
 [Run]
 Filename: "{app}\cinemaktep.exe"; Description: "{cm:LaunchProgram,Cine Maktep}"; Flags: nowait postinstall skipifsilent
 

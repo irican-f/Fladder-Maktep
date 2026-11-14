@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:async/async.dart';
 import 'package:audio_session/audio_session.dart';
@@ -29,7 +29,8 @@ import 'package:fladder/wrappers/players/player_states.dart';
 class LibMPV extends BasePlayer {
   mpv.Player? _player;
   VideoController? _controller;
-  String _currentSubtitleCodec = '';
+  Duration _subtitleOffset = Duration.zero;
+  final ValueNotifier<bool> _internalSubtitleRenderer = ValueNotifier(false);
 
   final StreamController<PlayerState> _stateController = StreamController.broadcast();
   @override
@@ -39,6 +40,7 @@ class LibMPV extends BasePlayer {
 
   bool _replayGainFallbackLogged = false;
   VideoPlayerSettingsModel _settings = VideoPlayerSettingsModel();
+  bool _lowResourceMode = false;
 
   RestartableTimer? _retryTimer;
   DateTime _firstLoadAttempt = DateTime.now();
@@ -71,8 +73,9 @@ class LibMPV extends BasePlayer {
   }
 
   @override
-  Future<void> init(VideoPlayerSettingsModel settings) async {
+  Future<void> init(VideoPlayerSettingsModel settings, {bool lowResourceMode = false}) async {
     _settings = settings;
+    _lowResourceMode = lowResourceMode;
     dispose();
 
     mpv.MediaKit.ensureInitialized();
@@ -81,6 +84,7 @@ class LibMPV extends BasePlayer {
       configuration: mpv.PlayerConfiguration(
         title: "nl.jknaapen.fladder",
         libassAndroidFont: libassFallbackFont,
+        libassAndroidFontName: libassFallbackFontName,
         libass: !kIsWeb && settings.useLibass,
         bufferSize: settings.bufferSize * 1024 * 1024, // MPV uses buffer size in bytes
       ),
@@ -101,10 +105,17 @@ class LibMPV extends BasePlayer {
       await nativePlayer.setProperty('force-seekable', 'yes');
       await nativePlayer.setProperty('gapless-audio', 'yes');
       await nativePlayer.setProperty('cache', 'yes');
-      await nativePlayer.setProperty('demuxer-max-bytes', '150M');
+      await nativePlayer.setProperty('demuxer-max-bytes', _lowResourceMode ? '64M' : '150M');
       await nativePlayer.setProperty('network-timeout', '60');
       await nativePlayer.setProperty('stream-buffer-size', '4M');
       await nativePlayer.setProperty('prefetch-playlist', 'yes');
+      await nativePlayer.observeProperty('sid', (String _) async {
+        final String codec = await nativePlayer.getProperty('current-tracks/sub/codec');
+        _internalSubtitleRenderer.value = _needsInternalRenderer(codec);
+        if (settings.useLibass) {
+          await nativePlayer.setProperty('sub-visibility', _internalSubtitleRenderer.value ? 'yes' : 'no');
+        }
+      });
 
       if (defaultTargetPlatform == TargetPlatform.android) {
         await nativePlayer.setProperty('ao', 'audiotrack');
@@ -184,6 +195,7 @@ class LibMPV extends BasePlayer {
       configuration: mpv.PlayerConfiguration(
         title: "nl.jknaapen.fladder",
         libassAndroidFont: libassFallbackFont,
+        libassAndroidFontName: libassFallbackFontName,
         libass: !kIsWeb && _settings.useLibass,
         bufferSize: _settings.bufferSize * 1024 * 1024,
       ),
@@ -261,6 +273,7 @@ class LibMPV extends BasePlayer {
 
     _retryTimer?.cancel();
     _retryTimer = null;
+    if (_player == null) return;
 
     // Live streams (HLS) report duration == 0 indefinitely, so the
     // duration-based "ready" predicate below never fires and the retry
@@ -564,7 +577,6 @@ class LibMPV extends BasePlayer {
       await _player?.setSubtitleTrack(mpv.SubtitleTrack.no());
       return -1;
     }
-    _currentSubtitleCodec = wantedSubtitle.codec;
     // A non-external subtitle on a transcode is burned in by the server: there is no selectable track, and
     // waiting for one only stalls the caller for the whole `_awaitTrack` timeout before the reload.
     if (playbackModel is TranscodePlaybackModel && !wantedSubtitle.isExternal) {
@@ -680,9 +692,23 @@ class LibMPV extends BasePlayer {
               controller: _controller!,
               showOverlay: showOverlay,
               controlsKey: controlsKey,
-              currentSubtitleCodec: _currentSubtitleCodec,
+              internalRenderer: _internalSubtitleRenderer,
             )
           : null;
+
+  static bool _needsInternalRenderer(String codec) {
+    final value = codec.toLowerCase();
+    return const ['ass', 'ssa', 'pgs', 'dvd', 'vobsub', 'dvb', 'xsub'].any(value.contains);
+  }
+
+  @override
+  Future<void> shiftSubtitleOffset(Duration offset) async {
+    if (_player?.platform is! mpv.NativePlayer) return;
+
+    _subtitleOffset += offset;
+    final nativePlayer = _player!.platform as dynamic;
+    await nativePlayer.setProperty('sub-delay', (_subtitleOffset.inMilliseconds / 1000).toStringAsFixed(3));
+  }
 
   @override
   Future<void> setVolume(double volume) async {
@@ -709,13 +735,13 @@ class _VideoSubtitles extends ConsumerStatefulWidget {
   final VideoController controller;
   final bool showOverlay;
   final GlobalKey? controlsKey;
-  final String currentSubtitleCodec;
+  final ValueListenable<bool> internalRenderer;
 
   const _VideoSubtitles({
     required this.controller,
+    required this.internalRenderer,
     this.showOverlay = false,
     this.controlsKey,
-    this.currentSubtitleCodec = '',
   });
 
   @override
@@ -734,6 +760,7 @@ class _VideoSubtitlesState extends ConsumerState<_VideoSubtitles> {
   void initState() {
     super.initState();
     subtitle = widget.controller.player.state.subtitle;
+    widget.internalRenderer.addListener(_onRendererChanged);
     subscription = widget.controller.player.stream.subtitle.listen((value) {
       if (mounted) {
         setState(() {
@@ -744,9 +771,14 @@ class _VideoSubtitlesState extends ConsumerState<_VideoSubtitles> {
     });
   }
 
+  void _onRendererChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
     subscription?.cancel();
+    widget.internalRenderer.removeListener(_onRendererChanged);
     super.dispose();
   }
 
@@ -764,23 +796,9 @@ class _VideoSubtitlesState extends ConsumerState<_VideoSubtitles> {
 
     final text = _cachedSubtitleText;
 
-    final bool isLibassEnabled = widget.controller.player.platform?.configuration.libass ?? false;
+    final isLibassEnabled = widget.controller.player.platform?.configuration.libass ?? false;
 
-    if (isLibassEnabled) {
-      // On desktop (Linux/Windows/macOS), mpv burns ALL subtitle formats into the video when libass is enabled.
-      // On mobile (Android/iOS), only ASS/SSA subs are burned in by libass; other formats need the Flutter overlay.
-      final bool isDesktop = defaultTargetPlatform == TargetPlatform.linux ||
-          defaultTargetPlatform == TargetPlatform.windows ||
-          defaultTargetPlatform == TargetPlatform.macOS;
-      if (isDesktop) {
-        return const SizedBox.shrink();
-      }
-      final currentSubCodec = widget.currentSubtitleCodec.toLowerCase();
-      final bool isAssSubtitle = currentSubCodec.contains('ass') || currentSubCodec.contains('ssa');
-      if (isAssSubtitle || text.isEmpty) {
-        return const SizedBox.shrink();
-      }
-    } else if (text.isEmpty) {
+    if (text.isEmpty || (isLibassEnabled && widget.internalRenderer.value)) {
       return const SizedBox.shrink();
     }
 
