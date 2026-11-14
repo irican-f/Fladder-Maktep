@@ -28,9 +28,26 @@ class FullScreenHelper implements FullScreenWrapper {
       await Future.delayed(const Duration(seconds: 1));
     } else {
       await html.document.documentElement?.requestFullscreen().toDart;
+      _resetOnBrowserExit(ref);
     }
     ref
         .read(mediaPlaybackProvider.notifier)
         .update((state) => state.copyWith(fullScreen: html.document.fullscreenElement != null));
   }
+}
+
+/// The browser can leave fullscreen on its own (Esc, back gesture, swiping the bar);
+/// clear the flag then too, so the button icon doesn't keep showing "exit fullscreen".
+void _resetOnBrowserExit(WidgetRef ref) {
+  late final JSFunction handler;
+  handler = ((html.Event _) {
+    if (html.document.fullscreenElement != null) return;
+    html.document.removeEventListener('fullscreenchange', handler);
+    try {
+      ref.read(mediaPlaybackProvider.notifier).update((state) => state.copyWith(fullScreen: false));
+    } catch (_) {
+      // The button that entered fullscreen is gone; nothing left to update.
+    }
+  }).toJS;
+  html.document.addEventListener('fullscreenchange', handler);
 }

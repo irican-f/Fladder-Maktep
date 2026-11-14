@@ -152,9 +152,13 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
             },
             child: MouseRegion(
               cursor: showOverlay ? SystemMouseCursors.basic : SystemMouseCursors.none,
-              onExit: (event) => toggleOverlay(value: false),
-              onEnter: (event) => toggleOverlay(value: true),
-              onHover: AdaptiveLayout.of(context).isDesktop || kIsWeb ? (event) => toggleOverlay(value: true) : null,
+              // Hover only means something for a mouse: on web a touch also enters and exits
+              // this region, and the exit on finger-up hid the controls right after each tap.
+              onExit: (event) => event.kind == PointerDeviceKind.mouse ? toggleOverlay(value: false) : null,
+              onEnter: (event) => event.kind == PointerDeviceKind.mouse ? toggleOverlay(value: true) : null,
+              onHover: AdaptiveLayout.of(context).isDesktop || kIsWeb
+                  ? (event) => event.kind == PointerDeviceKind.mouse ? toggleOverlay(value: true) : null
+                  : null,
               child: Stack(
                 children: [
                   Positioned.fill(
@@ -545,7 +549,9 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
                             onChanged: () => resetTimer(),
                           ),
                           const FullScreenButton(),
-                        ]
+                        ] else if (kIsWeb)
+                          // Mobile web: the browser chrome takes screen space, so keep fullscreen reachable.
+                          const FullScreenButton(),
                       ].addInBetween(const SizedBox(width: 8)),
                     ),
                   ),
