@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/models/items/episode_model.dart';
 import 'package:fladder/models/items/season_model.dart';
@@ -90,7 +91,7 @@ class _EpisodePosterState extends ConsumerState<EpisodePosters> {
             }
           }
           return "${context.localized.season(1)} ${entry.key}";
-        }()
+        }(),
     };
 
     final hasSeasons = episodesBySeason.isNotEmpty && episodesBySeason.length > 1;
@@ -126,10 +127,10 @@ class _EpisodePosterState extends ConsumerState<EpisodePosters> {
                         setState(() => selectedSeason = e.key);
                       },
                     ),
-                  )
+                  ),
                 ],
-              )
-            }
+              ),
+            },
           ],
           contentPadding: widget.contentPadding,
           startIndex: indexOfCurrent,
@@ -143,12 +144,9 @@ class _EpisodePosterState extends ConsumerState<EpisodePosters> {
               blur: allPlayed ? false : indexOfCurrent < index,
               onTap: widget.onEpisodeTap != null
                   ? () {
-                      widget.onEpisodeTap?.call(
-                        () {
-                          episode.navigateTo(context, tag: tag);
-                        },
-                        episode,
-                      );
+                      widget.onEpisodeTap?.call(() {
+                        episode.navigateTo(context, tag: tag);
+                      }, episode);
                     }
                   : () {
                       episode.navigateTo(context, tag: tag);
@@ -167,6 +165,7 @@ class _EpisodePosterState extends ConsumerState<EpisodePosters> {
                 );
                 context.refreshData();
               },
+              onPlay: () => widget.playEpisode(episode),
               actions: episode.generateActions(context, ref),
               isCurrentEpisode: widget.selectedEpisode == episode,
             );
@@ -184,34 +183,33 @@ class _EpisodePosterState extends ConsumerState<EpisodePosters> {
                   Flexible(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: Builder(builder: (context) {
-                        return Row(
-                          children: [
-                            ItemActionButton(
-                              selected: selectedSeason == null,
-                              label: Text(context.localized.all),
-                              action: () => setState(() => selectedSeason = null),
-                            ),
-                            ...episodesBySeason.entries.map(
-                              (e) => ItemActionButton(
-                                selected: selectedSeason == e.key,
-                                label: Text(constructSeasonNames[e.key] ?? "${context.localized.season(1)} ${e.key}"),
-                                action: () {
-                                  setState(() => selectedSeason = e.key);
-                                },
-                              ),
-                            ),
-                          ]
-                              .groupButtons(
-                                context,
-                                useIcons: true,
-                                shouldPop: false,
-                              )
-                              .addInBetween(
-                                const SizedBox(width: 12),
-                              ),
-                        );
-                      }),
+                      child: Builder(
+                        builder: (context) {
+                          return Row(
+                            children:
+                                [
+                                      ItemActionButton(
+                                        selected: selectedSeason == null,
+                                        label: Text(context.localized.all),
+                                        action: () => setState(() => selectedSeason = null),
+                                      ),
+                                      ...episodesBySeason.entries.map(
+                                        (e) => ItemActionButton(
+                                          selected: selectedSeason == e.key,
+                                          label: Text(
+                                            constructSeasonNames[e.key] ?? "${context.localized.season(1)} ${e.key}",
+                                          ),
+                                          action: () {
+                                            setState(() => selectedSeason = e.key);
+                                          },
+                                        ),
+                                      ),
+                                    ]
+                                    .groupButtons(context, useIcons: true, shouldPop: false)
+                                    .addInBetween(const SizedBox(width: 12)),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -228,6 +226,7 @@ class EpisodePoster extends ConsumerWidget {
   final bool showLabel;
   final Function()? onTap;
   final Function()? onLongPress;
+  final VoidCallback? onPlay;
   final bool blur;
   final List<ItemAction> actions;
   final Function(bool value)? onFocusChanged;
@@ -240,6 +239,7 @@ class EpisodePoster extends ConsumerWidget {
     this.showLabel = true,
     this.onTap,
     this.onLongPress,
+    this.onPlay,
     this.blur = false,
     required this.actions,
     this.onFocusChanged,
@@ -249,10 +249,7 @@ class EpisodePoster extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Widget placeHolder = Container(
-      height: double.infinity,
-      child: const Icon(Icons.local_movies_outlined),
-    );
+    Widget placeHolder = Container(height: double.infinity, child: const Icon(Icons.local_movies_outlined));
     bool episodeAvailable = episode.status == EpisodeStatus.available;
     final syncedDetails = ref.watch(syncedItemProvider(episode));
     return AspectRatio(
@@ -268,8 +265,12 @@ class EpisodePoster extends ConsumerWidget {
               onFocusChanged: onFocusChanged,
               onSecondaryTapDown: (details) async {
                 Offset localPosition = details.globalPosition;
-                RelativeRect position =
-                    RelativeRect.fromLTRB(localPosition.dx, localPosition.dy, localPosition.dx, localPosition.dy);
+                RelativeRect position = RelativeRect.fromLTRB(
+                  localPosition.dx,
+                  localPosition.dy,
+                  localPosition.dx,
+                  localPosition.dy,
+                );
                 await showMenu(context: context, position: position, items: actions.popupMenuItems(useIcons: true));
               },
               child: Hero(
@@ -285,8 +286,8 @@ class EpisodePoster extends ConsumerWidget {
                     blurOnly: !episodeAvailable
                         ? true
                         : ref.watch(clientSettingsProvider.select((value) => value.blurUpcomingEpisodes))
-                            ? blur
-                            : false,
+                        ? blur
+                        : false,
                   ),
                 ),
               ),
@@ -303,9 +304,7 @@ class EpisodePoster extends ConsumerWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             episode.status.label(context.localized, episode.dateAired),
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -318,29 +317,22 @@ class EpisodePoster extends ConsumerWidget {
                     children: [
                       switch (syncedDetails) {
                         AsyncValue<SyncedItem?>(:final value) => Builder(
-                            builder: (context) {
-                              if (value == null) {
-                                return const SizedBox.shrink();
-                              }
-                              return StatusCard(
-                                child: SyncButton(item: episode, syncedItem: value),
-                              );
-                            },
-                          ),
+                          builder: (context) {
+                            if (value == null) {
+                              return const SizedBox.shrink();
+                            }
+                            return StatusCard(
+                              child: SyncButton(item: episode, syncedItem: value),
+                            );
+                          },
+                        ),
                       },
                       if (episode.userData.isFavourite)
-                        const StatusCard(
-                          color: Colors.red,
-                          child: Icon(
-                            Icons.favorite_rounded,
-                          ),
-                        ),
+                        const StatusCard(color: Colors.red, child: Icon(Icons.favorite_rounded)),
                       if (episode.userData.played)
                         StatusCard(
                           color: Theme.of(context).colorScheme.primary,
-                          child: const Icon(
-                            Icons.check_rounded,
-                          ),
+                          child: const Icon(Icons.check_rounded),
                         ),
                     ],
                   ),
@@ -356,16 +348,24 @@ class EpisodePoster extends ConsumerWidget {
                   ),
               ],
               focusedOverlays: [
+                if (AdaptiveLayout.inputDeviceOf(context) == InputDevice.pointer && onPlay != null && episode.playAble)
+                  ExcludeFocus(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: IconButton.filledTonal(
+                        tooltip: context.localized.playLabel,
+                        onPressed: onPlay,
+                        icon: const Icon(IconsaxPlusBold.play, size: 32),
+                      ),
+                    ),
+                  ),
                 if (AdaptiveLayout.inputDeviceOf(context) == InputDevice.pointer && actions.isNotEmpty)
                   ExcludeFocus(
                     child: Align(
                       alignment: Alignment.bottomRight,
                       child: PopupMenuButton(
                         tooltip: context.localized.options,
-                        icon: const Icon(
-                          Icons.more_vert,
-                          color: Colors.white,
-                        ),
+                        icon: const Icon(Icons.more_vert, color: Colors.white),
                         itemBuilder: (context) => actions.popupMenuItems(useIcons: true),
                       ),
                     ),
@@ -383,21 +383,13 @@ class EpisodePoster extends ConsumerWidget {
                     child: Container(
                       height: 12,
                       width: 12,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: Theme.of(context).colorScheme.primary),
                     ),
                   ),
-                Flexible(
-                  child: Text(
-                    episode.episodeLabel(context.localized),
-                    maxLines: 1,
-                  ),
-                ),
+                Flexible(child: Text(episode.episodeLabel(context.localized), maxLines: 1)),
               ],
             ),
-          }
+          },
         ],
       ),
     );
