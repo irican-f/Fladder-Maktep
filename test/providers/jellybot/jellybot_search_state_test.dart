@@ -45,7 +45,7 @@ void main() {
       expect(req.filters, isNotNull);
       expect(req.filters!.length, 1);
       expect(req.filters!.first.name, 'quality');
-      expect(req.filters!.first.$value, '1080p');
+      expect(req.filters!.first.value, '1080p');
     });
   });
 
@@ -72,9 +72,7 @@ void main() {
 
       controller.setSelectedFilters({'quality': '1080p'});
       controller.setPage(2);
-      controller.setProvider(
-        const IProvider(id: 'p1', displayName: 'P', searchEnabled: true),
-      );
+      controller.setProvider(const IProvider(id: 'p1', displayName: 'P', searchEnabled: true));
 
       final s = controller.searchState;
       expect(s.provider?.id, 'p1');
@@ -97,8 +95,7 @@ void main() {
       expect(s.selectedFilters, {'quality': '1080p'});
     });
 
-    test(
-        'changing a filter with empty query keeps state at AsyncData(null) '
+    test('changing a filter with empty query keeps state at AsyncData(null) '
         '(auto-search guard)', () async {
       final container = ProviderContainer();
       addTearDown(container.dispose);
@@ -108,9 +105,7 @@ void main() {
       final initialValue = await container.read(jellybotSearchControllerProvider.future);
       expect(initialValue, isNull);
 
-      controller.setProvider(
-        const IProvider(id: 'p1', displayName: 'P', searchEnabled: true),
-      );
+      controller.setProvider(const IProvider(id: 'p1', displayName: 'P', searchEnabled: true));
       controller.toggleExactMatch(true);
       controller.setMinScore(0.5);
       controller.setSelectedFilters({'quality': '1080p'});

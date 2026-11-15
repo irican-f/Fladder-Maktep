@@ -1595,6 +1595,414 @@
           }
         }
       }
+    },
+    "/api/notifications": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Gets the caller's ready-to-watch events after the given id, oldest first.",
+        "operationId": "Notifications_GetNotifications",
+        "parameters": [
+          {
+            "name": "X-Jellyfin-Token",
+            "in": "header",
+            "required": true,
+            "description": "The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "afterId",
+            "in": "query",
+            "description": "Only events with a greater id. Omit for the first-run baseline (no items, latestId only).",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of events (default 50, max 100).",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Events returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyNotificationsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Jellyfin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/preferences": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Gets the caller's notification preferences (defaults when none stored).",
+        "operationId": "Notifications_GetPreferences",
+        "parameters": [
+          {
+            "name": "X-Jellyfin-Token",
+            "in": "header",
+            "required": true,
+            "description": "The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Preferences returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferencesDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Jellyfin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Updates the caller's notification preferences.",
+        "operationId": "Notifications_UpdatePreferences",
+        "parameters": [
+          {
+            "name": "X-Jellyfin-Token",
+            "in": "header",
+            "required": true,
+            "description": "The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferencesDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": "Preferences updated"
+          },
+          "401": {
+            "description": "Missing or invalid Jellyfin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/subscriptions/{seriesId}": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Gets whether the caller follows the series and whether JellyBot tracks it.",
+        "operationId": "Notifications_GetSubscription",
+        "parameters": [
+          {
+            "name": "X-Jellyfin-Token",
+            "in": "header",
+            "required": true,
+            "description": "The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "seriesId",
+            "in": "path",
+            "required": true,
+            "description": "The Jellyfin series id.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesSubscriptionDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Jellyfin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Subscribes the caller to the series.",
+        "operationId": "Notifications_Subscribe",
+        "parameters": [
+          {
+            "name": "X-Jellyfin-Token",
+            "in": "header",
+            "required": true,
+            "description": "The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "seriesId",
+            "in": "path",
+            "required": true,
+            "description": "The Jellyfin series id.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Subscribed"
+          },
+          "401": {
+            "description": "Missing or invalid Jellyfin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Unsubscribes the caller from the series.",
+        "operationId": "Notifications_Unsubscribe",
+        "parameters": [
+          {
+            "name": "X-Jellyfin-Token",
+            "in": "header",
+            "required": true,
+            "description": "The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "seriesId",
+            "in": "path",
+            "required": true,
+            "description": "The Jellyfin series id.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Unsubscribed"
+          },
+          "401": {
+            "description": "Missing or invalid Jellyfin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/history": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Gets the caller's ready-to-watch events before the given id, newest first.",
+        "operationId": "Notifications_GetHistory",
+        "parameters": [
+          {
+            "name": "X-Jellyfin-Token",
+            "in": "header",
+            "required": true,
+            "description": "The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "beforeId",
+            "in": "query",
+            "description": "Only events with a smaller id. Omit for the newest page.",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "nullable": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of events (default 50, max 100).",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Events returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyNotificationHistoryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Jellyfin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/read": {
+      "put": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "Marks the caller's events read up to the given id (the stored value only moves forward).",
+        "operationId": "Notifications_MarkRead",
+        "parameters": [
+          {
+            "name": "X-Jellyfin-Token",
+            "in": "header",
+            "required": true,
+            "description": "The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkNotificationsReadRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": "Read marker updated"
+          },
+          "401": {
+            "description": "Missing or invalid Jellyfin token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3149,6 +3557,143 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "ReadyNotificationKind": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Movie",
+          "SeasonComplete",
+          "NewEpisodes"
+        ],
+        "enum": [
+          "Movie",
+          "SeasonComplete",
+          "NewEpisodes"
+        ]
+      },
+      "ReadyNotificationDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ReadyNotificationKind"
+          },
+          "crawlLinkId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "jellyfinItemId": {
+            "type": "string",
+            "description": "Movie id, season id (SeasonComplete) or series id (NewEpisodes)."
+          },
+          "seriesId": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string"
+          },
+          "seasonNumber": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "episodeNumbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReadyNotificationsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadyNotificationDto"
+            }
+          },
+          "latestId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "lastReadId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Newest event id the caller has read; null = never read."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "The caller's master toggle (default true)."
+          }
+        }
+      },
+      "NotificationPreferencesDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "onlyMine": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SeriesSubscriptionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "subscribed": {
+            "type": "boolean"
+          },
+          "tracked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ReadyNotificationHistoryResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadyNotificationDto"
+            }
+          },
+          "lastReadId": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Newest event id the caller has read; null = never read."
+          }
+        }
+      },
+      "MarkNotificationsReadRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "lastReadId": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       }

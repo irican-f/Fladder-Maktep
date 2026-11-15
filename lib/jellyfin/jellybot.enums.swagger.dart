@@ -1,3 +1,6 @@
+// coverage:ignore-file
+// ignore_for_file: type=lint
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:collection/collection.dart';
 
@@ -127,4 +130,20 @@ enum CrawlStatus {
   final int? value;
 
   const CrawlStatus(this.value);
+}
+
+enum ReadyNotificationKind {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('Movie')
+  movie('Movie'),
+  @JsonValue('SeasonComplete')
+  seasoncomplete('SeasonComplete'),
+  @JsonValue('NewEpisodes')
+  newepisodes('NewEpisodes');
+
+  final String? value;
+
+  const ReadyNotificationKind(this.value);
 }

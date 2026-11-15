@@ -1,18 +1,25 @@
+// coverage:ignore-file
 // ignore_for_file: type=lint
+// ignore_for_file: unused_element_parameter
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:json_annotation/json_annotation.dart' as json;
 import 'package:collection/collection.dart';
+
 import 'dart:convert';
 
 import 'package:chopper/chopper.dart';
 
 import 'client_mapping.dart';
+
 import 'dart:async';
+
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart' show MultipartFile;
 import 'package:chopper/chopper.dart' as chopper;
+
 import 'jellybot.enums.swagger.dart' as enums;
+import 'jellybot.metadata.swagger.dart';
 export 'jellybot.enums.swagger.dart';
 
 part 'jellybot.swagger.chopper.dart';
@@ -56,7 +63,19 @@ abstract class Jellybot extends ChopperService {
 
   ///
   @GET(path: '/api/health')
-  Future<chopper.Response> _apiHealthGet();
+  Future<chopper.Response> _apiHealthGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'Health_Get',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Health"],
+      deprecated: false,
+    ),
+  });
 
   ///
   ///@param date
@@ -67,30 +86,47 @@ abstract class Jellybot extends ChopperService {
   ///
   ///@param date
   @GET(path: '/api/logs')
-  Future<chopper.Response<String>> _apiLogsGet({@Query('date') DateTime? date});
+  Future<chopper.Response<String>> _apiLogsGet({
+    @Query('date') DateTime? date,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'Logs_GetLogs',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Logs"],
+      deprecated: false,
+    ),
+  });
 
   ///Lists every configured api client. Secrets are never returned.
   Future<chopper.Response<List<ApiClientDto>>> apiApiClientsGet() {
-    generatedMapping.putIfAbsent(
-      ApiClientDto,
-      () => ApiClientDto.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(ApiClientDto, () => ApiClientDto.fromJsonFactory);
 
     return _apiApiClientsGet();
   }
 
   ///Lists every configured api client. Secrets are never returned.
   @GET(path: '/api/api-clients')
-  Future<chopper.Response<List<ApiClientDto>>> _apiApiClientsGet();
+  Future<chopper.Response<List<ApiClientDto>>> _apiApiClientsGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Lists every configured api client. Secrets are never returned.',
+      operationId: 'ApiClient_GetApiClients',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["ApiClient"],
+      deprecated: false,
+    ),
+  });
 
   ///Creates a new api client.
-  Future<chopper.Response<ApiClientDto>> apiApiClientsPost({
-    required CreateApiClientRequest? body,
-  }) {
-    generatedMapping.putIfAbsent(
-      ApiClientDto,
-      () => ApiClientDto.fromJsonFactory,
-    );
+  Future<chopper.Response<ApiClientDto>> apiApiClientsPost({required CreateApiClientRequest? body}) {
+    generatedMapping.putIfAbsent(ApiClientDto, () => ApiClientDto.fromJsonFactory);
 
     return _apiApiClientsPost(body: body);
   }
@@ -99,6 +135,17 @@ abstract class Jellybot extends ChopperService {
   @POST(path: '/api/api-clients', optionalBody: true)
   Future<chopper.Response<ApiClientDto>> _apiApiClientsPost({
     @Body() required CreateApiClientRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Creates a new api client.',
+      operationId: 'ApiClient_CreateApiClient',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["ApiClient"],
+      deprecated: false,
+    ),
   });
 
   ///Updates an api client. Secrets are overwritten only when a new value is sent.
@@ -107,10 +154,7 @@ abstract class Jellybot extends ChopperService {
     required String? apiClientId,
     required UpdateApiClientRequest? body,
   }) {
-    generatedMapping.putIfAbsent(
-      ApiClientDto,
-      () => ApiClientDto.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(ApiClientDto, () => ApiClientDto.fromJsonFactory);
 
     return _apiApiClientsApiClientIdPut(apiClientId: apiClientId, body: body);
   }
@@ -121,13 +165,22 @@ abstract class Jellybot extends ChopperService {
   Future<chopper.Response<ApiClientDto>> _apiApiClientsApiClientIdPut({
     @Path('apiClientId') required String? apiClientId,
     @Body() required UpdateApiClientRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Updates an api client. Secrets are overwritten only when a new value is sent.',
+      operationId: 'ApiClient_UpdateApiClient',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["ApiClient"],
+      deprecated: false,
+    ),
   });
 
   ///Deletes an api client.
   ///@param apiClientId
-  Future<chopper.Response> apiApiClientsApiClientIdDelete({
-    required String? apiClientId,
-  }) {
+  Future<chopper.Response> apiApiClientsApiClientIdDelete({required String? apiClientId}) {
     return _apiApiClientsApiClientIdDelete(apiClientId: apiClientId);
   }
 
@@ -136,6 +189,17 @@ abstract class Jellybot extends ChopperService {
   @DELETE(path: '/api/api-clients/{apiClientId}')
   Future<chopper.Response> _apiApiClientsApiClientIdDelete({
     @Path('apiClientId') required String? apiClientId,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Deletes an api client.',
+      operationId: 'ApiClient_DeleteApiClient',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["ApiClient"],
+      deprecated: false,
+    ),
   });
 
   ///Gets added crawl links, the results are paginated.
@@ -183,19 +247,25 @@ abstract class Jellybot extends ChopperService {
     @Query('status') String? status,
     @Query('provider') String? provider,
     @Query('category') Object? category,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets added crawl links, the results are paginated.',
+      operationId: 'CrawlLink_GetAddedCrawlLinks',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
   });
 
   ///Extracts media information from a URL without persisting anything. If the URL points to a show
   ///page with multiple seasons, the response indicates that season selection is required — call the
   ///select-season endpoint with the chosen season. Otherwise the response carries an addToken; pass
   ///it to confirm-add to commit the link.
-  Future<chopper.Response<ExtractMediaResponse>> apiCrawlLinksPost({
-    required ExtractMediaRequest? body,
-  }) {
-    generatedMapping.putIfAbsent(
-      ExtractMediaResponse,
-      () => ExtractMediaResponse.fromJsonFactory,
-    );
+  Future<chopper.Response<ExtractMediaResponse>> apiCrawlLinksPost({required ExtractMediaRequest? body}) {
+    generatedMapping.putIfAbsent(ExtractMediaResponse, () => ExtractMediaResponse.fromJsonFactory);
 
     return _apiCrawlLinksPost(body: body);
   }
@@ -207,6 +277,20 @@ abstract class Jellybot extends ChopperService {
   @POST(path: '/api/crawl-links', optionalBody: true)
   Future<chopper.Response<ExtractMediaResponse>> _apiCrawlLinksPost({
     @Body() required ExtractMediaRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '''Extracts media information from a URL without persisting anything. If the URL points to a show
+page with multiple seasons, the response indicates that season selection is required — call the
+select-season endpoint with the chosen season. Otherwise the response carries an addToken; pass
+it to confirm-add to commit the link.''',
+      operationId: 'CrawlLink_AddCrawlLink',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
   });
 
   ///Deletes a crawl link.
@@ -218,17 +302,25 @@ abstract class Jellybot extends ChopperService {
   ///Deletes a crawl link.
   ///@param id The id of the crawl link to delete.
   @DELETE(path: '/api/crawl-links')
-  Future<chopper.Response> _apiCrawlLinksDelete({@Query('id') String? id});
+  Future<chopper.Response> _apiCrawlLinksDelete({
+    @Query('id') String? id,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Deletes a crawl link.',
+      operationId: 'CrawlLink_DeleteCrawlLink',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
+  });
 
   ///Selects a season for a show page URL and previews the crawl link (without persisting). Call this
   ///when the initial extraction returned requiresSeasonSelection = true.
-  Future<chopper.Response<ExtractMediaResponse>> apiCrawlLinksSelectSeasonPost({
-    required SelectSeasonRequest? body,
-  }) {
-    generatedMapping.putIfAbsent(
-      ExtractMediaResponse,
-      () => ExtractMediaResponse.fromJsonFactory,
-    );
+  Future<chopper.Response<ExtractMediaResponse>> apiCrawlLinksSelectSeasonPost({required SelectSeasonRequest? body}) {
+    generatedMapping.putIfAbsent(ExtractMediaResponse, () => ExtractMediaResponse.fromJsonFactory);
 
     return _apiCrawlLinksSelectSeasonPost(body: body);
   }
@@ -236,18 +328,26 @@ abstract class Jellybot extends ChopperService {
   ///Selects a season for a show page URL and previews the crawl link (without persisting). Call this
   ///when the initial extraction returned requiresSeasonSelection = true.
   @POST(path: '/api/crawl-links/select-season', optionalBody: true)
-  Future<chopper.Response<ExtractMediaResponse>> _apiCrawlLinksSelectSeasonPost(
-      {@Body() required SelectSeasonRequest? body});
+  Future<chopper.Response<ExtractMediaResponse>> _apiCrawlLinksSelectSeasonPost({
+    @Body() required SelectSeasonRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '''Selects a season for a show page URL and previews the crawl link (without persisting). Call this
+when the initial extraction returned requiresSeasonSelection = true.''',
+      operationId: 'CrawlLink_SelectSeason',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
+  });
 
   ///Commits a previously-previewed crawl link to the database. Call after add or select-season,
   ///passing the addToken from that response.
-  Future<chopper.Response<CrawlLinkDto>> apiCrawlLinksConfirmAddPost({
-    required ExtractMediaConfirmationRequest? body,
-  }) {
-    generatedMapping.putIfAbsent(
-      CrawlLinkDto,
-      () => CrawlLinkDto.fromJsonFactory,
-    );
+  Future<chopper.Response<CrawlLinkDto>> apiCrawlLinksConfirmAddPost({required ExtractMediaConfirmationRequest? body}) {
+    generatedMapping.putIfAbsent(CrawlLinkDto, () => CrawlLinkDto.fromJsonFactory);
 
     return _apiCrawlLinksConfirmAddPost(body: body);
   }
@@ -257,6 +357,18 @@ abstract class Jellybot extends ChopperService {
   @POST(path: '/api/crawl-links/confirm-add', optionalBody: true)
   Future<chopper.Response<CrawlLinkDto>> _apiCrawlLinksConfirmAddPost({
     @Body() required ExtractMediaConfirmationRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '''Commits a previously-previewed crawl link to the database. Call after add or select-season,
+passing the addToken from that response.''',
+      operationId: 'CrawlLink_ConfirmCrawlLink',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
   });
 
   ///Changes the name of the show for an added link.
@@ -265,15 +377,9 @@ abstract class Jellybot extends ChopperService {
     required String? crawlLinkId,
     required RenameCrawlLinkRequest? body,
   }) {
-    generatedMapping.putIfAbsent(
-      RenameLinkResult,
-      () => RenameLinkResult.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(RenameLinkResult, () => RenameLinkResult.fromJsonFactory);
 
-    return _apiCrawlLinksCrawlLinkIdRenamePut(
-      crawlLinkId: crawlLinkId,
-      body: body,
-    );
+    return _apiCrawlLinksCrawlLinkIdRenamePut(crawlLinkId: crawlLinkId, body: body);
   }
 
   ///Changes the name of the show for an added link.
@@ -282,6 +388,17 @@ abstract class Jellybot extends ChopperService {
   Future<chopper.Response<RenameLinkResult>> _apiCrawlLinksCrawlLinkIdRenamePut({
     @Path('crawlLinkId') required String? crawlLinkId,
     @Body() required RenameCrawlLinkRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Changes the name of the show for an added link.',
+      operationId: 'CrawlLink_RenameCrawlLink',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
   });
 
   ///Updates editable crawl-link fields.
@@ -290,10 +407,7 @@ abstract class Jellybot extends ChopperService {
     required String? crawlLinkId,
     required UpdateCrawlLinkRequest? body,
   }) {
-    generatedMapping.putIfAbsent(
-      CrawlLinkDto,
-      () => CrawlLinkDto.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(CrawlLinkDto, () => CrawlLinkDto.fromJsonFactory);
 
     return _apiCrawlLinksCrawlLinkIdPut(crawlLinkId: crawlLinkId, body: body);
   }
@@ -304,6 +418,17 @@ abstract class Jellybot extends ChopperService {
   Future<chopper.Response<CrawlLinkDto>> _apiCrawlLinksCrawlLinkIdPut({
     @Path('crawlLinkId') required String? crawlLinkId,
     @Body() required UpdateCrawlLinkRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Updates editable crawl-link fields.',
+      operationId: 'CrawlLink_UpdateCrawlLink',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
   });
 
   ///
@@ -317,6 +442,17 @@ abstract class Jellybot extends ChopperService {
   @GET(path: '/api/crawl-links/{crawlLinkId}/disabled-hosts')
   Future<chopper.Response<List<String>>> _apiCrawlLinksCrawlLinkIdDisabledHostsGet({
     @Path('crawlLinkId') required String? crawlLinkId,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'CrawlLink_GetDisabledHosts',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
   });
 
   ///
@@ -325,21 +461,26 @@ abstract class Jellybot extends ChopperService {
     required String? crawlLinkId,
     required UpdateDisabledHostsRequest? body,
   }) {
-    return _apiCrawlLinksCrawlLinkIdDisabledHostsPut(
-      crawlLinkId: crawlLinkId,
-      body: body,
-    );
+    return _apiCrawlLinksCrawlLinkIdDisabledHostsPut(crawlLinkId: crawlLinkId, body: body);
   }
 
   ///
   ///@param crawlLinkId
-  @PUT(
-    path: '/api/crawl-links/{crawlLinkId}/disabled-hosts',
-    optionalBody: true,
-  )
+  @PUT(path: '/api/crawl-links/{crawlLinkId}/disabled-hosts', optionalBody: true)
   Future<chopper.Response<List<String>>> _apiCrawlLinksCrawlLinkIdDisabledHostsPut({
     @Path('crawlLinkId') required String? crawlLinkId,
     @Body() required UpdateDisabledHostsRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'CrawlLink_ReplaceDisabledHosts',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
   });
 
   ///
@@ -349,7 +490,19 @@ abstract class Jellybot extends ChopperService {
 
   ///
   @GET(path: '/api/crawl-links/global-disabled-hosts')
-  Future<chopper.Response<List<String>>> _apiCrawlLinksGlobalDisabledHostsGet();
+  Future<chopper.Response<List<String>>> _apiCrawlLinksGlobalDisabledHostsGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'CrawlLink_GetGlobalDisabledHosts',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
+  });
 
   ///
   Future<chopper.Response<List<String>>> apiCrawlLinksGlobalDisabledHostsPut({
@@ -362,15 +515,23 @@ abstract class Jellybot extends ChopperService {
   @PUT(path: '/api/crawl-links/global-disabled-hosts', optionalBody: true)
   Future<chopper.Response<List<String>>> _apiCrawlLinksGlobalDisabledHostsPut({
     @Body() required UpdateDisabledHostsRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'CrawlLink_ReplaceGlobalDisabledHosts',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["CrawlLink"],
+      deprecated: false,
+    ),
   });
 
   ///Downloads the debrided file from a specified file host and URL.
   ///@param fileHost The name of the file hosting service.
   ///@param url The URL of the file to be debrided.
-  Future<chopper.Response<String>> apiDebridFileHostGet({
-    required String? fileHost,
-    String? url,
-  }) {
+  Future<chopper.Response<String>> apiDebridFileHostGet({required String? fileHost, String? url}) {
     return _apiDebridFileHostGet(fileHost: fileHost, url: url);
   }
 
@@ -381,21 +542,41 @@ abstract class Jellybot extends ChopperService {
   Future<chopper.Response<String>> _apiDebridFileHostGet({
     @Path('fileHost') required String? fileHost,
     @Query('url') String? url,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Downloads the debrided file from a specified file host and URL.',
+      operationId: 'Debrid_DownloadDebridedFile',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Debrid"],
+      deprecated: false,
+    ),
   });
 
   ///Gets all running or queued downloads
   Future<chopper.Response<List<DownloadDto>>> apiDownloadsGet() {
-    generatedMapping.putIfAbsent(
-      DownloadDto,
-      () => DownloadDto.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(DownloadDto, () => DownloadDto.fromJsonFactory);
 
     return _apiDownloadsGet();
   }
 
   ///Gets all running or queued downloads
   @GET(path: '/api/downloads')
-  Future<chopper.Response<List<DownloadDto>>> _apiDownloadsGet();
+  Future<chopper.Response<List<DownloadDto>>> _apiDownloadsGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets all running or queued downloads',
+      operationId: 'Downloads_GetDownloads',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Downloads"],
+      deprecated: false,
+    ),
+  });
 
   ///Cancels a download by its file url
   ///@param url The file url
@@ -406,7 +587,20 @@ abstract class Jellybot extends ChopperService {
   ///Cancels a download by its file url
   ///@param url The file url
   @DELETE(path: '/api/downloads')
-  Future<chopper.Response> _apiDownloadsDelete({@Query('url') String? url});
+  Future<chopper.Response> _apiDownloadsDelete({
+    @Query('url') String? url,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Cancels a download by its file url',
+      operationId: 'Downloads_CancelDownload',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Downloads"],
+      deprecated: false,
+    ),
+  });
 
   ///
   Future<chopper.Response> apiInvitesPendingGet() {
@@ -415,12 +609,22 @@ abstract class Jellybot extends ChopperService {
 
   ///
   @GET(path: '/api/invites/pending')
-  Future<chopper.Response> _apiInvitesPendingGet();
+  Future<chopper.Response> _apiInvitesPendingGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'Invite_GetPendingInvites',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Invite"],
+      deprecated: false,
+    ),
+  });
 
   ///
-  Future<chopper.Response> apiInvitesPost({
-    required MediaServerInviteRequest? body,
-  }) {
+  Future<chopper.Response> apiInvitesPost({required MediaServerInviteRequest? body}) {
     return _apiInvitesPost(body: body);
   }
 
@@ -428,21 +632,41 @@ abstract class Jellybot extends ChopperService {
   @POST(path: '/api/invites', optionalBody: true)
   Future<chopper.Response> _apiInvitesPost({
     @Body() required MediaServerInviteRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'Invite_InviteFriend',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Invite"],
+      deprecated: false,
+    ),
   });
 
   ///
   Future<chopper.Response<List<ScheduledJob>>> apiJobsGet() {
-    generatedMapping.putIfAbsent(
-      ScheduledJob,
-      () => ScheduledJob.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(ScheduledJob, () => ScheduledJob.fromJsonFactory);
 
     return _apiJobsGet();
   }
 
   ///
   @GET(path: '/api/jobs')
-  Future<chopper.Response<List<ScheduledJob>>> _apiJobsGet();
+  Future<chopper.Response<List<ScheduledJob>>> _apiJobsGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'Job_GetRunningJobs',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Job"],
+      deprecated: false,
+    ),
+  });
 
   ///Trigger a cron job
   Future<chopper.Response> apiJobsPost({required TriggerJobRequest? body}) {
@@ -453,6 +677,17 @@ abstract class Jellybot extends ChopperService {
   @POST(path: '/api/jobs', optionalBody: true)
   Future<chopper.Response> _apiJobsPost({
     @Body() required TriggerJobRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Trigger a cron job',
+      operationId: 'Job_TriggerJob',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Job"],
+      deprecated: false,
+    ),
   });
 
   ///Cancels a running cron job
@@ -464,30 +699,45 @@ abstract class Jellybot extends ChopperService {
   @DELETE(path: '/api/jobs')
   Future<chopper.Response> _apiJobsDelete({
     @Body() required ScheduledJob? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Cancels a running cron job',
+      operationId: 'Job_InterruptJob',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Job"],
+      deprecated: false,
+    ),
   });
 
   ///Gets the list of Live TV channels.
   Future<chopper.Response<List<LiveTvChannelDto>>> apiLiveTvChannelsGet() {
-    generatedMapping.putIfAbsent(
-      LiveTvChannelDto,
-      () => LiveTvChannelDto.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(LiveTvChannelDto, () => LiveTvChannelDto.fromJsonFactory);
 
     return _apiLiveTvChannelsGet();
   }
 
   ///Gets the list of Live TV channels.
   @GET(path: '/api/live-tv/channels')
-  Future<chopper.Response<List<LiveTvChannelDto>>> _apiLiveTvChannelsGet();
+  Future<chopper.Response<List<LiveTvChannelDto>>> _apiLiveTvChannelsGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets the list of Live TV channels.',
+      operationId: 'LiveTv_GetLiveTvChannels',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["LiveTv"],
+      deprecated: false,
+    ),
+  });
 
   ///
-  Future<chopper.Response<DebridLinkResult>> apiMediaDebridLinkPost({
-    required DebridLinkRequest? body,
-  }) {
-    generatedMapping.putIfAbsent(
-      DebridLinkResult,
-      () => DebridLinkResult.fromJsonFactory,
-    );
+  Future<chopper.Response<DebridLinkResult>> apiMediaDebridLinkPost({required DebridLinkRequest? body}) {
+    generatedMapping.putIfAbsent(DebridLinkResult, () => DebridLinkResult.fromJsonFactory);
 
     return _apiMediaDebridLinkPost(body: body);
   }
@@ -496,17 +746,23 @@ abstract class Jellybot extends ChopperService {
   @POST(path: '/api/media/debrid-link', optionalBody: true)
   Future<chopper.Response<DebridLinkResult>> _apiMediaDebridLinkPost({
     @Body() required DebridLinkRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'MediaOperations_DebridLink',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["MediaOperations"],
+      deprecated: false,
+    ),
   });
 
   ///
   ///@param url
-  Future<chopper.Response<RemoveLinkResult>> apiMediaRemoveLinkDelete({
-    String? url,
-  }) {
-    generatedMapping.putIfAbsent(
-      RemoveLinkResult,
-      () => RemoveLinkResult.fromJsonFactory,
-    );
+  Future<chopper.Response<RemoveLinkResult>> apiMediaRemoveLinkDelete({String? url}) {
+    generatedMapping.putIfAbsent(RemoveLinkResult, () => RemoveLinkResult.fromJsonFactory);
 
     return _apiMediaRemoveLinkDelete(url: url);
   }
@@ -516,15 +772,24 @@ abstract class Jellybot extends ChopperService {
   @DELETE(path: '/api/media/remove-link')
   Future<chopper.Response<RemoveLinkResult>> _apiMediaRemoveLinkDelete({
     @Query('url') String? url,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'MediaOperations_RemoveLink',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["MediaOperations"],
+      deprecated: false,
+    ),
   });
 
   ///
-  Future<chopper.Response<RemoveCorruptedFileResult>> apiMediaCorruptedFilePost(
-      {required RemoveCorruptedFileRequest? body}) {
-    generatedMapping.putIfAbsent(
-      RemoveCorruptedFileResult,
-      () => RemoveCorruptedFileResult.fromJsonFactory,
-    );
+  Future<chopper.Response<RemoveCorruptedFileResult>> apiMediaCorruptedFilePost({
+    required RemoveCorruptedFileRequest? body,
+  }) {
+    generatedMapping.putIfAbsent(RemoveCorruptedFileResult, () => RemoveCorruptedFileResult.fromJsonFactory);
 
     return _apiMediaCorruptedFilePost(body: body);
   }
@@ -533,6 +798,17 @@ abstract class Jellybot extends ChopperService {
   @POST(path: '/api/media/corrupted-file', optionalBody: true)
   Future<chopper.Response<RemoveCorruptedFileResult>> _apiMediaCorruptedFilePost({
     @Body() required RemoveCorruptedFileRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'MediaOperations_RemoveCorruptedFile',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["MediaOperations"],
+      deprecated: false,
+    ),
   });
 
   ///
@@ -542,13 +818,23 @@ abstract class Jellybot extends ChopperService {
 
   ///
   @POST(path: '/api/mega-debrid/callback', optionalBody: true)
-  Future<chopper.Response<String>> _apiMegaDebridCallbackPost();
+  Future<chopper.Response<String>> _apiMegaDebridCallbackPost({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'MegaDebrid_SuccessCallback',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["MegaDebrid"],
+      deprecated: false,
+    ),
+  });
 
   ///Gets the list of enabled providers.
   ///@param searchEnabled Indicates if it should return only providers which have the search functionality.
-  Future<chopper.Response<List<IProvider>>> apiProvidersGet({
-    bool? searchEnabled,
-  }) {
+  Future<chopper.Response<List<IProvider>>> apiProvidersGet({bool? searchEnabled}) {
     generatedMapping.putIfAbsent(IProvider, () => IProvider.fromJsonFactory);
 
     return _apiProvidersGet(searchEnabled: searchEnabled);
@@ -559,6 +845,17 @@ abstract class Jellybot extends ChopperService {
   @GET(path: '/api/providers')
   Future<chopper.Response<List<IProvider>>> _apiProvidersGet({
     @Query('searchEnabled') bool? searchEnabled,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets the list of enabled providers.',
+      operationId: 'Provider_GetAvailableProviders',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Provider"],
+      deprecated: false,
+    ),
   });
 
   ///Gets every provider regardless of enabled state (management view).
@@ -570,7 +867,19 @@ abstract class Jellybot extends ChopperService {
 
   ///Gets every provider regardless of enabled state (management view).
   @GET(path: '/api/providers/all')
-  Future<chopper.Response<List<IProvider>>> _apiProvidersAllGet();
+  Future<chopper.Response<List<IProvider>>> _apiProvidersAllGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets every provider regardless of enabled state (management view).',
+      operationId: 'Provider_GetAllProviders',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Provider"],
+      deprecated: false,
+    ),
+  });
 
   ///Updates a provider's configuration.
   ///@param providerId
@@ -589,6 +898,17 @@ abstract class Jellybot extends ChopperService {
   Future<chopper.Response<IProvider>> _apiProvidersProviderIdPut({
     @Path('providerId') required String? providerId,
     @Body() required UpdateProviderRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Updates a provider\'s configuration.',
+      operationId: 'Provider_UpdateProvider',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Provider"],
+      deprecated: false,
+    ),
   });
 
   ///Gets the available search filters for a given provider and a media category
@@ -598,10 +918,7 @@ abstract class Jellybot extends ChopperService {
     required String? providerId,
     enums.MediaCategory? mediaCategory,
   }) {
-    generatedMapping.putIfAbsent(
-      ISearchFilter,
-      () => ISearchFilter.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(ISearchFilter, () => ISearchFilter.fromJsonFactory);
 
     return _apiProvidersProviderIdSearchFiltersGet(
       providerId: providerId,
@@ -616,6 +933,17 @@ abstract class Jellybot extends ChopperService {
   Future<chopper.Response<List<ISearchFilter>>> _apiProvidersProviderIdSearchFiltersGet({
     @Path('providerId') required String? providerId,
     @Query('mediaCategory') String? mediaCategory,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets the available search filters for a given provider and a media category',
+      operationId: 'Provider_GetProviderFilters',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Provider"],
+      deprecated: false,
+    ),
   });
 
   ///Search the provider website and gets the results. The results are paginated.
@@ -629,10 +957,7 @@ abstract class Jellybot extends ChopperService {
       () => PaginatedResponseOfProviderSearchItemDto.fromJsonFactory,
     );
 
-    return _apiProvidersProviderIdSearchPost(
-      providerId: providerId,
-      body: body,
-    );
+    return _apiProvidersProviderIdSearchPost(providerId: providerId, body: body);
   }
 
   ///Search the provider website and gets the results. The results are paginated.
@@ -641,30 +966,45 @@ abstract class Jellybot extends ChopperService {
   Future<chopper.Response<PaginatedResponseOfProviderSearchItemDto>> _apiProvidersProviderIdSearchPost({
     @Path('providerId') required String? providerId,
     @Body() required ApiMediaSearchRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Search the provider website and gets the results. The results are paginated.',
+      operationId: 'Provider_Search',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Provider"],
+      deprecated: false,
+    ),
   });
 
   ///Gets the Live TV channel source (DB value, or config fallback when never saved).
   Future<chopper.Response<LiveTvSourceResult>> apiSettingsLiveTvSourceGet() {
-    generatedMapping.putIfAbsent(
-      LiveTvSourceResult,
-      () => LiveTvSourceResult.fromJsonFactory,
-    );
+    generatedMapping.putIfAbsent(LiveTvSourceResult, () => LiveTvSourceResult.fromJsonFactory);
 
     return _apiSettingsLiveTvSourceGet();
   }
 
   ///Gets the Live TV channel source (DB value, or config fallback when never saved).
   @GET(path: '/api/settings/live-tv-source')
-  Future<chopper.Response<LiveTvSourceResult>> _apiSettingsLiveTvSourceGet();
+  Future<chopper.Response<LiveTvSourceResult>> _apiSettingsLiveTvSourceGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets the Live TV channel source (DB value, or config fallback when never saved).',
+      operationId: 'Settings_GetLiveTvSource',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Settings"],
+      deprecated: false,
+    ),
+  });
 
   ///Updates the Live TV channel source. Applies from the next LiveTvChannelsJob run.
-  Future<chopper.Response<LiveTvSourceResult>> apiSettingsLiveTvSourcePut({
-    required UpdateLiveTvSourceRequest? body,
-  }) {
-    generatedMapping.putIfAbsent(
-      LiveTvSourceResult,
-      () => LiveTvSourceResult.fromJsonFactory,
-    );
+  Future<chopper.Response<LiveTvSourceResult>> apiSettingsLiveTvSourcePut({required UpdateLiveTvSourceRequest? body}) {
+    generatedMapping.putIfAbsent(LiveTvSourceResult, () => LiveTvSourceResult.fromJsonFactory);
 
     return _apiSettingsLiveTvSourcePut(body: body);
   }
@@ -673,6 +1013,17 @@ abstract class Jellybot extends ChopperService {
   @PUT(path: '/api/settings/live-tv-source', optionalBody: true)
   Future<chopper.Response<LiveTvSourceResult>> _apiSettingsLiveTvSourcePut({
     @Body() required UpdateLiveTvSourceRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Updates the Live TV channel source. Applies from the next LiveTvChannelsJob run.',
+      operationId: 'Settings_UpdateLiveTvSource',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Settings"],
+      deprecated: false,
+    ),
   });
 
   ///Gets the list of countries the current Live TV source exposes (empty if it can't be reached).
@@ -682,7 +1033,19 @@ abstract class Jellybot extends ChopperService {
 
   ///Gets the list of countries the current Live TV source exposes (empty if it can't be reached).
   @GET(path: '/api/settings/live-tv-source/countries')
-  Future<chopper.Response<List<String>>> _apiSettingsLiveTvSourceCountriesGet();
+  Future<chopper.Response<List<String>>> _apiSettingsLiveTvSourceCountriesGet({
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets the list of countries the current Live TV source exposes (empty if it can\'t be reached).',
+      operationId: 'Settings_GetLiveTvSourceCountries',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Settings"],
+      deprecated: false,
+    ),
+  });
 
   ///
   Future<chopper.Response> apiTorrentsUploadPost({
@@ -691,12 +1054,7 @@ abstract class Jellybot extends ChopperService {
     dynamic mediaCategory,
     String? authorId,
   }) {
-    return _apiTorrentsUploadPost(
-      file: file,
-      mediaName: mediaName,
-      mediaCategory: mediaCategory,
-      authorId: authorId,
-    );
+    return _apiTorrentsUploadPost(file: file, mediaName: mediaName, mediaCategory: mediaCategory, authorId: authorId);
   }
 
   ///
@@ -707,6 +1065,266 @@ abstract class Jellybot extends ChopperService {
     @Part('mediaName') String? mediaName,
     @Part('mediaCategory') dynamic mediaCategory,
     @Part('authorId') String? authorId,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: '',
+      operationId: 'Torrent_UploadTorrent',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Torrent"],
+      deprecated: false,
+    ),
+  });
+
+  ///Gets the caller's ready-to-watch events after the given id, oldest first.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param afterId Only events with a greater id. Omit for the first-run baseline (no items, latestId only).
+  ///@param limit Maximum number of events (default 50, max 100).
+  Future<chopper.Response<ReadyNotificationsResponse>> apiNotificationsGet({
+    String? xJellyfinToken,
+    int? afterId,
+    int? limit,
+  }) {
+    generatedMapping.putIfAbsent(ReadyNotificationsResponse, () => ReadyNotificationsResponse.fromJsonFactory);
+
+    return _apiNotificationsGet(xJellyfinToken: xJellyfinToken?.toString(), afterId: afterId, limit: limit);
+  }
+
+  ///Gets the caller's ready-to-watch events after the given id, oldest first.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param afterId Only events with a greater id. Omit for the first-run baseline (no items, latestId only).
+  ///@param limit Maximum number of events (default 50, max 100).
+  @GET(path: '/api/notifications')
+  Future<chopper.Response<ReadyNotificationsResponse>> _apiNotificationsGet({
+    @Header('X-Jellyfin-Token') String? xJellyfinToken,
+    @Query('afterId') int? afterId,
+    @Query('limit') int? limit,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets the caller\'s ready-to-watch events after the given id, oldest first.',
+      operationId: 'Notifications_GetNotifications',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Notifications"],
+      deprecated: false,
+    ),
+  });
+
+  ///Gets the caller's notification preferences (defaults when none stored).
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  Future<chopper.Response<NotificationPreferencesDto>> apiNotificationsPreferencesGet({String? xJellyfinToken}) {
+    generatedMapping.putIfAbsent(NotificationPreferencesDto, () => NotificationPreferencesDto.fromJsonFactory);
+
+    return _apiNotificationsPreferencesGet(xJellyfinToken: xJellyfinToken?.toString());
+  }
+
+  ///Gets the caller's notification preferences (defaults when none stored).
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  @GET(path: '/api/notifications/preferences')
+  Future<chopper.Response<NotificationPreferencesDto>> _apiNotificationsPreferencesGet({
+    @Header('X-Jellyfin-Token') String? xJellyfinToken,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets the caller\'s notification preferences (defaults when none stored).',
+      operationId: 'Notifications_GetPreferences',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Notifications"],
+      deprecated: false,
+    ),
+  });
+
+  ///Updates the caller's notification preferences.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  Future<chopper.Response> apiNotificationsPreferencesPut({
+    String? xJellyfinToken,
+    required NotificationPreferencesDto? body,
+  }) {
+    return _apiNotificationsPreferencesPut(xJellyfinToken: xJellyfinToken?.toString(), body: body);
+  }
+
+  ///Updates the caller's notification preferences.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  @PUT(path: '/api/notifications/preferences', optionalBody: true)
+  Future<chopper.Response> _apiNotificationsPreferencesPut({
+    @Header('X-Jellyfin-Token') String? xJellyfinToken,
+    @Body() required NotificationPreferencesDto? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Updates the caller\'s notification preferences.',
+      operationId: 'Notifications_UpdatePreferences',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Notifications"],
+      deprecated: false,
+    ),
+  });
+
+  ///Gets whether the caller follows the series and whether JellyBot tracks it.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param seriesId The Jellyfin series id.
+  Future<chopper.Response<SeriesSubscriptionDto>> apiNotificationsSubscriptionsSeriesIdGet({
+    String? xJellyfinToken,
+    required String? seriesId,
+  }) {
+    generatedMapping.putIfAbsent(SeriesSubscriptionDto, () => SeriesSubscriptionDto.fromJsonFactory);
+
+    return _apiNotificationsSubscriptionsSeriesIdGet(xJellyfinToken: xJellyfinToken?.toString(), seriesId: seriesId);
+  }
+
+  ///Gets whether the caller follows the series and whether JellyBot tracks it.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param seriesId The Jellyfin series id.
+  @GET(path: '/api/notifications/subscriptions/{seriesId}')
+  Future<chopper.Response<SeriesSubscriptionDto>> _apiNotificationsSubscriptionsSeriesIdGet({
+    @Header('X-Jellyfin-Token') String? xJellyfinToken,
+    @Path('seriesId') required String? seriesId,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets whether the caller follows the series and whether JellyBot tracks it.',
+      operationId: 'Notifications_GetSubscription',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Notifications"],
+      deprecated: false,
+    ),
+  });
+
+  ///Subscribes the caller to the series.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param seriesId The Jellyfin series id.
+  Future<chopper.Response> apiNotificationsSubscriptionsSeriesIdPut({
+    String? xJellyfinToken,
+    required String? seriesId,
+  }) {
+    return _apiNotificationsSubscriptionsSeriesIdPut(xJellyfinToken: xJellyfinToken?.toString(), seriesId: seriesId);
+  }
+
+  ///Subscribes the caller to the series.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param seriesId The Jellyfin series id.
+  @PUT(path: '/api/notifications/subscriptions/{seriesId}', optionalBody: true)
+  Future<chopper.Response> _apiNotificationsSubscriptionsSeriesIdPut({
+    @Header('X-Jellyfin-Token') String? xJellyfinToken,
+    @Path('seriesId') required String? seriesId,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Subscribes the caller to the series.',
+      operationId: 'Notifications_Subscribe',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Notifications"],
+      deprecated: false,
+    ),
+  });
+
+  ///Unsubscribes the caller from the series.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param seriesId The Jellyfin series id.
+  Future<chopper.Response> apiNotificationsSubscriptionsSeriesIdDelete({
+    String? xJellyfinToken,
+    required String? seriesId,
+  }) {
+    return _apiNotificationsSubscriptionsSeriesIdDelete(xJellyfinToken: xJellyfinToken?.toString(), seriesId: seriesId);
+  }
+
+  ///Unsubscribes the caller from the series.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param seriesId The Jellyfin series id.
+  @DELETE(path: '/api/notifications/subscriptions/{seriesId}')
+  Future<chopper.Response> _apiNotificationsSubscriptionsSeriesIdDelete({
+    @Header('X-Jellyfin-Token') String? xJellyfinToken,
+    @Path('seriesId') required String? seriesId,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Unsubscribes the caller from the series.',
+      operationId: 'Notifications_Unsubscribe',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Notifications"],
+      deprecated: false,
+    ),
+  });
+
+  ///Gets the caller's ready-to-watch events before the given id, newest first.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param beforeId Only events with a smaller id. Omit for the newest page.
+  ///@param limit Maximum number of events (default 50, max 100).
+  Future<chopper.Response<ReadyNotificationHistoryResponse>> apiNotificationsHistoryGet({
+    String? xJellyfinToken,
+    int? beforeId,
+    int? limit,
+  }) {
+    generatedMapping.putIfAbsent(
+      ReadyNotificationHistoryResponse,
+      () => ReadyNotificationHistoryResponse.fromJsonFactory,
+    );
+
+    return _apiNotificationsHistoryGet(xJellyfinToken: xJellyfinToken?.toString(), beforeId: beforeId, limit: limit);
+  }
+
+  ///Gets the caller's ready-to-watch events before the given id, newest first.
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  ///@param beforeId Only events with a smaller id. Omit for the newest page.
+  ///@param limit Maximum number of events (default 50, max 100).
+  @GET(path: '/api/notifications/history')
+  Future<chopper.Response<ReadyNotificationHistoryResponse>> _apiNotificationsHistoryGet({
+    @Header('X-Jellyfin-Token') String? xJellyfinToken,
+    @Query('beforeId') int? beforeId,
+    @Query('limit') int? limit,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Gets the caller\'s ready-to-watch events before the given id, newest first.',
+      operationId: 'Notifications_GetHistory',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Notifications"],
+      deprecated: false,
+    ),
+  });
+
+  ///Marks the caller's events read up to the given id (the stored value only moves forward).
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  Future<chopper.Response> apiNotificationsReadPut({
+    String? xJellyfinToken,
+    required MarkNotificationsReadRequest? body,
+  }) {
+    return _apiNotificationsReadPut(xJellyfinToken: xJellyfinToken?.toString(), body: body);
+  }
+
+  ///Marks the caller's events read up to the given id (the stored value only moves forward).
+  ///@param X-Jellyfin-Token The caller's Jellyfin access token, validated against the JellyBot Jellyfin server.
+  @PUT(path: '/api/notifications/read', optionalBody: true)
+  Future<chopper.Response> _apiNotificationsReadPut({
+    @Header('X-Jellyfin-Token') String? xJellyfinToken,
+    @Body() required MarkNotificationsReadRequest? body,
+    @chopper.Tag()
+    SwaggerMetaData swaggerMetaData = const SwaggerMetaData(
+      description: '',
+      summary: 'Marks the caller\'s events read up to the given id (the stored value only moves forward).',
+      operationId: 'Notifications_MarkRead',
+      consumes: [],
+      produces: [],
+      security: [],
+      tags: ["Notifications"],
+      deprecated: false,
+    ),
   });
 }
 
@@ -777,71 +1395,28 @@ class ApiClientDto {
             (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
-            (identical(other.baseUrl, baseUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.baseUrl,
-                  baseUrl,
-                )) &&
-            (identical(other.username, username) ||
-                const DeepCollectionEquality().equals(
-                  other.username,
-                  username,
-                )) &&
+            (identical(other.baseUrl, baseUrl) || const DeepCollectionEquality().equals(other.baseUrl, baseUrl)) &&
+            (identical(other.username, username) || const DeepCollectionEquality().equals(other.username, username)) &&
             (identical(other.hasApiKey, hasApiKey) ||
-                const DeepCollectionEquality().equals(
-                  other.hasApiKey,
-                  hasApiKey,
-                )) &&
+                const DeepCollectionEquality().equals(other.hasApiKey, hasApiKey)) &&
             (identical(other.hasPassword, hasPassword) ||
-                const DeepCollectionEquality().equals(
-                  other.hasPassword,
-                  hasPassword,
-                )) &&
+                const DeepCollectionEquality().equals(other.hasPassword, hasPassword)) &&
             (identical(other.isEnabled, isEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isEnabled,
-                  isEnabled,
-                )) &&
-            (identical(other.isActive, isActive) ||
-                const DeepCollectionEquality().equals(
-                  other.isActive,
-                  isActive,
-                )) &&
+                const DeepCollectionEquality().equals(other.isEnabled, isEnabled)) &&
+            (identical(other.isActive, isActive) || const DeepCollectionEquality().equals(other.isActive, isActive)) &&
             (identical(other.subscriptionExpiresAt, subscriptionExpiresAt) ||
-                const DeepCollectionEquality().equals(
-                  other.subscriptionExpiresAt,
-                  subscriptionExpiresAt,
-                )) &&
-            (identical(other.priority, priority) ||
-                const DeepCollectionEquality().equals(
-                  other.priority,
-                  priority,
-                )) &&
+                const DeepCollectionEquality().equals(other.subscriptionExpiresAt, subscriptionExpiresAt)) &&
+            (identical(other.priority, priority) || const DeepCollectionEquality().equals(other.priority, priority)) &&
             (identical(other.maxConcurrentRequests, maxConcurrentRequests) ||
-                const DeepCollectionEquality().equals(
-                  other.maxConcurrentRequests,
-                  maxConcurrentRequests,
-                )) &&
+                const DeepCollectionEquality().equals(other.maxConcurrentRequests, maxConcurrentRequests)) &&
             (identical(other.rateLimitPerMinute, rateLimitPerMinute) ||
-                const DeepCollectionEquality().equals(
-                  other.rateLimitPerMinute,
-                  rateLimitPerMinute,
-                )) &&
+                const DeepCollectionEquality().equals(other.rateLimitPerMinute, rateLimitPerMinute)) &&
             (identical(other.isTorrentClient, isTorrentClient) ||
-                const DeepCollectionEquality().equals(
-                  other.isTorrentClient,
-                  isTorrentClient,
-                )) &&
+                const DeepCollectionEquality().equals(other.isTorrentClient, isTorrentClient)) &&
             (identical(other.createdAt, createdAt) ||
-                const DeepCollectionEquality().equals(
-                  other.createdAt,
-                  createdAt,
-                )) &&
+                const DeepCollectionEquality().equals(other.createdAt, createdAt)) &&
             (identical(other.updatedAt, updatedAt) ||
-                const DeepCollectionEquality().equals(
-                  other.updatedAt,
-                  updatedAt,
-                )));
+                const DeepCollectionEquality().equals(other.updatedAt, updatedAt)));
   }
 
   @override
@@ -948,14 +1523,7 @@ extension $ApiClientDtoExtension on ApiClientDto {
 
 @JsonSerializable(explicitToJson: true)
 class ProblemDetails {
-  const ProblemDetails({
-    this.type,
-    this.title,
-    this.status,
-    this.detail,
-    this.instance,
-    this.extensions,
-  });
+  const ProblemDetails({this.type, this.title, this.status, this.detail, this.instance, this.extensions});
 
   factory ProblemDetails.fromJson(Map<String, dynamic> json) => _$ProblemDetailsFromJson(json);
 
@@ -984,16 +1552,9 @@ class ProblemDetails {
             (identical(other.title, title) || const DeepCollectionEquality().equals(other.title, title)) &&
             (identical(other.status, status) || const DeepCollectionEquality().equals(other.status, status)) &&
             (identical(other.detail, detail) || const DeepCollectionEquality().equals(other.detail, detail)) &&
-            (identical(other.instance, instance) ||
-                const DeepCollectionEquality().equals(
-                  other.instance,
-                  instance,
-                )) &&
+            (identical(other.instance, instance) || const DeepCollectionEquality().equals(other.instance, instance)) &&
             (identical(other.extensions, extensions) ||
-                const DeepCollectionEquality().equals(
-                  other.extensions,
-                  extensions,
-                )));
+                const DeepCollectionEquality().equals(other.extensions, extensions)));
   }
 
   @override
@@ -1102,52 +1663,21 @@ class CreateApiClientRequest {
         (other is CreateApiClientRequest &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
-            (identical(other.baseUrl, baseUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.baseUrl,
-                  baseUrl,
-                )) &&
+            (identical(other.baseUrl, baseUrl) || const DeepCollectionEquality().equals(other.baseUrl, baseUrl)) &&
             (identical(other.apiKey, apiKey) || const DeepCollectionEquality().equals(other.apiKey, apiKey)) &&
-            (identical(other.username, username) ||
-                const DeepCollectionEquality().equals(
-                  other.username,
-                  username,
-                )) &&
-            (identical(other.password, password) ||
-                const DeepCollectionEquality().equals(
-                  other.password,
-                  password,
-                )) &&
+            (identical(other.username, username) || const DeepCollectionEquality().equals(other.username, username)) &&
+            (identical(other.password, password) || const DeepCollectionEquality().equals(other.password, password)) &&
             (identical(other.isEnabled, isEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isEnabled,
-                  isEnabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.isEnabled, isEnabled)) &&
             (identical(other.subscriptionExpiresAt, subscriptionExpiresAt) ||
-                const DeepCollectionEquality().equals(
-                  other.subscriptionExpiresAt,
-                  subscriptionExpiresAt,
-                )) &&
-            (identical(other.priority, priority) ||
-                const DeepCollectionEquality().equals(
-                  other.priority,
-                  priority,
-                )) &&
+                const DeepCollectionEquality().equals(other.subscriptionExpiresAt, subscriptionExpiresAt)) &&
+            (identical(other.priority, priority) || const DeepCollectionEquality().equals(other.priority, priority)) &&
             (identical(other.maxConcurrentRequests, maxConcurrentRequests) ||
-                const DeepCollectionEquality().equals(
-                  other.maxConcurrentRequests,
-                  maxConcurrentRequests,
-                )) &&
+                const DeepCollectionEquality().equals(other.maxConcurrentRequests, maxConcurrentRequests)) &&
             (identical(other.rateLimitPerMinute, rateLimitPerMinute) ||
-                const DeepCollectionEquality().equals(
-                  other.rateLimitPerMinute,
-                  rateLimitPerMinute,
-                )) &&
+                const DeepCollectionEquality().equals(other.rateLimitPerMinute, rateLimitPerMinute)) &&
             (identical(other.isTorrentClient, isTorrentClient) ||
-                const DeepCollectionEquality().equals(
-                  other.isTorrentClient,
-                  isTorrentClient,
-                )));
+                const DeepCollectionEquality().equals(other.isTorrentClient, isTorrentClient)));
   }
 
   @override
@@ -1286,52 +1816,21 @@ class UpdateApiClientRequest {
         (other is UpdateApiClientRequest &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
-            (identical(other.baseUrl, baseUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.baseUrl,
-                  baseUrl,
-                )) &&
+            (identical(other.baseUrl, baseUrl) || const DeepCollectionEquality().equals(other.baseUrl, baseUrl)) &&
             (identical(other.apiKey, apiKey) || const DeepCollectionEquality().equals(other.apiKey, apiKey)) &&
-            (identical(other.username, username) ||
-                const DeepCollectionEquality().equals(
-                  other.username,
-                  username,
-                )) &&
-            (identical(other.password, password) ||
-                const DeepCollectionEquality().equals(
-                  other.password,
-                  password,
-                )) &&
+            (identical(other.username, username) || const DeepCollectionEquality().equals(other.username, username)) &&
+            (identical(other.password, password) || const DeepCollectionEquality().equals(other.password, password)) &&
             (identical(other.isEnabled, isEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isEnabled,
-                  isEnabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.isEnabled, isEnabled)) &&
             (identical(other.subscriptionExpiresAt, subscriptionExpiresAt) ||
-                const DeepCollectionEquality().equals(
-                  other.subscriptionExpiresAt,
-                  subscriptionExpiresAt,
-                )) &&
-            (identical(other.priority, priority) ||
-                const DeepCollectionEquality().equals(
-                  other.priority,
-                  priority,
-                )) &&
+                const DeepCollectionEquality().equals(other.subscriptionExpiresAt, subscriptionExpiresAt)) &&
+            (identical(other.priority, priority) || const DeepCollectionEquality().equals(other.priority, priority)) &&
             (identical(other.maxConcurrentRequests, maxConcurrentRequests) ||
-                const DeepCollectionEquality().equals(
-                  other.maxConcurrentRequests,
-                  maxConcurrentRequests,
-                )) &&
+                const DeepCollectionEquality().equals(other.maxConcurrentRequests, maxConcurrentRequests)) &&
             (identical(other.rateLimitPerMinute, rateLimitPerMinute) ||
-                const DeepCollectionEquality().equals(
-                  other.rateLimitPerMinute,
-                  rateLimitPerMinute,
-                )) &&
+                const DeepCollectionEquality().equals(other.rateLimitPerMinute, rateLimitPerMinute)) &&
             (identical(other.isTorrentClient, isTorrentClient) ||
-                const DeepCollectionEquality().equals(
-                  other.isTorrentClient,
-                  isTorrentClient,
-                )));
+                const DeepCollectionEquality().equals(other.isTorrentClient, isTorrentClient)));
   }
 
   @override
@@ -1449,25 +1948,12 @@ class PaginatedResponseOfCrawlLinkDto {
     return identical(this, other) ||
         (other is PaginatedResponseOfCrawlLinkDto &&
             (identical(other.currentPage, currentPage) ||
-                const DeepCollectionEquality().equals(
-                  other.currentPage,
-                  currentPage,
-                )) &&
+                const DeepCollectionEquality().equals(other.currentPage, currentPage)) &&
             (identical(other.totalPages, totalPages) ||
-                const DeepCollectionEquality().equals(
-                  other.totalPages,
-                  totalPages,
-                )) &&
-            (identical(other.pageSize, pageSize) ||
-                const DeepCollectionEquality().equals(
-                  other.pageSize,
-                  pageSize,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalPages, totalPages)) &&
+            (identical(other.pageSize, pageSize) || const DeepCollectionEquality().equals(other.pageSize, pageSize)) &&
             (identical(other.totalCount, totalCount) ||
-                const DeepCollectionEquality().equals(
-                  other.totalCount,
-                  totalCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalCount, totalCount)) &&
             (identical(other.items, items) || const DeepCollectionEquality().equals(other.items, items)));
   }
 
@@ -1625,11 +2111,7 @@ class CrawlLinkDto {
   final enums.MediaServerType? mediaServerType;
   @JsonKey(name: 'isEnabled', includeIfNull: false)
   final bool? isEnabled;
-  @JsonKey(
-    name: 'disabledHosts',
-    includeIfNull: false,
-    defaultValue: <String>[],
-  )
+  @JsonKey(name: 'disabledHosts', includeIfNull: false, defaultValue: <String>[])
   final List<String>? disabledHosts;
   static const fromJsonFactory = _$CrawlLinkDtoFromJson;
 
@@ -1638,129 +2120,49 @@ class CrawlLinkDto {
     return identical(this, other) ||
         (other is CrawlLinkDto &&
             (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
-            (identical(other.mediaId, mediaId) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaId,
-                  mediaId,
-                )) &&
+            (identical(other.mediaId, mediaId) || const DeepCollectionEquality().equals(other.mediaId, mediaId)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.secondName, secondName) ||
-                const DeepCollectionEquality().equals(
-                  other.secondName,
-                  secondName,
-                )) &&
-            (identical(other.provider, provider) ||
-                const DeepCollectionEquality().equals(
-                  other.provider,
-                  provider,
-                )) &&
+                const DeepCollectionEquality().equals(other.secondName, secondName)) &&
+            (identical(other.provider, provider) || const DeepCollectionEquality().equals(other.provider, provider)) &&
             (identical(other.providerId, providerId) ||
-                const DeepCollectionEquality().equals(
-                  other.providerId,
-                  providerId,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerId, providerId)) &&
             (identical(other.providerItemId, providerItemId) ||
-                const DeepCollectionEquality().equals(
-                  other.providerItemId,
-                  providerItemId,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerItemId, providerItemId)) &&
             (identical(other.providerCategory, providerCategory) ||
-                const DeepCollectionEquality().equals(
-                  other.providerCategory,
-                  providerCategory,
-                )) &&
-            (identical(other.category, category) ||
-                const DeepCollectionEquality().equals(
-                  other.category,
-                  category,
-                )) &&
-            (identical(other.fullUrl, fullUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.fullUrl,
-                  fullUrl,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerCategory, providerCategory)) &&
+            (identical(other.category, category) || const DeepCollectionEquality().equals(other.category, category)) &&
+            (identical(other.fullUrl, fullUrl) || const DeepCollectionEquality().equals(other.fullUrl, fullUrl)) &&
             (identical(other.relativeUrl, relativeUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.relativeUrl,
-                  relativeUrl,
-                )) &&
+                const DeepCollectionEquality().equals(other.relativeUrl, relativeUrl)) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.thumbnailUrl,
-                  thumbnailUrl,
-                )) &&
+                const DeepCollectionEquality().equals(other.thumbnailUrl, thumbnailUrl)) &&
             (identical(other.airedEpisodesCount, airedEpisodesCount) ||
-                const DeepCollectionEquality().equals(
-                  other.airedEpisodesCount,
-                  airedEpisodesCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.airedEpisodesCount, airedEpisodesCount)) &&
             (identical(other.totalEpisodesCount, totalEpisodesCount) ||
-                const DeepCollectionEquality().equals(
-                  other.totalEpisodesCount,
-                  totalEpisodesCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalEpisodesCount, totalEpisodesCount)) &&
             (identical(other.season, season) || const DeepCollectionEquality().equals(other.season, season)) &&
-            (identical(other.quality, quality) ||
-                const DeepCollectionEquality().equals(
-                  other.quality,
-                  quality,
-                )) &&
-            (identical(other.version, version) ||
-                const DeepCollectionEquality().equals(
-                  other.version,
-                  version,
-                )) &&
+            (identical(other.quality, quality) || const DeepCollectionEquality().equals(other.quality, quality)) &&
+            (identical(other.version, version) || const DeepCollectionEquality().equals(other.version, version)) &&
             (identical(other.productionYear, productionYear) ||
-                const DeepCollectionEquality().equals(
-                  other.productionYear,
-                  productionYear,
-                )) &&
+                const DeepCollectionEquality().equals(other.productionYear, productionYear)) &&
             (identical(other.lastChecked, lastChecked) ||
-                const DeepCollectionEquality().equals(
-                  other.lastChecked,
-                  lastChecked,
-                )) &&
+                const DeepCollectionEquality().equals(other.lastChecked, lastChecked)) &&
             (identical(other.downloaded, downloaded) ||
-                const DeepCollectionEquality().equals(
-                  other.downloaded,
-                  downloaded,
-                )) &&
-            (identical(other.hasError, hasError) ||
-                const DeepCollectionEquality().equals(
-                  other.hasError,
-                  hasError,
-                )) &&
+                const DeepCollectionEquality().equals(other.downloaded, downloaded)) &&
+            (identical(other.hasError, hasError) || const DeepCollectionEquality().equals(other.hasError, hasError)) &&
             (identical(other.createdBy, createdBy) ||
-                const DeepCollectionEquality().equals(
-                  other.createdBy,
-                  createdBy,
-                )) &&
-            (identical(other.authorId, authorId) ||
-                const DeepCollectionEquality().equals(
-                  other.authorId,
-                  authorId,
-                )) &&
+                const DeepCollectionEquality().equals(other.createdBy, createdBy)) &&
+            (identical(other.authorId, authorId) || const DeepCollectionEquality().equals(other.authorId, authorId)) &&
             (identical(other.createdAt, createdAt) ||
-                const DeepCollectionEquality().equals(
-                  other.createdAt,
-                  createdAt,
-                )) &&
+                const DeepCollectionEquality().equals(other.createdAt, createdAt)) &&
             (identical(other.origin, origin) || const DeepCollectionEquality().equals(other.origin, origin)) &&
             (identical(other.mediaServerType, mediaServerType) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaServerType,
-                  mediaServerType,
-                )) &&
+                const DeepCollectionEquality().equals(other.mediaServerType, mediaServerType)) &&
             (identical(other.isEnabled, isEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isEnabled,
-                  isEnabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.isEnabled, isEnabled)) &&
             (identical(other.disabledHosts, disabledHosts) ||
-                const DeepCollectionEquality().equals(
-                  other.disabledHosts,
-                  disabledHosts,
-                )));
+                const DeepCollectionEquality().equals(other.disabledHosts, disabledHosts)));
   }
 
   @override
@@ -1927,14 +2329,7 @@ extension $CrawlLinkDtoExtension on CrawlLinkDto {
 
 @JsonSerializable(explicitToJson: true)
 class ProviderDto {
-  const ProviderDto({
-    this.displayName,
-    this.name,
-    this.url,
-    this.enabled,
-    this.searchEnabled,
-    this.isManuallyDisabled,
-  });
+  const ProviderDto({this.displayName, this.name, this.url, this.enabled, this.searchEnabled, this.isManuallyDisabled});
 
   factory ProviderDto.fromJson(Map<String, dynamic> json) => _$ProviderDtoFromJson(json);
 
@@ -1960,27 +2355,14 @@ class ProviderDto {
     return identical(this, other) ||
         (other is ProviderDto &&
             (identical(other.displayName, displayName) ||
-                const DeepCollectionEquality().equals(
-                  other.displayName,
-                  displayName,
-                )) &&
+                const DeepCollectionEquality().equals(other.displayName, displayName)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
-            (identical(other.enabled, enabled) ||
-                const DeepCollectionEquality().equals(
-                  other.enabled,
-                  enabled,
-                )) &&
+            (identical(other.enabled, enabled) || const DeepCollectionEquality().equals(other.enabled, enabled)) &&
             (identical(other.searchEnabled, searchEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.searchEnabled,
-                  searchEnabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.searchEnabled, searchEnabled)) &&
             (identical(other.isManuallyDisabled, isManuallyDisabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isManuallyDisabled,
-                  isManuallyDisabled,
-                )));
+                const DeepCollectionEquality().equals(other.isManuallyDisabled, isManuallyDisabled)));
   }
 
   @override
@@ -2078,57 +2460,26 @@ class ExtractMediaResponse {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is ExtractMediaResponse &&
-            (identical(
-                  other.requiresSeasonSelection,
-                  requiresSeasonSelection,
-                ) ||
-                const DeepCollectionEquality().equals(
-                  other.requiresSeasonSelection,
-                  requiresSeasonSelection,
-                )) &&
+            (identical(other.requiresSeasonSelection, requiresSeasonSelection) ||
+                const DeepCollectionEquality().equals(other.requiresSeasonSelection, requiresSeasonSelection)) &&
             (identical(other.availableSeasons, availableSeasons) ||
-                const DeepCollectionEquality().equals(
-                  other.availableSeasons,
-                  availableSeasons,
-                )) &&
+                const DeepCollectionEquality().equals(other.availableSeasons, availableSeasons)) &&
             (identical(other.mediaTitle, mediaTitle) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaTitle,
-                  mediaTitle,
-                )) &&
+                const DeepCollectionEquality().equals(other.mediaTitle, mediaTitle)) &&
             (identical(other.originalUrl, originalUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.originalUrl,
-                  originalUrl,
-                )) &&
-            (identical(other.addToken, addToken) ||
-                const DeepCollectionEquality().equals(
-                  other.addToken,
-                  addToken,
-                )) &&
+                const DeepCollectionEquality().equals(other.originalUrl, originalUrl)) &&
+            (identical(other.addToken, addToken) || const DeepCollectionEquality().equals(other.addToken, addToken)) &&
             (identical(other.crawlLink, crawlLink) ||
-                const DeepCollectionEquality().equals(
-                  other.crawlLink,
-                  crawlLink,
-                )) &&
+                const DeepCollectionEquality().equals(other.crawlLink, crawlLink)) &&
             (identical(other.mediaExistsOnServer, mediaExistsOnServer) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaExistsOnServer,
-                  mediaExistsOnServer,
-                )) &&
-            (identical(
-                  other.requiresExistenceConfirmation,
-                  requiresExistenceConfirmation,
-                ) ||
+                const DeepCollectionEquality().equals(other.mediaExistsOnServer, mediaExistsOnServer)) &&
+            (identical(other.requiresExistenceConfirmation, requiresExistenceConfirmation) ||
                 const DeepCollectionEquality().equals(
                   other.requiresExistenceConfirmation,
                   requiresExistenceConfirmation,
                 )) &&
             (identical(other.existingMedia, existingMedia) ||
-                const DeepCollectionEquality().equals(
-                  other.existingMedia,
-                  existingMedia,
-                )));
+                const DeepCollectionEquality().equals(other.existingMedia, existingMedia)));
   }
 
   @override
@@ -2185,8 +2536,9 @@ extension $ExtractMediaResponseExtension on ExtractMediaResponse {
     Wrapped<dynamic>? existingMedia,
   }) {
     return ExtractMediaResponse(
-      requiresSeasonSelection:
-          (requiresSeasonSelection != null ? requiresSeasonSelection.value : this.requiresSeasonSelection),
+      requiresSeasonSelection: (requiresSeasonSelection != null
+          ? requiresSeasonSelection.value
+          : this.requiresSeasonSelection),
       availableSeasons: (availableSeasons != null ? availableSeasons.value : this.availableSeasons),
       mediaTitle: (mediaTitle != null ? mediaTitle.value : this.mediaTitle),
       originalUrl: (originalUrl != null ? originalUrl.value : this.originalUrl),
@@ -2238,21 +2590,11 @@ class MediaSearchResultDto {
             (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.title, title) || const DeepCollectionEquality().equals(other.title, title)) &&
             (identical(other.originalTitle, originalTitle) ||
-                const DeepCollectionEquality().equals(
-                  other.originalTitle,
-                  originalTitle,
-                )) &&
+                const DeepCollectionEquality().equals(other.originalTitle, originalTitle)) &&
             (identical(other.productionYear, productionYear) ||
-                const DeepCollectionEquality().equals(
-                  other.productionYear,
-                  productionYear,
-                )) &&
+                const DeepCollectionEquality().equals(other.productionYear, productionYear)) &&
             (identical(other.isShow, isShow) || const DeepCollectionEquality().equals(other.isShow, isShow)) &&
-            (identical(other.mediaUrl, mediaUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaUrl,
-                  mediaUrl,
-                )));
+            (identical(other.mediaUrl, mediaUrl) || const DeepCollectionEquality().equals(other.mediaUrl, mediaUrl)));
   }
 
   @override
@@ -2309,12 +2651,7 @@ extension $MediaSearchResultDtoExtension on MediaSearchResultDto {
 
 @JsonSerializable(explicitToJson: true)
 class ExtractMediaRequest {
-  const ExtractMediaRequest({
-    this.url,
-    this.userName,
-    this.userId,
-    this.mediaCategory,
-  });
+  const ExtractMediaRequest({this.url, this.userName, this.userId, this.mediaCategory});
 
   factory ExtractMediaRequest.fromJson(Map<String, dynamic> json) => _$ExtractMediaRequestFromJson(json);
 
@@ -2341,17 +2678,10 @@ class ExtractMediaRequest {
     return identical(this, other) ||
         (other is ExtractMediaRequest &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
-            (identical(other.userName, userName) ||
-                const DeepCollectionEquality().equals(
-                  other.userName,
-                  userName,
-                )) &&
+            (identical(other.userName, userName) || const DeepCollectionEquality().equals(other.userName, userName)) &&
             (identical(other.userId, userId) || const DeepCollectionEquality().equals(other.userId, userId)) &&
             (identical(other.mediaCategory, mediaCategory) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaCategory,
-                  mediaCategory,
-                )));
+                const DeepCollectionEquality().equals(other.mediaCategory, mediaCategory)));
   }
 
   @override
@@ -2367,12 +2697,7 @@ class ExtractMediaRequest {
 }
 
 extension $ExtractMediaRequestExtension on ExtractMediaRequest {
-  ExtractMediaRequest copyWith({
-    String? url,
-    String? userName,
-    String? userId,
-    enums.MediaCategory? mediaCategory,
-  }) {
+  ExtractMediaRequest copyWith({String? url, String? userName, String? userId, enums.MediaCategory? mediaCategory}) {
     return ExtractMediaRequest(
       url: url ?? this.url,
       userName: userName ?? this.userName,
@@ -2398,13 +2723,7 @@ extension $ExtractMediaRequestExtension on ExtractMediaRequest {
 
 @JsonSerializable(explicitToJson: true)
 class SelectSeasonRequest {
-  const SelectSeasonRequest({
-    this.url,
-    this.season,
-    this.userName,
-    this.userId,
-    this.mediaCategory,
-  });
+  const SelectSeasonRequest({this.url, this.season, this.userName, this.userId, this.mediaCategory});
 
   factory SelectSeasonRequest.fromJson(Map<String, dynamic> json) => _$SelectSeasonRequestFromJson(json);
 
@@ -2434,17 +2753,10 @@ class SelectSeasonRequest {
         (other is SelectSeasonRequest &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
             (identical(other.season, season) || const DeepCollectionEquality().equals(other.season, season)) &&
-            (identical(other.userName, userName) ||
-                const DeepCollectionEquality().equals(
-                  other.userName,
-                  userName,
-                )) &&
+            (identical(other.userName, userName) || const DeepCollectionEquality().equals(other.userName, userName)) &&
             (identical(other.userId, userId) || const DeepCollectionEquality().equals(other.userId, userId)) &&
             (identical(other.mediaCategory, mediaCategory) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaCategory,
-                  mediaCategory,
-                )));
+                const DeepCollectionEquality().equals(other.mediaCategory, mediaCategory)));
   }
 
   @override
@@ -2514,16 +2826,9 @@ class ExtractMediaConfirmationRequest {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is ExtractMediaConfirmationRequest &&
-            (identical(other.addToken, addToken) ||
-                const DeepCollectionEquality().equals(
-                  other.addToken,
-                  addToken,
-                )) &&
+            (identical(other.addToken, addToken) || const DeepCollectionEquality().equals(other.addToken, addToken)) &&
             (identical(other.mediaTitle, mediaTitle) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaTitle,
-                  mediaTitle,
-                )));
+                const DeepCollectionEquality().equals(other.mediaTitle, mediaTitle)));
   }
 
   @override
@@ -2537,20 +2842,14 @@ class ExtractMediaConfirmationRequest {
 }
 
 extension $ExtractMediaConfirmationRequestExtension on ExtractMediaConfirmationRequest {
-  ExtractMediaConfirmationRequest copyWith({
-    String? addToken,
-    String? mediaTitle,
-  }) {
+  ExtractMediaConfirmationRequest copyWith({String? addToken, String? mediaTitle}) {
     return ExtractMediaConfirmationRequest(
       addToken: addToken ?? this.addToken,
       mediaTitle: mediaTitle ?? this.mediaTitle,
     );
   }
 
-  ExtractMediaConfirmationRequest copyWithWrapped({
-    Wrapped<String?>? addToken,
-    Wrapped<String?>? mediaTitle,
-  }) {
+  ExtractMediaConfirmationRequest copyWithWrapped({Wrapped<String?>? addToken, Wrapped<String?>? mediaTitle}) {
     return ExtractMediaConfirmationRequest(
       addToken: (addToken != null ? addToken.value : this.addToken),
       mediaTitle: (mediaTitle != null ? mediaTitle.value : this.mediaTitle),
@@ -2560,12 +2859,7 @@ extension $ExtractMediaConfirmationRequestExtension on ExtractMediaConfirmationR
 
 @JsonSerializable(explicitToJson: true)
 class RenameLinkResult {
-  const RenameLinkResult({
-    this.isSuccess,
-    this.error,
-    this.oldName,
-    this.newName,
-  });
+  const RenameLinkResult({this.isSuccess, this.error, this.oldName, this.newName});
 
   factory RenameLinkResult.fromJson(Map<String, dynamic> json) => _$RenameLinkResultFromJson(json);
 
@@ -2587,16 +2881,9 @@ class RenameLinkResult {
     return identical(this, other) ||
         (other is RenameLinkResult &&
             (identical(other.isSuccess, isSuccess) ||
-                const DeepCollectionEquality().equals(
-                  other.isSuccess,
-                  isSuccess,
-                )) &&
+                const DeepCollectionEquality().equals(other.isSuccess, isSuccess)) &&
             (identical(other.error, error) || const DeepCollectionEquality().equals(other.error, error)) &&
-            (identical(other.oldName, oldName) ||
-                const DeepCollectionEquality().equals(
-                  other.oldName,
-                  oldName,
-                )) &&
+            (identical(other.oldName, oldName) || const DeepCollectionEquality().equals(other.oldName, oldName)) &&
             (identical(other.newName, newName) || const DeepCollectionEquality().equals(other.newName, newName)));
   }
 
@@ -2613,12 +2900,7 @@ class RenameLinkResult {
 }
 
 extension $RenameLinkResultExtension on RenameLinkResult {
-  RenameLinkResult copyWith({
-    bool? isSuccess,
-    String? error,
-    String? oldName,
-    String? newName,
-  }) {
+  RenameLinkResult copyWith({bool? isSuccess, String? error, String? oldName, String? newName}) {
     return RenameLinkResult(
       isSuccess: isSuccess ?? this.isSuccess,
       error: error ?? this.error,
@@ -2675,9 +2957,7 @@ extension $RenameCrawlLinkRequestExtension on RenameCrawlLinkRequest {
   }
 
   RenameCrawlLinkRequest copyWithWrapped({Wrapped<String?>? newName}) {
-    return RenameCrawlLinkRequest(
-      newName: (newName != null ? newName.value : this.newName),
-    );
+    return RenameCrawlLinkRequest(newName: (newName != null ? newName.value : this.newName));
   }
 }
 
@@ -2743,11 +3023,7 @@ class UpdateCrawlLinkRequest {
   final bool? hasError;
   @JsonKey(name: 'isEnabled', includeIfNull: false)
   final bool? isEnabled;
-  @JsonKey(
-    name: 'disabledHosts',
-    includeIfNull: false,
-    defaultValue: <String>[],
-  )
+  @JsonKey(name: 'disabledHosts', includeIfNull: false, defaultValue: <String>[])
   final List<String>? disabledHosts;
   static const fromJsonFactory = _$UpdateCrawlLinkRequestFromJson;
 
@@ -2757,82 +3033,33 @@ class UpdateCrawlLinkRequest {
         (other is UpdateCrawlLinkRequest &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.secondName, secondName) ||
-                const DeepCollectionEquality().equals(
-                  other.secondName,
-                  secondName,
-                )) &&
+                const DeepCollectionEquality().equals(other.secondName, secondName)) &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
             (identical(other.providerCategory, providerCategory) ||
-                const DeepCollectionEquality().equals(
-                  other.providerCategory,
-                  providerCategory,
-                )) &&
-            (identical(other.category, category) ||
-                const DeepCollectionEquality().equals(
-                  other.category,
-                  category,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerCategory, providerCategory)) &&
+            (identical(other.category, category) || const DeepCollectionEquality().equals(other.category, category)) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.thumbnailUrl,
-                  thumbnailUrl,
-                )) &&
+                const DeepCollectionEquality().equals(other.thumbnailUrl, thumbnailUrl)) &&
             (identical(other.airedEpisodesCount, airedEpisodesCount) ||
-                const DeepCollectionEquality().equals(
-                  other.airedEpisodesCount,
-                  airedEpisodesCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.airedEpisodesCount, airedEpisodesCount)) &&
             (identical(other.totalEpisodesCount, totalEpisodesCount) ||
-                const DeepCollectionEquality().equals(
-                  other.totalEpisodesCount,
-                  totalEpisodesCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalEpisodesCount, totalEpisodesCount)) &&
             (identical(other.season, season) || const DeepCollectionEquality().equals(other.season, season)) &&
-            (identical(other.quality, quality) ||
-                const DeepCollectionEquality().equals(
-                  other.quality,
-                  quality,
-                )) &&
-            (identical(other.version, version) ||
-                const DeepCollectionEquality().equals(
-                  other.version,
-                  version,
-                )) &&
+            (identical(other.quality, quality) || const DeepCollectionEquality().equals(other.quality, quality)) &&
+            (identical(other.version, version) || const DeepCollectionEquality().equals(other.version, version)) &&
             (identical(other.productionYear, productionYear) ||
-                const DeepCollectionEquality().equals(
-                  other.productionYear,
-                  productionYear,
-                )) &&
+                const DeepCollectionEquality().equals(other.productionYear, productionYear)) &&
             (identical(other.lastChecked, lastChecked) ||
-                const DeepCollectionEquality().equals(
-                  other.lastChecked,
-                  lastChecked,
-                )) &&
+                const DeepCollectionEquality().equals(other.lastChecked, lastChecked)) &&
             (identical(other.clearLastChecked, clearLastChecked) ||
-                const DeepCollectionEquality().equals(
-                  other.clearLastChecked,
-                  clearLastChecked,
-                )) &&
+                const DeepCollectionEquality().equals(other.clearLastChecked, clearLastChecked)) &&
             (identical(other.downloaded, downloaded) ||
-                const DeepCollectionEquality().equals(
-                  other.downloaded,
-                  downloaded,
-                )) &&
-            (identical(other.hasError, hasError) ||
-                const DeepCollectionEquality().equals(
-                  other.hasError,
-                  hasError,
-                )) &&
+                const DeepCollectionEquality().equals(other.downloaded, downloaded)) &&
+            (identical(other.hasError, hasError) || const DeepCollectionEquality().equals(other.hasError, hasError)) &&
             (identical(other.isEnabled, isEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isEnabled,
-                  isEnabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.isEnabled, isEnabled)) &&
             (identical(other.disabledHosts, disabledHosts) ||
-                const DeepCollectionEquality().equals(
-                  other.disabledHosts,
-                  disabledHosts,
-                )));
+                const DeepCollectionEquality().equals(other.disabledHosts, disabledHosts)));
   }
 
   @override
@@ -2980,9 +3207,7 @@ extension $UpdateDisabledHostsRequestExtension on UpdateDisabledHostsRequest {
   }
 
   UpdateDisabledHostsRequest copyWithWrapped({Wrapped<List<String>?>? hosts}) {
-    return UpdateDisabledHostsRequest(
-      hosts: (hosts != null ? hosts.value : this.hosts),
-    );
+    return UpdateDisabledHostsRequest(hosts: (hosts != null ? hosts.value : this.hosts));
   }
 }
 
@@ -3063,93 +3288,39 @@ class DownloadDto {
     return identical(this, other) ||
         (other is DownloadDto &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
-            (identical(other.fileName, fileName) ||
-                const DeepCollectionEquality().equals(
-                  other.fileName,
-                  fileName,
-                )) &&
+            (identical(other.fileName, fileName) || const DeepCollectionEquality().equals(other.fileName, fileName)) &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
             (identical(other.destinationFolder, destinationFolder) ||
-                const DeepCollectionEquality().equals(
-                  other.destinationFolder,
-                  destinationFolder,
-                )) &&
+                const DeepCollectionEquality().equals(other.destinationFolder, destinationFolder)) &&
             (identical(other.isRunning, isRunning) ||
-                const DeepCollectionEquality().equals(
-                  other.isRunning,
-                  isRunning,
-                )) &&
+                const DeepCollectionEquality().equals(other.isRunning, isRunning)) &&
             (identical(other.isCancelled, isCancelled) ||
-                const DeepCollectionEquality().equals(
-                  other.isCancelled,
-                  isCancelled,
-                )) &&
+                const DeepCollectionEquality().equals(other.isCancelled, isCancelled)) &&
             (identical(other.isCompleted, isCompleted) ||
-                const DeepCollectionEquality().equals(
-                  other.isCompleted,
-                  isCompleted,
-                )) &&
+                const DeepCollectionEquality().equals(other.isCompleted, isCompleted)) &&
             (identical(other.isDeadLink, isDeadLink) ||
-                const DeepCollectionEquality().equals(
-                  other.isDeadLink,
-                  isDeadLink,
-                )) &&
+                const DeepCollectionEquality().equals(other.isDeadLink, isDeadLink)) &&
             (identical(other.episodeIndex, episodeIndex) ||
-                const DeepCollectionEquality().equals(
-                  other.episodeIndex,
-                  episodeIndex,
-                )) &&
-            (identical(other.progress, progress) ||
-                const DeepCollectionEquality().equals(
-                  other.progress,
-                  progress,
-                )) &&
+                const DeepCollectionEquality().equals(other.episodeIndex, episodeIndex)) &&
+            (identical(other.progress, progress) || const DeepCollectionEquality().equals(other.progress, progress)) &&
             (identical(other.speed, speed) || const DeepCollectionEquality().equals(other.speed, speed)) &&
             (identical(other.speedUnit, speedUnit) ||
-                const DeepCollectionEquality().equals(
-                  other.speedUnit,
-                  speedUnit,
-                )) &&
+                const DeepCollectionEquality().equals(other.speedUnit, speedUnit)) &&
             (identical(other.averageSpeed, averageSpeed) ||
-                const DeepCollectionEquality().equals(
-                  other.averageSpeed,
-                  averageSpeed,
-                )) &&
+                const DeepCollectionEquality().equals(other.averageSpeed, averageSpeed)) &&
             (identical(other.averageSpeedUnit, averageSpeedUnit) ||
-                const DeepCollectionEquality().equals(
-                  other.averageSpeedUnit,
-                  averageSpeedUnit,
-                )) &&
+                const DeepCollectionEquality().equals(other.averageSpeedUnit, averageSpeedUnit)) &&
             (identical(other.sizeReceived, sizeReceived) ||
-                const DeepCollectionEquality().equals(
-                  other.sizeReceived,
-                  sizeReceived,
-                )) &&
-            (identical(other.sizeUnit, sizeUnit) ||
-                const DeepCollectionEquality().equals(
-                  other.sizeUnit,
-                  sizeUnit,
-                )) &&
+                const DeepCollectionEquality().equals(other.sizeReceived, sizeReceived)) &&
+            (identical(other.sizeUnit, sizeUnit) || const DeepCollectionEquality().equals(other.sizeUnit, sizeUnit)) &&
             (identical(other.totalSize, totalSize) ||
-                const DeepCollectionEquality().equals(
-                  other.totalSize,
-                  totalSize,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalSize, totalSize)) &&
             (identical(other.totalSizeUnit, totalSizeUnit) ||
-                const DeepCollectionEquality().equals(
-                  other.totalSizeUnit,
-                  totalSizeUnit,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalSizeUnit, totalSizeUnit)) &&
             (identical(other.estimatedTime, estimatedTime) ||
-                const DeepCollectionEquality().equals(
-                  other.estimatedTime,
-                  estimatedTime,
-                )) &&
+                const DeepCollectionEquality().equals(other.estimatedTime, estimatedTime)) &&
             (identical(other.estimatedTimeUnit, estimatedTimeUnit) ||
-                const DeepCollectionEquality().equals(
-                  other.estimatedTimeUnit,
-                  estimatedTimeUnit,
-                )));
+                const DeepCollectionEquality().equals(other.estimatedTimeUnit, estimatedTimeUnit)));
   }
 
   @override
@@ -3295,10 +3466,7 @@ class MediaServerInviteRequest {
         (other is MediaServerInviteRequest &&
             (identical(other.email, email) || const DeepCollectionEquality().equals(other.email, email)) &&
             (identical(other.libraries, libraries) ||
-                const DeepCollectionEquality().equals(
-                  other.libraries,
-                  libraries,
-                )));
+                const DeepCollectionEquality().equals(other.libraries, libraries)));
   }
 
   @override
@@ -3313,16 +3481,10 @@ class MediaServerInviteRequest {
 
 extension $MediaServerInviteRequestExtension on MediaServerInviteRequest {
   MediaServerInviteRequest copyWith({String? email, List<String>? libraries}) {
-    return MediaServerInviteRequest(
-      email: email ?? this.email,
-      libraries: libraries ?? this.libraries,
-    );
+    return MediaServerInviteRequest(email: email ?? this.email, libraries: libraries ?? this.libraries);
   }
 
-  MediaServerInviteRequest copyWithWrapped({
-    Wrapped<String?>? email,
-    Wrapped<List<String>?>? libraries,
-  }) {
+  MediaServerInviteRequest copyWithWrapped({Wrapped<String?>? email, Wrapped<List<String>?>? libraries}) {
     return MediaServerInviteRequest(
       email: (email != null ? email.value : this.email),
       libraries: (libraries != null ? libraries.value : this.libraries),
@@ -3357,10 +3519,7 @@ class ScheduledJob {
             (identical(other.type, type) || const DeepCollectionEquality().equals(other.type, type)) &&
             (identical(other.status, status) || const DeepCollectionEquality().equals(other.status, status)) &&
             (identical(other.startedAt, startedAt) ||
-                const DeepCollectionEquality().equals(
-                  other.startedAt,
-                  startedAt,
-                )));
+                const DeepCollectionEquality().equals(other.startedAt, startedAt)));
   }
 
   @override
@@ -3376,12 +3535,7 @@ class ScheduledJob {
 }
 
 extension $ScheduledJobExtension on ScheduledJob {
-  ScheduledJob copyWith({
-    String? id,
-    String? type,
-    String? status,
-    DateTime? startedAt,
-  }) {
+  ScheduledJob copyWith({String? id, String? type, String? status, DateTime? startedAt}) {
     return ScheduledJob(
       id: id ?? this.id,
       type: type ?? this.type,
@@ -3438,9 +3592,7 @@ extension $TriggerJobRequestExtension on TriggerJobRequest {
   }
 
   TriggerJobRequest copyWithWrapped({Wrapped<String?>? jobType}) {
-    return TriggerJobRequest(
-      jobType: (jobType != null ? jobType.value : this.jobType),
-    );
+    return TriggerJobRequest(jobType: (jobType != null ? jobType.value : this.jobType));
   }
 }
 
@@ -3488,31 +3640,14 @@ class LiveTvChannelDto {
         (other is LiveTvChannelDto &&
             (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
-            (identical(other.iconUrl, iconUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.iconUrl,
-                  iconUrl,
-                )) &&
-            (identical(other.category, category) ||
-                const DeepCollectionEquality().equals(
-                  other.category,
-                  category,
-                )) &&
+            (identical(other.iconUrl, iconUrl) || const DeepCollectionEquality().equals(other.iconUrl, iconUrl)) &&
+            (identical(other.category, category) || const DeepCollectionEquality().equals(other.category, category)) &&
             (identical(other.streamUrl, streamUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.streamUrl,
-                  streamUrl,
-                )) &&
+                const DeepCollectionEquality().equals(other.streamUrl, streamUrl)) &&
             (identical(other.createdAt, createdAt) ||
-                const DeepCollectionEquality().equals(
-                  other.createdAt,
-                  createdAt,
-                )) &&
+                const DeepCollectionEquality().equals(other.createdAt, createdAt)) &&
             (identical(other.updatedAt, updatedAt) ||
-                const DeepCollectionEquality().equals(
-                  other.updatedAt,
-                  updatedAt,
-                )));
+                const DeepCollectionEquality().equals(other.updatedAt, updatedAt)));
   }
 
   @override
@@ -3594,16 +3729,10 @@ class DebridLinkResult {
     return identical(this, other) ||
         (other is DebridLinkResult &&
             (identical(other.isSuccess, isSuccess) ||
-                const DeepCollectionEquality().equals(
-                  other.isSuccess,
-                  isSuccess,
-                )) &&
+                const DeepCollectionEquality().equals(other.isSuccess, isSuccess)) &&
             (identical(other.error, error) || const DeepCollectionEquality().equals(other.error, error)) &&
             (identical(other.debridedUrl, debridedUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.debridedUrl,
-                  debridedUrl,
-                )));
+                const DeepCollectionEquality().equals(other.debridedUrl, debridedUrl)));
   }
 
   @override
@@ -3618,11 +3747,7 @@ class DebridLinkResult {
 }
 
 extension $DebridLinkResultExtension on DebridLinkResult {
-  DebridLinkResult copyWith({
-    bool? isSuccess,
-    String? error,
-    String? debridedUrl,
-  }) {
+  DebridLinkResult copyWith({bool? isSuccess, String? error, String? debridedUrl}) {
     return DebridLinkResult(
       isSuccess: isSuccess ?? this.isSuccess,
       error: error ?? this.error,
@@ -3702,16 +3827,10 @@ class RemoveLinkResult {
     return identical(this, other) ||
         (other is RemoveLinkResult &&
             (identical(other.isSuccess, isSuccess) ||
-                const DeepCollectionEquality().equals(
-                  other.isSuccess,
-                  isSuccess,
-                )) &&
+                const DeepCollectionEquality().equals(other.isSuccess, isSuccess)) &&
             (identical(other.error, error) || const DeepCollectionEquality().equals(other.error, error)) &&
             (identical(other.removedLink, removedLink) ||
-                const DeepCollectionEquality().equals(
-                  other.removedLink,
-                  removedLink,
-                )));
+                const DeepCollectionEquality().equals(other.removedLink, removedLink)));
   }
 
   @override
@@ -3726,11 +3845,7 @@ class RemoveLinkResult {
 }
 
 extension $RemoveLinkResultExtension on RemoveLinkResult {
-  RemoveLinkResult copyWith({
-    bool? isSuccess,
-    String? error,
-    String? removedLink,
-  }) {
+  RemoveLinkResult copyWith({bool? isSuccess, String? error, String? removedLink}) {
     return RemoveLinkResult(
       isSuccess: isSuccess ?? this.isSuccess,
       error: error ?? this.error,
@@ -3753,11 +3868,7 @@ extension $RemoveLinkResultExtension on RemoveLinkResult {
 
 @JsonSerializable(explicitToJson: true)
 class RemoveCorruptedFileResult {
-  const RemoveCorruptedFileResult({
-    this.isSuccess,
-    this.error,
-    this.episodesRemoved,
-  });
+  const RemoveCorruptedFileResult({this.isSuccess, this.error, this.episodesRemoved});
 
   factory RemoveCorruptedFileResult.fromJson(Map<String, dynamic> json) => _$RemoveCorruptedFileResultFromJson(json);
 
@@ -3777,16 +3888,10 @@ class RemoveCorruptedFileResult {
     return identical(this, other) ||
         (other is RemoveCorruptedFileResult &&
             (identical(other.isSuccess, isSuccess) ||
-                const DeepCollectionEquality().equals(
-                  other.isSuccess,
-                  isSuccess,
-                )) &&
+                const DeepCollectionEquality().equals(other.isSuccess, isSuccess)) &&
             (identical(other.error, error) || const DeepCollectionEquality().equals(other.error, error)) &&
             (identical(other.episodesRemoved, episodesRemoved) ||
-                const DeepCollectionEquality().equals(
-                  other.episodesRemoved,
-                  episodesRemoved,
-                )));
+                const DeepCollectionEquality().equals(other.episodesRemoved, episodesRemoved)));
   }
 
   @override
@@ -3801,11 +3906,7 @@ class RemoveCorruptedFileResult {
 }
 
 extension $RemoveCorruptedFileResultExtension on RemoveCorruptedFileResult {
-  RemoveCorruptedFileResult copyWith({
-    bool? isSuccess,
-    String? error,
-    int? episodesRemoved,
-  }) {
+  RemoveCorruptedFileResult copyWith({bool? isSuccess, String? error, int? episodesRemoved}) {
     return RemoveCorruptedFileResult(
       isSuccess: isSuccess ?? this.isSuccess,
       error: error ?? this.error,
@@ -3846,15 +3947,9 @@ class RemoveCorruptedFileRequest {
     return identical(this, other) ||
         (other is RemoveCorruptedFileRequest &&
             (identical(other.crawlLinkId, crawlLinkId) ||
-                const DeepCollectionEquality().equals(
-                  other.crawlLinkId,
-                  crawlLinkId,
-                )) &&
+                const DeepCollectionEquality().equals(other.crawlLinkId, crawlLinkId)) &&
             (identical(other.episodeIndexes, episodeIndexes) ||
-                const DeepCollectionEquality().equals(
-                  other.episodeIndexes,
-                  episodeIndexes,
-                )));
+                const DeepCollectionEquality().equals(other.episodeIndexes, episodeIndexes)));
   }
 
   @override
@@ -3868,20 +3963,14 @@ class RemoveCorruptedFileRequest {
 }
 
 extension $RemoveCorruptedFileRequestExtension on RemoveCorruptedFileRequest {
-  RemoveCorruptedFileRequest copyWith({
-    String? crawlLinkId,
-    List<int>? episodeIndexes,
-  }) {
+  RemoveCorruptedFileRequest copyWith({String? crawlLinkId, List<int>? episodeIndexes}) {
     return RemoveCorruptedFileRequest(
       crawlLinkId: crawlLinkId ?? this.crawlLinkId,
       episodeIndexes: episodeIndexes ?? this.episodeIndexes,
     );
   }
 
-  RemoveCorruptedFileRequest copyWithWrapped({
-    Wrapped<String?>? crawlLinkId,
-    Wrapped<List<int>?>? episodeIndexes,
-  }) {
+  RemoveCorruptedFileRequest copyWithWrapped({Wrapped<String?>? crawlLinkId, Wrapped<List<int>?>? episodeIndexes}) {
     return RemoveCorruptedFileRequest(
       crawlLinkId: (crawlLinkId != null ? crawlLinkId.value : this.crawlLinkId),
       episodeIndexes: (episodeIndexes != null ? episodeIndexes.value : this.episodeIndexes),
@@ -3921,11 +4010,7 @@ class IProvider {
   final bool? searchEnabled;
   @JsonKey(name: 'isManuallyDisabled', includeIfNull: false)
   final bool? isManuallyDisabled;
-  @JsonKey(
-    name: 'crawlLinksRef',
-    includeIfNull: false,
-    defaultValue: <ICrawlLink>[],
-  )
+  @JsonKey(name: 'crawlLinksRef', includeIfNull: false, defaultValue: <ICrawlLink>[])
   final List<ICrawlLink>? crawlLinksRef;
   static const fromJsonFactory = _$IProviderFromJson;
 
@@ -3935,32 +4020,16 @@ class IProvider {
         (other is IProvider &&
             (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.displayName, displayName) ||
-                const DeepCollectionEquality().equals(
-                  other.displayName,
-                  displayName,
-                )) &&
+                const DeepCollectionEquality().equals(other.displayName, displayName)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
-            (identical(other.enabled, enabled) ||
-                const DeepCollectionEquality().equals(
-                  other.enabled,
-                  enabled,
-                )) &&
+            (identical(other.enabled, enabled) || const DeepCollectionEquality().equals(other.enabled, enabled)) &&
             (identical(other.searchEnabled, searchEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.searchEnabled,
-                  searchEnabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.searchEnabled, searchEnabled)) &&
             (identical(other.isManuallyDisabled, isManuallyDisabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isManuallyDisabled,
-                  isManuallyDisabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.isManuallyDisabled, isManuallyDisabled)) &&
             (identical(other.crawlLinksRef, crawlLinksRef) ||
-                const DeepCollectionEquality().equals(
-                  other.crawlLinksRef,
-                  crawlLinksRef,
-                )));
+                const DeepCollectionEquality().equals(other.crawlLinksRef, crawlLinksRef)));
   }
 
   @override
@@ -4141,125 +4210,50 @@ class ICrawlLink {
     return identical(this, other) ||
         (other is ICrawlLink &&
             (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
-            (identical(other.mediaId, mediaId) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaId,
-                  mediaId,
-                )) &&
+            (identical(other.mediaId, mediaId) || const DeepCollectionEquality().equals(other.mediaId, mediaId)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.secondName, secondName) ||
-                const DeepCollectionEquality().equals(
-                  other.secondName,
-                  secondName,
-                )) &&
+                const DeepCollectionEquality().equals(other.secondName, secondName)) &&
             (identical(other.formattedName, formattedName) ||
-                const DeepCollectionEquality().equals(
-                  other.formattedName,
-                  formattedName,
-                )) &&
+                const DeepCollectionEquality().equals(other.formattedName, formattedName)) &&
             (identical(other.providerId, providerId) ||
-                const DeepCollectionEquality().equals(
-                  other.providerId,
-                  providerId,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerId, providerId)) &&
             (identical(other.providerRef, providerRef) ||
-                const DeepCollectionEquality().equals(
-                  other.providerRef,
-                  providerRef,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerRef, providerRef)) &&
             (identical(other.providerItemId, providerItemId) ||
-                const DeepCollectionEquality().equals(
-                  other.providerItemId,
-                  providerItemId,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerItemId, providerItemId)) &&
             (identical(other.providerCategory, providerCategory) ||
-                const DeepCollectionEquality().equals(
-                  other.providerCategory,
-                  providerCategory,
-                )) &&
-            (identical(other.category, category) ||
-                const DeepCollectionEquality().equals(
-                  other.category,
-                  category,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerCategory, providerCategory)) &&
+            (identical(other.category, category) || const DeepCollectionEquality().equals(other.category, category)) &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.thumbnailUrl,
-                  thumbnailUrl,
-                )) &&
+                const DeepCollectionEquality().equals(other.thumbnailUrl, thumbnailUrl)) &&
             (identical(other.airedEpisodesCount, airedEpisodesCount) ||
-                const DeepCollectionEquality().equals(
-                  other.airedEpisodesCount,
-                  airedEpisodesCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.airedEpisodesCount, airedEpisodesCount)) &&
             (identical(other.totalEpisodesCount, totalEpisodesCount) ||
-                const DeepCollectionEquality().equals(
-                  other.totalEpisodesCount,
-                  totalEpisodesCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalEpisodesCount, totalEpisodesCount)) &&
             (identical(other.season, season) || const DeepCollectionEquality().equals(other.season, season)) &&
-            (identical(other.quality, quality) ||
-                const DeepCollectionEquality().equals(
-                  other.quality,
-                  quality,
-                )) &&
-            (identical(other.version, version) ||
-                const DeepCollectionEquality().equals(
-                  other.version,
-                  version,
-                )) &&
+            (identical(other.quality, quality) || const DeepCollectionEquality().equals(other.quality, quality)) &&
+            (identical(other.version, version) || const DeepCollectionEquality().equals(other.version, version)) &&
             (identical(other.productionYear, productionYear) ||
-                const DeepCollectionEquality().equals(
-                  other.productionYear,
-                  productionYear,
-                )) &&
+                const DeepCollectionEquality().equals(other.productionYear, productionYear)) &&
             (identical(other.lastChecked, lastChecked) ||
-                const DeepCollectionEquality().equals(
-                  other.lastChecked,
-                  lastChecked,
-                )) &&
+                const DeepCollectionEquality().equals(other.lastChecked, lastChecked)) &&
             (identical(other.downloaded, downloaded) ||
-                const DeepCollectionEquality().equals(
-                  other.downloaded,
-                  downloaded,
-                )) &&
-            (identical(other.hasError, hasError) ||
-                const DeepCollectionEquality().equals(
-                  other.hasError,
-                  hasError,
-                )) &&
+                const DeepCollectionEquality().equals(other.downloaded, downloaded)) &&
+            (identical(other.hasError, hasError) || const DeepCollectionEquality().equals(other.hasError, hasError)) &&
             (identical(other.createdBy, createdBy) ||
-                const DeepCollectionEquality().equals(
-                  other.createdBy,
-                  createdBy,
-                )) &&
-            (identical(other.authorId, authorId) ||
-                const DeepCollectionEquality().equals(
-                  other.authorId,
-                  authorId,
-                )) &&
+                const DeepCollectionEquality().equals(other.createdBy, createdBy)) &&
+            (identical(other.authorId, authorId) || const DeepCollectionEquality().equals(other.authorId, authorId)) &&
             (identical(other.isEnabled, isEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isEnabled,
-                  isEnabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.isEnabled, isEnabled)) &&
             (identical(other.createdAt, createdAt) ||
-                const DeepCollectionEquality().equals(
-                  other.createdAt,
-                  createdAt,
-                )) &&
+                const DeepCollectionEquality().equals(other.createdAt, createdAt)) &&
             (identical(other.origin, origin) || const DeepCollectionEquality().equals(other.origin, origin)) &&
             (identical(other.mediaServerType, mediaServerType) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaServerType,
-                  mediaServerType,
-                )) &&
+                const DeepCollectionEquality().equals(other.mediaServerType, mediaServerType)) &&
             (identical(other.runningCrawl, runningCrawl) ||
-                const DeepCollectionEquality().equals(
-                  other.runningCrawl,
-                  runningCrawl,
-                )));
+                const DeepCollectionEquality().equals(other.runningCrawl, runningCrawl)));
   }
 
   @override
@@ -4470,17 +4464,9 @@ class IScheduledCrawl {
   final String? url;
   @JsonKey(name: 'thumbnailUrl', includeIfNull: false)
   final String? thumbnailUrl;
-  @JsonKey(
-    name: 'downloadLinks',
-    includeIfNull: false,
-    defaultValue: <DownloadLink>[],
-  )
+  @JsonKey(name: 'downloadLinks', includeIfNull: false, defaultValue: <DownloadLink>[])
   final List<DownloadLink>? downloadLinks;
-  @JsonKey(
-    name: 'extractedLinks',
-    includeIfNull: false,
-    defaultValue: <DownloadLink>[],
-  )
+  @JsonKey(name: 'extractedLinks', includeIfNull: false, defaultValue: <DownloadLink>[])
   final List<DownloadLink>? extractedLinks;
   @JsonKey(name: 'failedEpisodes', includeIfNull: false, defaultValue: <int>[])
   final List<int>? failedEpisodes;
@@ -4509,74 +4495,34 @@ class IScheduledCrawl {
         (other is IScheduledCrawl &&
             (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.crawlLinkId, crawlLinkId) ||
-                const DeepCollectionEquality().equals(
-                  other.crawlLinkId,
-                  crawlLinkId,
-                )) &&
+                const DeepCollectionEquality().equals(other.crawlLinkId, crawlLinkId)) &&
             (identical(other.jobId, jobId) || const DeepCollectionEquality().equals(other.jobId, jobId)) &&
             (identical(other.crawlLinkRef, crawlLinkRef) ||
-                const DeepCollectionEquality().equals(
-                  other.crawlLinkRef,
-                  crawlLinkRef,
-                )) &&
+                const DeepCollectionEquality().equals(other.crawlLinkRef, crawlLinkRef)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
             (identical(other.mediaName, mediaName) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaName,
-                  mediaName,
-                )) &&
+                const DeepCollectionEquality().equals(other.mediaName, mediaName)) &&
             (identical(other.mediaFolder, mediaFolder) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaFolder,
-                  mediaFolder,
-                )) &&
+                const DeepCollectionEquality().equals(other.mediaFolder, mediaFolder)) &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.thumbnailUrl,
-                  thumbnailUrl,
-                )) &&
+                const DeepCollectionEquality().equals(other.thumbnailUrl, thumbnailUrl)) &&
             (identical(other.downloadLinks, downloadLinks) ||
-                const DeepCollectionEquality().equals(
-                  other.downloadLinks,
-                  downloadLinks,
-                )) &&
+                const DeepCollectionEquality().equals(other.downloadLinks, downloadLinks)) &&
             (identical(other.extractedLinks, extractedLinks) ||
-                const DeepCollectionEquality().equals(
-                  other.extractedLinks,
-                  extractedLinks,
-                )) &&
+                const DeepCollectionEquality().equals(other.extractedLinks, extractedLinks)) &&
             (identical(other.failedEpisodes, failedEpisodes) ||
-                const DeepCollectionEquality().equals(
-                  other.failedEpisodes,
-                  failedEpisodes,
-                )) &&
+                const DeepCollectionEquality().equals(other.failedEpisodes, failedEpisodes)) &&
             (identical(other.successfulDownloads, successfulDownloads) ||
-                const DeepCollectionEquality().equals(
-                  other.successfulDownloads,
-                  successfulDownloads,
-                )) &&
+                const DeepCollectionEquality().equals(other.successfulDownloads, successfulDownloads)) &&
             (identical(other.skippedDownloads, skippedDownloads) ||
-                const DeepCollectionEquality().equals(
-                  other.skippedDownloads,
-                  skippedDownloads,
-                )) &&
+                const DeepCollectionEquality().equals(other.skippedDownloads, skippedDownloads)) &&
             (identical(other.status, status) || const DeepCollectionEquality().equals(other.status, status)) &&
-            (identical(other.hasError, hasError) ||
-                const DeepCollectionEquality().equals(
-                  other.hasError,
-                  hasError,
-                )) &&
+            (identical(other.hasError, hasError) || const DeepCollectionEquality().equals(other.hasError, hasError)) &&
             (identical(other.createdAt, createdAt) ||
-                const DeepCollectionEquality().equals(
-                  other.createdAt,
-                  createdAt,
-                )) &&
+                const DeepCollectionEquality().equals(other.createdAt, createdAt)) &&
             (identical(other.extractedItemInfo, extractedItemInfo) ||
-                const DeepCollectionEquality().equals(
-                  other.extractedItemInfo,
-                  extractedItemInfo,
-                )));
+                const DeepCollectionEquality().equals(other.extractedItemInfo, extractedItemInfo)));
   }
 
   @override
@@ -4741,37 +4687,15 @@ class DownloadLink {
         (other is DownloadLink &&
             (identical(other.index, index) || const DeepCollectionEquality().equals(other.index, index)) &&
             (identical(other.link, link) || const DeepCollectionEquality().equals(other.link, link)) &&
-            (identical(other.version, version) ||
-                const DeepCollectionEquality().equals(
-                  other.version,
-                  version,
-                )) &&
+            (identical(other.version, version) || const DeepCollectionEquality().equals(other.version, version)) &&
             (identical(other.qualityLabel, qualityLabel) ||
-                const DeepCollectionEquality().equals(
-                  other.qualityLabel,
-                  qualityLabel,
-                )) &&
-            (identical(other.quality, quality) ||
-                const DeepCollectionEquality().equals(
-                  other.quality,
-                  quality,
-                )) &&
+                const DeepCollectionEquality().equals(other.qualityLabel, qualityLabel)) &&
+            (identical(other.quality, quality) || const DeepCollectionEquality().equals(other.quality, quality)) &&
             (identical(other.size, size) || const DeepCollectionEquality().equals(other.size, size)) &&
-            (identical(other.sizeUnit, sizeUnit) ||
-                const DeepCollectionEquality().equals(
-                  other.sizeUnit,
-                  sizeUnit,
-                )) &&
-            (identical(other.fileHost, fileHost) ||
-                const DeepCollectionEquality().equals(
-                  other.fileHost,
-                  fileHost,
-                )) &&
+            (identical(other.sizeUnit, sizeUnit) || const DeepCollectionEquality().equals(other.sizeUnit, sizeUnit)) &&
+            (identical(other.fileHost, fileHost) || const DeepCollectionEquality().equals(other.fileHost, fileHost)) &&
             (identical(other.isFullSeason, isFullSeason) ||
-                const DeepCollectionEquality().equals(
-                  other.isFullSeason,
-                  isFullSeason,
-                )));
+                const DeepCollectionEquality().equals(other.isFullSeason, isFullSeason)));
   }
 
   @override
@@ -4900,11 +4824,7 @@ class IExtractedItemInfo {
     fromJson: mediaCategoryNullableFromJson,
   )
   final enums.MediaCategory? category;
-  @JsonKey(
-    name: 'downloadLinks',
-    includeIfNull: false,
-    defaultValue: <DownloadLink>[],
-  )
+  @JsonKey(name: 'downloadLinks', includeIfNull: false, defaultValue: <DownloadLink>[])
   final List<DownloadLink>? downloadLinks;
   @JsonKey(name: 'thumbnailUrl', includeIfNull: false)
   final String? thumbnailUrl;
@@ -4914,78 +4834,32 @@ class IExtractedItemInfo {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is IExtractedItemInfo &&
-            (identical(other.provider, provider) ||
-                const DeepCollectionEquality().equals(
-                  other.provider,
-                  provider,
-                )) &&
+            (identical(other.provider, provider) || const DeepCollectionEquality().equals(other.provider, provider)) &&
             (identical(other.title, title) || const DeepCollectionEquality().equals(other.title, title)) &&
             (identical(other.originalTitle, originalTitle) ||
-                const DeepCollectionEquality().equals(
-                  other.originalTitle,
-                  originalTitle,
-                )) &&
+                const DeepCollectionEquality().equals(other.originalTitle, originalTitle)) &&
             (identical(other.relativeUrl, relativeUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.relativeUrl,
-                  relativeUrl,
-                )) &&
-            (identical(other.version, version) ||
-                const DeepCollectionEquality().equals(
-                  other.version,
-                  version,
-                )) &&
+                const DeepCollectionEquality().equals(other.relativeUrl, relativeUrl)) &&
+            (identical(other.version, version) || const DeepCollectionEquality().equals(other.version, version)) &&
             (identical(other.providerId, providerId) ||
-                const DeepCollectionEquality().equals(
-                  other.providerId,
-                  providerId,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerId, providerId)) &&
             (identical(other.season, season) || const DeepCollectionEquality().equals(other.season, season)) &&
             (identical(other.airedEpisodesCount, airedEpisodesCount) ||
-                const DeepCollectionEquality().equals(
-                  other.airedEpisodesCount,
-                  airedEpisodesCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.airedEpisodesCount, airedEpisodesCount)) &&
             (identical(other.totalEpisodesCount, totalEpisodesCount) ||
-                const DeepCollectionEquality().equals(
-                  other.totalEpisodesCount,
-                  totalEpisodesCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalEpisodesCount, totalEpisodesCount)) &&
             (identical(other.seasonCount, seasonCount) ||
-                const DeepCollectionEquality().equals(
-                  other.seasonCount,
-                  seasonCount,
-                )) &&
-            (identical(other.quality, quality) ||
-                const DeepCollectionEquality().equals(
-                  other.quality,
-                  quality,
-                )) &&
+                const DeepCollectionEquality().equals(other.seasonCount, seasonCount)) &&
+            (identical(other.quality, quality) || const DeepCollectionEquality().equals(other.quality, quality)) &&
             (identical(other.providerCategory, providerCategory) ||
-                const DeepCollectionEquality().equals(
-                  other.providerCategory,
-                  providerCategory,
-                )) &&
+                const DeepCollectionEquality().equals(other.providerCategory, providerCategory)) &&
             (identical(other.productionYear, productionYear) ||
-                const DeepCollectionEquality().equals(
-                  other.productionYear,
-                  productionYear,
-                )) &&
-            (identical(other.category, category) ||
-                const DeepCollectionEquality().equals(
-                  other.category,
-                  category,
-                )) &&
+                const DeepCollectionEquality().equals(other.productionYear, productionYear)) &&
+            (identical(other.category, category) || const DeepCollectionEquality().equals(other.category, category)) &&
             (identical(other.downloadLinks, downloadLinks) ||
-                const DeepCollectionEquality().equals(
-                  other.downloadLinks,
-                  downloadLinks,
-                )) &&
+                const DeepCollectionEquality().equals(other.downloadLinks, downloadLinks)) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.thumbnailUrl,
-                  thumbnailUrl,
-                )));
+                const DeepCollectionEquality().equals(other.thumbnailUrl, thumbnailUrl)));
   }
 
   @override
@@ -5092,13 +4966,7 @@ extension $IExtractedItemInfoExtension on IExtractedItemInfo {
 
 @JsonSerializable(explicitToJson: true)
 class UpdateProviderRequest {
-  const UpdateProviderRequest({
-    this.displayName,
-    this.url,
-    this.enabled,
-    this.searchEnabled,
-    this.isManuallyDisabled,
-  });
+  const UpdateProviderRequest({this.displayName, this.url, this.enabled, this.searchEnabled, this.isManuallyDisabled});
 
   factory UpdateProviderRequest.fromJson(Map<String, dynamic> json) => _$UpdateProviderRequestFromJson(json);
 
@@ -5122,26 +4990,13 @@ class UpdateProviderRequest {
     return identical(this, other) ||
         (other is UpdateProviderRequest &&
             (identical(other.displayName, displayName) ||
-                const DeepCollectionEquality().equals(
-                  other.displayName,
-                  displayName,
-                )) &&
+                const DeepCollectionEquality().equals(other.displayName, displayName)) &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
-            (identical(other.enabled, enabled) ||
-                const DeepCollectionEquality().equals(
-                  other.enabled,
-                  enabled,
-                )) &&
+            (identical(other.enabled, enabled) || const DeepCollectionEquality().equals(other.enabled, enabled)) &&
             (identical(other.searchEnabled, searchEnabled) ||
-                const DeepCollectionEquality().equals(
-                  other.searchEnabled,
-                  searchEnabled,
-                )) &&
+                const DeepCollectionEquality().equals(other.searchEnabled, searchEnabled)) &&
             (identical(other.isManuallyDisabled, isManuallyDisabled) ||
-                const DeepCollectionEquality().equals(
-                  other.isManuallyDisabled,
-                  isManuallyDisabled,
-                )));
+                const DeepCollectionEquality().equals(other.isManuallyDisabled, isManuallyDisabled)));
   }
 
   @override
@@ -5193,13 +5048,7 @@ extension $UpdateProviderRequestExtension on UpdateProviderRequest {
 
 @JsonSerializable(explicitToJson: true)
 class ISearchFilter {
-  const ISearchFilter({
-    this.label,
-    this.name,
-    this.$value,
-    this.valueLabel,
-    this.options,
-  });
+  const ISearchFilter({this.label, this.name, this.value, this.valueLabel, this.options});
 
   factory ISearchFilter.fromJson(Map<String, dynamic> json) => _$ISearchFilterFromJson(json);
 
@@ -5211,14 +5060,10 @@ class ISearchFilter {
   @JsonKey(name: 'name', includeIfNull: false)
   final String? name;
   @JsonKey(name: 'value', includeIfNull: false)
-  final String? $value;
+  final String? value;
   @JsonKey(name: 'valueLabel', includeIfNull: false)
   final String? valueLabel;
-  @JsonKey(
-    name: 'options',
-    includeIfNull: false,
-    defaultValue: <ISearchFilterOption>[],
-  )
+  @JsonKey(name: 'options', includeIfNull: false, defaultValue: <ISearchFilterOption>[])
   final List<ISearchFilterOption>? options;
   static const fromJsonFactory = _$ISearchFilterFromJson;
 
@@ -5228,12 +5073,9 @@ class ISearchFilter {
         (other is ISearchFilter &&
             (identical(other.label, label) || const DeepCollectionEquality().equals(other.label, label)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
-            (identical(other.$value, $value) || const DeepCollectionEquality().equals(other.$value, $value)) &&
+            (identical(other.value, value) || const DeepCollectionEquality().equals(other.value, value)) &&
             (identical(other.valueLabel, valueLabel) ||
-                const DeepCollectionEquality().equals(
-                  other.valueLabel,
-                  valueLabel,
-                )) &&
+                const DeepCollectionEquality().equals(other.valueLabel, valueLabel)) &&
             (identical(other.options, options) || const DeepCollectionEquality().equals(other.options, options)));
   }
 
@@ -5244,7 +5086,7 @@ class ISearchFilter {
   int get hashCode =>
       const DeepCollectionEquality().hash(label) ^
       const DeepCollectionEquality().hash(name) ^
-      const DeepCollectionEquality().hash($value) ^
+      const DeepCollectionEquality().hash(value) ^
       const DeepCollectionEquality().hash(valueLabel) ^
       const DeepCollectionEquality().hash(options) ^
       runtimeType.hashCode;
@@ -5254,14 +5096,14 @@ extension $ISearchFilterExtension on ISearchFilter {
   ISearchFilter copyWith({
     String? label,
     String? name,
-    String? $value,
+    String? value,
     String? valueLabel,
     List<ISearchFilterOption>? options,
   }) {
     return ISearchFilter(
       label: label ?? this.label,
       name: name ?? this.name,
-      $value: $value ?? this.$value,
+      value: value ?? this.value,
       valueLabel: valueLabel ?? this.valueLabel,
       options: options ?? this.options,
     );
@@ -5270,14 +5112,14 @@ extension $ISearchFilterExtension on ISearchFilter {
   ISearchFilter copyWithWrapped({
     Wrapped<String?>? label,
     Wrapped<String?>? name,
-    Wrapped<String?>? $value,
+    Wrapped<String?>? value,
     Wrapped<String?>? valueLabel,
     Wrapped<List<ISearchFilterOption>?>? options,
   }) {
     return ISearchFilter(
       label: (label != null ? label.value : this.label),
       name: (name != null ? name.value : this.name),
-      $value: ($value != null ? $value.value : this.$value),
+      value: (value != null ? value.value : this.value),
       valueLabel: (valueLabel != null ? valueLabel.value : this.valueLabel),
       options: (options != null ? options.value : this.options),
     );
@@ -5286,7 +5128,7 @@ extension $ISearchFilterExtension on ISearchFilter {
 
 @JsonSerializable(explicitToJson: true)
 class ISearchFilterOption {
-  const ISearchFilterOption({this.label, this.$value});
+  const ISearchFilterOption({this.label, this.value});
 
   factory ISearchFilterOption.fromJson(Map<String, dynamic> json) => _$ISearchFilterOptionFromJson(json);
 
@@ -5296,7 +5138,7 @@ class ISearchFilterOption {
   @JsonKey(name: 'label', includeIfNull: false)
   final String? label;
   @JsonKey(name: 'value', includeIfNull: false)
-  final String? $value;
+  final String? value;
   static const fromJsonFactory = _$ISearchFilterOptionFromJson;
 
   @override
@@ -5304,7 +5146,7 @@ class ISearchFilterOption {
     return identical(this, other) ||
         (other is ISearchFilterOption &&
             (identical(other.label, label) || const DeepCollectionEquality().equals(other.label, label)) &&
-            (identical(other.$value, $value) || const DeepCollectionEquality().equals(other.$value, $value)));
+            (identical(other.value, value) || const DeepCollectionEquality().equals(other.value, value)));
   }
 
   @override
@@ -5312,24 +5154,18 @@ class ISearchFilterOption {
 
   @override
   int get hashCode =>
-      const DeepCollectionEquality().hash(label) ^ const DeepCollectionEquality().hash($value) ^ runtimeType.hashCode;
+      const DeepCollectionEquality().hash(label) ^ const DeepCollectionEquality().hash(value) ^ runtimeType.hashCode;
 }
 
 extension $ISearchFilterOptionExtension on ISearchFilterOption {
-  ISearchFilterOption copyWith({String? label, String? $value}) {
-    return ISearchFilterOption(
-      label: label ?? this.label,
-      $value: $value ?? this.$value,
-    );
+  ISearchFilterOption copyWith({String? label, String? value}) {
+    return ISearchFilterOption(label: label ?? this.label, value: value ?? this.value);
   }
 
-  ISearchFilterOption copyWithWrapped({
-    Wrapped<String?>? label,
-    Wrapped<String?>? $value,
-  }) {
+  ISearchFilterOption copyWithWrapped({Wrapped<String?>? label, Wrapped<String?>? value}) {
     return ISearchFilterOption(
       label: (label != null ? label.value : this.label),
-      $value: ($value != null ? $value.value : this.$value),
+      value: (value != null ? value.value : this.value),
     );
   }
 }
@@ -5344,9 +5180,7 @@ class PaginatedResponseOfProviderSearchItemDto {
     this.items,
   });
 
-  factory PaginatedResponseOfProviderSearchItemDto.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory PaginatedResponseOfProviderSearchItemDto.fromJson(Map<String, dynamic> json) =>
       _$PaginatedResponseOfProviderSearchItemDtoFromJson(json);
 
   static const toJsonFactory = _$PaginatedResponseOfProviderSearchItemDtoToJson;
@@ -5360,11 +5194,7 @@ class PaginatedResponseOfProviderSearchItemDto {
   final int? pageSize;
   @JsonKey(name: 'totalCount', includeIfNull: false)
   final int? totalCount;
-  @JsonKey(
-    name: 'items',
-    includeIfNull: false,
-    defaultValue: <ProviderSearchItemDto>[],
-  )
+  @JsonKey(name: 'items', includeIfNull: false, defaultValue: <ProviderSearchItemDto>[])
   final List<ProviderSearchItemDto>? items;
   static const fromJsonFactory = _$PaginatedResponseOfProviderSearchItemDtoFromJson;
 
@@ -5373,25 +5203,12 @@ class PaginatedResponseOfProviderSearchItemDto {
     return identical(this, other) ||
         (other is PaginatedResponseOfProviderSearchItemDto &&
             (identical(other.currentPage, currentPage) ||
-                const DeepCollectionEquality().equals(
-                  other.currentPage,
-                  currentPage,
-                )) &&
+                const DeepCollectionEquality().equals(other.currentPage, currentPage)) &&
             (identical(other.totalPages, totalPages) ||
-                const DeepCollectionEquality().equals(
-                  other.totalPages,
-                  totalPages,
-                )) &&
-            (identical(other.pageSize, pageSize) ||
-                const DeepCollectionEquality().equals(
-                  other.pageSize,
-                  pageSize,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalPages, totalPages)) &&
+            (identical(other.pageSize, pageSize) || const DeepCollectionEquality().equals(other.pageSize, pageSize)) &&
             (identical(other.totalCount, totalCount) ||
-                const DeepCollectionEquality().equals(
-                  other.totalCount,
-                  totalCount,
-                )) &&
+                const DeepCollectionEquality().equals(other.totalCount, totalCount)) &&
             (identical(other.items, items) || const DeepCollectionEquality().equals(other.items, items)));
   }
 
@@ -5487,27 +5304,13 @@ class ProviderSearchItemDto {
         (other is ProviderSearchItemDto &&
             (identical(other.title, title) || const DeepCollectionEquality().equals(other.title, title)) &&
             (identical(other.description, description) ||
-                const DeepCollectionEquality().equals(
-                  other.description,
-                  description,
-                )) &&
+                const DeepCollectionEquality().equals(other.description, description)) &&
             (identical(other.url, url) || const DeepCollectionEquality().equals(other.url, url)) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.thumbnailUrl,
-                  thumbnailUrl,
-                )) &&
+                const DeepCollectionEquality().equals(other.thumbnailUrl, thumbnailUrl)) &&
             (identical(other.season, season) || const DeepCollectionEquality().equals(other.season, season)) &&
-            (identical(other.quality, quality) ||
-                const DeepCollectionEquality().equals(
-                  other.quality,
-                  quality,
-                )) &&
-            (identical(other.language, language) ||
-                const DeepCollectionEquality().equals(
-                  other.language,
-                  language,
-                )) &&
+            (identical(other.quality, quality) || const DeepCollectionEquality().equals(other.quality, quality)) &&
+            (identical(other.language, language) || const DeepCollectionEquality().equals(other.language, language)) &&
             (identical(other.year, year) || const DeepCollectionEquality().equals(other.year, year)) &&
             (identical(other.score, score) || const DeepCollectionEquality().equals(other.score, score)));
   }
@@ -5596,11 +5399,7 @@ class ApiMediaSearchRequest {
   static const toJsonFactory = _$ApiMediaSearchRequestToJson;
   Map<String, dynamic> toJson() => _$ApiMediaSearchRequestToJson(this);
 
-  @JsonKey(
-    name: 'filters',
-    includeIfNull: false,
-    defaultValue: <SearchFilter>[],
-  )
+  @JsonKey(name: 'filters', includeIfNull: false, defaultValue: <SearchFilter>[])
   final List<SearchFilter>? filters;
   @JsonKey(name: 'page', includeIfNull: false)
   final int? page;
@@ -5625,33 +5424,14 @@ class ApiMediaSearchRequest {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is ApiMediaSearchRequest &&
-            (identical(other.filters, filters) ||
-                const DeepCollectionEquality().equals(
-                  other.filters,
-                  filters,
-                )) &&
+            (identical(other.filters, filters) || const DeepCollectionEquality().equals(other.filters, filters)) &&
             (identical(other.page, page) || const DeepCollectionEquality().equals(other.page, page)) &&
-            (identical(other.pageSize, pageSize) ||
-                const DeepCollectionEquality().equals(
-                  other.pageSize,
-                  pageSize,
-                )) &&
+            (identical(other.pageSize, pageSize) || const DeepCollectionEquality().equals(other.pageSize, pageSize)) &&
             (identical(other.query, query) || const DeepCollectionEquality().equals(other.query, query)) &&
-            (identical(other.category, category) ||
-                const DeepCollectionEquality().equals(
-                  other.category,
-                  category,
-                )) &&
+            (identical(other.category, category) || const DeepCollectionEquality().equals(other.category, category)) &&
             (identical(other.exactMatch, exactMatch) ||
-                const DeepCollectionEquality().equals(
-                  other.exactMatch,
-                  exactMatch,
-                )) &&
-            (identical(other.minScore, minScore) ||
-                const DeepCollectionEquality().equals(
-                  other.minScore,
-                  minScore,
-                )));
+                const DeepCollectionEquality().equals(other.exactMatch, exactMatch)) &&
+            (identical(other.minScore, minScore) || const DeepCollectionEquality().equals(other.minScore, minScore)));
   }
 
   @override
@@ -5713,13 +5493,7 @@ extension $ApiMediaSearchRequestExtension on ApiMediaSearchRequest {
 
 @JsonSerializable(explicitToJson: true)
 class SearchFilter {
-  const SearchFilter({
-    this.label,
-    this.name,
-    this.$value,
-    this.valueLabel,
-    this.options,
-  });
+  const SearchFilter({this.label, this.name, this.value, this.valueLabel, this.options});
 
   factory SearchFilter.fromJson(Map<String, dynamic> json) => _$SearchFilterFromJson(json);
 
@@ -5731,14 +5505,10 @@ class SearchFilter {
   @JsonKey(name: 'name', includeIfNull: false)
   final String? name;
   @JsonKey(name: 'value', includeIfNull: false)
-  final String? $value;
+  final String? value;
   @JsonKey(name: 'valueLabel', includeIfNull: false)
   final String? valueLabel;
-  @JsonKey(
-    name: 'options',
-    includeIfNull: false,
-    defaultValue: <ISearchFilterOption>[],
-  )
+  @JsonKey(name: 'options', includeIfNull: false, defaultValue: <ISearchFilterOption>[])
   final List<ISearchFilterOption>? options;
   static const fromJsonFactory = _$SearchFilterFromJson;
 
@@ -5748,12 +5518,9 @@ class SearchFilter {
         (other is SearchFilter &&
             (identical(other.label, label) || const DeepCollectionEquality().equals(other.label, label)) &&
             (identical(other.name, name) || const DeepCollectionEquality().equals(other.name, name)) &&
-            (identical(other.$value, $value) || const DeepCollectionEquality().equals(other.$value, $value)) &&
+            (identical(other.value, value) || const DeepCollectionEquality().equals(other.value, value)) &&
             (identical(other.valueLabel, valueLabel) ||
-                const DeepCollectionEquality().equals(
-                  other.valueLabel,
-                  valueLabel,
-                )) &&
+                const DeepCollectionEquality().equals(other.valueLabel, valueLabel)) &&
             (identical(other.options, options) || const DeepCollectionEquality().equals(other.options, options)));
   }
 
@@ -5764,7 +5531,7 @@ class SearchFilter {
   int get hashCode =>
       const DeepCollectionEquality().hash(label) ^
       const DeepCollectionEquality().hash(name) ^
-      const DeepCollectionEquality().hash($value) ^
+      const DeepCollectionEquality().hash(value) ^
       const DeepCollectionEquality().hash(valueLabel) ^
       const DeepCollectionEquality().hash(options) ^
       runtimeType.hashCode;
@@ -5774,14 +5541,14 @@ extension $SearchFilterExtension on SearchFilter {
   SearchFilter copyWith({
     String? label,
     String? name,
-    String? $value,
+    String? value,
     String? valueLabel,
     List<ISearchFilterOption>? options,
   }) {
     return SearchFilter(
       label: label ?? this.label,
       name: name ?? this.name,
-      $value: $value ?? this.$value,
+      value: value ?? this.value,
       valueLabel: valueLabel ?? this.valueLabel,
       options: options ?? this.options,
     );
@@ -5790,14 +5557,14 @@ extension $SearchFilterExtension on SearchFilter {
   SearchFilter copyWithWrapped({
     Wrapped<String?>? label,
     Wrapped<String?>? name,
-    Wrapped<String?>? $value,
+    Wrapped<String?>? value,
     Wrapped<String?>? valueLabel,
     Wrapped<List<ISearchFilterOption>?>? options,
   }) {
     return SearchFilter(
       label: (label != null ? label.value : this.label),
       name: (name != null ? name.value : this.name),
-      $value: ($value != null ? $value.value : this.$value),
+      value: (value != null ? value.value : this.value),
       valueLabel: (valueLabel != null ? valueLabel.value : this.valueLabel),
       options: (options != null ? options.value : this.options),
     );
@@ -5806,12 +5573,7 @@ extension $SearchFilterExtension on SearchFilter {
 
 @JsonSerializable(explicitToJson: true)
 class MediaSearchRequest {
-  const MediaSearchRequest({
-    this.query,
-    this.category,
-    this.exactMatch,
-    this.minScore,
-  });
+  const MediaSearchRequest({this.query, this.category, this.exactMatch, this.minScore});
 
   factory MediaSearchRequest.fromJson(Map<String, dynamic> json) => _$MediaSearchRequestFromJson(json);
 
@@ -5838,21 +5600,10 @@ class MediaSearchRequest {
     return identical(this, other) ||
         (other is MediaSearchRequest &&
             (identical(other.query, query) || const DeepCollectionEquality().equals(other.query, query)) &&
-            (identical(other.category, category) ||
-                const DeepCollectionEquality().equals(
-                  other.category,
-                  category,
-                )) &&
+            (identical(other.category, category) || const DeepCollectionEquality().equals(other.category, category)) &&
             (identical(other.exactMatch, exactMatch) ||
-                const DeepCollectionEquality().equals(
-                  other.exactMatch,
-                  exactMatch,
-                )) &&
-            (identical(other.minScore, minScore) ||
-                const DeepCollectionEquality().equals(
-                  other.minScore,
-                  minScore,
-                )));
+                const DeepCollectionEquality().equals(other.exactMatch, exactMatch)) &&
+            (identical(other.minScore, minScore) || const DeepCollectionEquality().equals(other.minScore, minScore)));
   }
 
   @override
@@ -5868,12 +5619,7 @@ class MediaSearchRequest {
 }
 
 extension $MediaSearchRequestExtension on MediaSearchRequest {
-  MediaSearchRequest copyWith({
-    String? query,
-    enums.MediaCategory? category,
-    bool? exactMatch,
-    double? minScore,
-  }) {
+  MediaSearchRequest copyWith({String? query, enums.MediaCategory? category, bool? exactMatch, double? minScore}) {
     return MediaSearchRequest(
       query: query ?? this.query,
       category: category ?? this.category,
@@ -5918,21 +5664,11 @@ class LiveTvSourceResult {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is LiveTvSourceResult &&
-            (identical(other.baseUrl, baseUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.baseUrl,
-                  baseUrl,
-                )) &&
+            (identical(other.baseUrl, baseUrl) || const DeepCollectionEquality().equals(other.baseUrl, baseUrl)) &&
             (identical(other.countries, countries) ||
-                const DeepCollectionEquality().equals(
-                  other.countries,
-                  countries,
-                )) &&
+                const DeepCollectionEquality().equals(other.countries, countries)) &&
             (identical(other.fromDatabase, fromDatabase) ||
-                const DeepCollectionEquality().equals(
-                  other.fromDatabase,
-                  fromDatabase,
-                )));
+                const DeepCollectionEquality().equals(other.fromDatabase, fromDatabase)));
   }
 
   @override
@@ -5947,11 +5683,7 @@ class LiveTvSourceResult {
 }
 
 extension $LiveTvSourceResultExtension on LiveTvSourceResult {
-  LiveTvSourceResult copyWith({
-    String? baseUrl,
-    List<String>? countries,
-    bool? fromDatabase,
-  }) {
+  LiveTvSourceResult copyWith({String? baseUrl, List<String>? countries, bool? fromDatabase}) {
     return LiveTvSourceResult(
       baseUrl: baseUrl ?? this.baseUrl,
       countries: countries ?? this.countries,
@@ -5991,16 +5723,9 @@ class UpdateLiveTvSourceRequest {
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is UpdateLiveTvSourceRequest &&
-            (identical(other.baseUrl, baseUrl) ||
-                const DeepCollectionEquality().equals(
-                  other.baseUrl,
-                  baseUrl,
-                )) &&
+            (identical(other.baseUrl, baseUrl) || const DeepCollectionEquality().equals(other.baseUrl, baseUrl)) &&
             (identical(other.countries, countries) ||
-                const DeepCollectionEquality().equals(
-                  other.countries,
-                  countries,
-                )));
+                const DeepCollectionEquality().equals(other.countries, countries)));
   }
 
   @override
@@ -6014,20 +5739,11 @@ class UpdateLiveTvSourceRequest {
 }
 
 extension $UpdateLiveTvSourceRequestExtension on UpdateLiveTvSourceRequest {
-  UpdateLiveTvSourceRequest copyWith({
-    String? baseUrl,
-    List<String>? countries,
-  }) {
-    return UpdateLiveTvSourceRequest(
-      baseUrl: baseUrl ?? this.baseUrl,
-      countries: countries ?? this.countries,
-    );
+  UpdateLiveTvSourceRequest copyWith({String? baseUrl, List<String>? countries}) {
+    return UpdateLiveTvSourceRequest(baseUrl: baseUrl ?? this.baseUrl, countries: countries ?? this.countries);
   }
 
-  UpdateLiveTvSourceRequest copyWithWrapped({
-    Wrapped<String?>? baseUrl,
-    Wrapped<List<String>?>? countries,
-  }) {
+  UpdateLiveTvSourceRequest copyWithWrapped({Wrapped<String?>? baseUrl, Wrapped<List<String>?>? countries}) {
     return UpdateLiveTvSourceRequest(
       baseUrl: (baseUrl != null ? baseUrl.value : this.baseUrl),
       countries: (countries != null ? countries.value : this.countries),
@@ -6036,17 +5752,396 @@ extension $UpdateLiveTvSourceRequestExtension on UpdateLiveTvSourceRequest {
 }
 
 @JsonSerializable(explicitToJson: true)
-class ApiTorrentsUploadPost$RequestBody {
-  const ApiTorrentsUploadPost$RequestBody({
-    this.file,
-    this.mediaName,
-    this.mediaCategory,
-    this.authorId,
+class ReadyNotificationDto {
+  const ReadyNotificationDto({
+    this.id,
+    this.kind,
+    this.crawlLinkId,
+    this.jellyfinItemId,
+    this.seriesId,
+    this.title,
+    this.seasonNumber,
+    this.episodeNumbers,
+    this.createdAt,
   });
 
-  factory ApiTorrentsUploadPost$RequestBody.fromJson(
-    Map<String, dynamic> json,
-  ) =>
+  factory ReadyNotificationDto.fromJson(Map<String, dynamic> json) => _$ReadyNotificationDtoFromJson(json);
+
+  static const toJsonFactory = _$ReadyNotificationDtoToJson;
+  Map<String, dynamic> toJson() => _$ReadyNotificationDtoToJson(this);
+
+  @JsonKey(name: 'id', includeIfNull: false)
+  final int? id;
+  @JsonKey(
+    name: 'kind',
+    includeIfNull: false,
+    toJson: readyNotificationKindNullableToJson,
+    fromJson: readyNotificationKindNullableFromJson,
+  )
+  final enums.ReadyNotificationKind? kind;
+  @JsonKey(name: 'crawlLinkId', includeIfNull: false)
+  final String? crawlLinkId;
+  @JsonKey(name: 'jellyfinItemId', includeIfNull: false)
+  final String? jellyfinItemId;
+  @JsonKey(name: 'seriesId', includeIfNull: false)
+  final String? seriesId;
+  @JsonKey(name: 'title', includeIfNull: false)
+  final String? title;
+  @JsonKey(name: 'seasonNumber', includeIfNull: false)
+  final int? seasonNumber;
+  @JsonKey(name: 'episodeNumbers', includeIfNull: false, defaultValue: <int>[])
+  final List<int>? episodeNumbers;
+  @JsonKey(name: 'createdAt', includeIfNull: false)
+  final DateTime? createdAt;
+  static const fromJsonFactory = _$ReadyNotificationDtoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ReadyNotificationDto &&
+            (identical(other.id, id) || const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.kind, kind) || const DeepCollectionEquality().equals(other.kind, kind)) &&
+            (identical(other.crawlLinkId, crawlLinkId) ||
+                const DeepCollectionEquality().equals(other.crawlLinkId, crawlLinkId)) &&
+            (identical(other.jellyfinItemId, jellyfinItemId) ||
+                const DeepCollectionEquality().equals(other.jellyfinItemId, jellyfinItemId)) &&
+            (identical(other.seriesId, seriesId) || const DeepCollectionEquality().equals(other.seriesId, seriesId)) &&
+            (identical(other.title, title) || const DeepCollectionEquality().equals(other.title, title)) &&
+            (identical(other.seasonNumber, seasonNumber) ||
+                const DeepCollectionEquality().equals(other.seasonNumber, seasonNumber)) &&
+            (identical(other.episodeNumbers, episodeNumbers) ||
+                const DeepCollectionEquality().equals(other.episodeNumbers, episodeNumbers)) &&
+            (identical(other.createdAt, createdAt) ||
+                const DeepCollectionEquality().equals(other.createdAt, createdAt)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(kind) ^
+      const DeepCollectionEquality().hash(crawlLinkId) ^
+      const DeepCollectionEquality().hash(jellyfinItemId) ^
+      const DeepCollectionEquality().hash(seriesId) ^
+      const DeepCollectionEquality().hash(title) ^
+      const DeepCollectionEquality().hash(seasonNumber) ^
+      const DeepCollectionEquality().hash(episodeNumbers) ^
+      const DeepCollectionEquality().hash(createdAt) ^
+      runtimeType.hashCode;
+}
+
+extension $ReadyNotificationDtoExtension on ReadyNotificationDto {
+  ReadyNotificationDto copyWith({
+    int? id,
+    enums.ReadyNotificationKind? kind,
+    String? crawlLinkId,
+    String? jellyfinItemId,
+    String? seriesId,
+    String? title,
+    int? seasonNumber,
+    List<int>? episodeNumbers,
+    DateTime? createdAt,
+  }) {
+    return ReadyNotificationDto(
+      id: id ?? this.id,
+      kind: kind ?? this.kind,
+      crawlLinkId: crawlLinkId ?? this.crawlLinkId,
+      jellyfinItemId: jellyfinItemId ?? this.jellyfinItemId,
+      seriesId: seriesId ?? this.seriesId,
+      title: title ?? this.title,
+      seasonNumber: seasonNumber ?? this.seasonNumber,
+      episodeNumbers: episodeNumbers ?? this.episodeNumbers,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  ReadyNotificationDto copyWithWrapped({
+    Wrapped<int?>? id,
+    Wrapped<enums.ReadyNotificationKind?>? kind,
+    Wrapped<String?>? crawlLinkId,
+    Wrapped<String?>? jellyfinItemId,
+    Wrapped<String?>? seriesId,
+    Wrapped<String?>? title,
+    Wrapped<int?>? seasonNumber,
+    Wrapped<List<int>?>? episodeNumbers,
+    Wrapped<DateTime?>? createdAt,
+  }) {
+    return ReadyNotificationDto(
+      id: (id != null ? id.value : this.id),
+      kind: (kind != null ? kind.value : this.kind),
+      crawlLinkId: (crawlLinkId != null ? crawlLinkId.value : this.crawlLinkId),
+      jellyfinItemId: (jellyfinItemId != null ? jellyfinItemId.value : this.jellyfinItemId),
+      seriesId: (seriesId != null ? seriesId.value : this.seriesId),
+      title: (title != null ? title.value : this.title),
+      seasonNumber: (seasonNumber != null ? seasonNumber.value : this.seasonNumber),
+      episodeNumbers: (episodeNumbers != null ? episodeNumbers.value : this.episodeNumbers),
+      createdAt: (createdAt != null ? createdAt.value : this.createdAt),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ReadyNotificationsResponse {
+  const ReadyNotificationsResponse({this.items, this.latestId, this.lastReadId, this.enabled});
+
+  factory ReadyNotificationsResponse.fromJson(Map<String, dynamic> json) => _$ReadyNotificationsResponseFromJson(json);
+
+  static const toJsonFactory = _$ReadyNotificationsResponseToJson;
+  Map<String, dynamic> toJson() => _$ReadyNotificationsResponseToJson(this);
+
+  @JsonKey(name: 'items', includeIfNull: false, defaultValue: <ReadyNotificationDto>[])
+  final List<ReadyNotificationDto>? items;
+  @JsonKey(name: 'latestId', includeIfNull: false)
+  final int? latestId;
+  @JsonKey(name: 'lastReadId', includeIfNull: false)
+  final int? lastReadId;
+  @JsonKey(name: 'enabled', includeIfNull: false)
+  final bool? enabled;
+  static const fromJsonFactory = _$ReadyNotificationsResponseFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ReadyNotificationsResponse &&
+            (identical(other.items, items) || const DeepCollectionEquality().equals(other.items, items)) &&
+            (identical(other.latestId, latestId) || const DeepCollectionEquality().equals(other.latestId, latestId)) &&
+            (identical(other.lastReadId, lastReadId) ||
+                const DeepCollectionEquality().equals(other.lastReadId, lastReadId)) &&
+            (identical(other.enabled, enabled) || const DeepCollectionEquality().equals(other.enabled, enabled)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(items) ^
+      const DeepCollectionEquality().hash(latestId) ^
+      const DeepCollectionEquality().hash(lastReadId) ^
+      const DeepCollectionEquality().hash(enabled) ^
+      runtimeType.hashCode;
+}
+
+extension $ReadyNotificationsResponseExtension on ReadyNotificationsResponse {
+  ReadyNotificationsResponse copyWith({
+    List<ReadyNotificationDto>? items,
+    int? latestId,
+    int? lastReadId,
+    bool? enabled,
+  }) {
+    return ReadyNotificationsResponse(
+      items: items ?? this.items,
+      latestId: latestId ?? this.latestId,
+      lastReadId: lastReadId ?? this.lastReadId,
+      enabled: enabled ?? this.enabled,
+    );
+  }
+
+  ReadyNotificationsResponse copyWithWrapped({
+    Wrapped<List<ReadyNotificationDto>?>? items,
+    Wrapped<int?>? latestId,
+    Wrapped<int?>? lastReadId,
+    Wrapped<bool?>? enabled,
+  }) {
+    return ReadyNotificationsResponse(
+      items: (items != null ? items.value : this.items),
+      latestId: (latestId != null ? latestId.value : this.latestId),
+      lastReadId: (lastReadId != null ? lastReadId.value : this.lastReadId),
+      enabled: (enabled != null ? enabled.value : this.enabled),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class NotificationPreferencesDto {
+  const NotificationPreferencesDto({this.enabled, this.onlyMine});
+
+  factory NotificationPreferencesDto.fromJson(Map<String, dynamic> json) => _$NotificationPreferencesDtoFromJson(json);
+
+  static const toJsonFactory = _$NotificationPreferencesDtoToJson;
+  Map<String, dynamic> toJson() => _$NotificationPreferencesDtoToJson(this);
+
+  @JsonKey(name: 'enabled', includeIfNull: false)
+  final bool? enabled;
+  @JsonKey(name: 'onlyMine', includeIfNull: false)
+  final bool? onlyMine;
+  static const fromJsonFactory = _$NotificationPreferencesDtoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is NotificationPreferencesDto &&
+            (identical(other.enabled, enabled) || const DeepCollectionEquality().equals(other.enabled, enabled)) &&
+            (identical(other.onlyMine, onlyMine) || const DeepCollectionEquality().equals(other.onlyMine, onlyMine)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(enabled) ^
+      const DeepCollectionEquality().hash(onlyMine) ^
+      runtimeType.hashCode;
+}
+
+extension $NotificationPreferencesDtoExtension on NotificationPreferencesDto {
+  NotificationPreferencesDto copyWith({bool? enabled, bool? onlyMine}) {
+    return NotificationPreferencesDto(enabled: enabled ?? this.enabled, onlyMine: onlyMine ?? this.onlyMine);
+  }
+
+  NotificationPreferencesDto copyWithWrapped({Wrapped<bool?>? enabled, Wrapped<bool?>? onlyMine}) {
+    return NotificationPreferencesDto(
+      enabled: (enabled != null ? enabled.value : this.enabled),
+      onlyMine: (onlyMine != null ? onlyMine.value : this.onlyMine),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class SeriesSubscriptionDto {
+  const SeriesSubscriptionDto({this.subscribed, this.tracked});
+
+  factory SeriesSubscriptionDto.fromJson(Map<String, dynamic> json) => _$SeriesSubscriptionDtoFromJson(json);
+
+  static const toJsonFactory = _$SeriesSubscriptionDtoToJson;
+  Map<String, dynamic> toJson() => _$SeriesSubscriptionDtoToJson(this);
+
+  @JsonKey(name: 'subscribed', includeIfNull: false)
+  final bool? subscribed;
+  @JsonKey(name: 'tracked', includeIfNull: false)
+  final bool? tracked;
+  static const fromJsonFactory = _$SeriesSubscriptionDtoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is SeriesSubscriptionDto &&
+            (identical(other.subscribed, subscribed) ||
+                const DeepCollectionEquality().equals(other.subscribed, subscribed)) &&
+            (identical(other.tracked, tracked) || const DeepCollectionEquality().equals(other.tracked, tracked)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(subscribed) ^
+      const DeepCollectionEquality().hash(tracked) ^
+      runtimeType.hashCode;
+}
+
+extension $SeriesSubscriptionDtoExtension on SeriesSubscriptionDto {
+  SeriesSubscriptionDto copyWith({bool? subscribed, bool? tracked}) {
+    return SeriesSubscriptionDto(subscribed: subscribed ?? this.subscribed, tracked: tracked ?? this.tracked);
+  }
+
+  SeriesSubscriptionDto copyWithWrapped({Wrapped<bool?>? subscribed, Wrapped<bool?>? tracked}) {
+    return SeriesSubscriptionDto(
+      subscribed: (subscribed != null ? subscribed.value : this.subscribed),
+      tracked: (tracked != null ? tracked.value : this.tracked),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ReadyNotificationHistoryResponse {
+  const ReadyNotificationHistoryResponse({this.items, this.lastReadId});
+
+  factory ReadyNotificationHistoryResponse.fromJson(Map<String, dynamic> json) =>
+      _$ReadyNotificationHistoryResponseFromJson(json);
+
+  static const toJsonFactory = _$ReadyNotificationHistoryResponseToJson;
+  Map<String, dynamic> toJson() => _$ReadyNotificationHistoryResponseToJson(this);
+
+  @JsonKey(name: 'items', includeIfNull: false, defaultValue: <ReadyNotificationDto>[])
+  final List<ReadyNotificationDto>? items;
+  @JsonKey(name: 'lastReadId', includeIfNull: false)
+  final int? lastReadId;
+  static const fromJsonFactory = _$ReadyNotificationHistoryResponseFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ReadyNotificationHistoryResponse &&
+            (identical(other.items, items) || const DeepCollectionEquality().equals(other.items, items)) &&
+            (identical(other.lastReadId, lastReadId) ||
+                const DeepCollectionEquality().equals(other.lastReadId, lastReadId)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(items) ^
+      const DeepCollectionEquality().hash(lastReadId) ^
+      runtimeType.hashCode;
+}
+
+extension $ReadyNotificationHistoryResponseExtension on ReadyNotificationHistoryResponse {
+  ReadyNotificationHistoryResponse copyWith({List<ReadyNotificationDto>? items, int? lastReadId}) {
+    return ReadyNotificationHistoryResponse(items: items ?? this.items, lastReadId: lastReadId ?? this.lastReadId);
+  }
+
+  ReadyNotificationHistoryResponse copyWithWrapped({
+    Wrapped<List<ReadyNotificationDto>?>? items,
+    Wrapped<int?>? lastReadId,
+  }) {
+    return ReadyNotificationHistoryResponse(
+      items: (items != null ? items.value : this.items),
+      lastReadId: (lastReadId != null ? lastReadId.value : this.lastReadId),
+    );
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class MarkNotificationsReadRequest {
+  const MarkNotificationsReadRequest({this.lastReadId});
+
+  factory MarkNotificationsReadRequest.fromJson(Map<String, dynamic> json) =>
+      _$MarkNotificationsReadRequestFromJson(json);
+
+  static const toJsonFactory = _$MarkNotificationsReadRequestToJson;
+  Map<String, dynamic> toJson() => _$MarkNotificationsReadRequestToJson(this);
+
+  @JsonKey(name: 'lastReadId', includeIfNull: false)
+  final int? lastReadId;
+  static const fromJsonFactory = _$MarkNotificationsReadRequestFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is MarkNotificationsReadRequest &&
+            (identical(other.lastReadId, lastReadId) ||
+                const DeepCollectionEquality().equals(other.lastReadId, lastReadId)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode => const DeepCollectionEquality().hash(lastReadId) ^ runtimeType.hashCode;
+}
+
+extension $MarkNotificationsReadRequestExtension on MarkNotificationsReadRequest {
+  MarkNotificationsReadRequest copyWith({int? lastReadId}) {
+    return MarkNotificationsReadRequest(lastReadId: lastReadId ?? this.lastReadId);
+  }
+
+  MarkNotificationsReadRequest copyWithWrapped({Wrapped<int?>? lastReadId}) {
+    return MarkNotificationsReadRequest(lastReadId: (lastReadId != null ? lastReadId.value : this.lastReadId));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ApiTorrentsUploadPost$RequestBody {
+  const ApiTorrentsUploadPost$RequestBody({this.file, this.mediaName, this.mediaCategory, this.authorId});
+
+  factory ApiTorrentsUploadPost$RequestBody.fromJson(Map<String, dynamic> json) =>
       _$ApiTorrentsUploadPost$RequestBodyFromJson(json);
 
   static const toJsonFactory = _$ApiTorrentsUploadPost$RequestBodyToJson;
@@ -6073,20 +6168,10 @@ class ApiTorrentsUploadPost$RequestBody {
         (other is ApiTorrentsUploadPost$RequestBody &&
             (identical(other.file, file) || const DeepCollectionEquality().equals(other.file, file)) &&
             (identical(other.mediaName, mediaName) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaName,
-                  mediaName,
-                )) &&
+                const DeepCollectionEquality().equals(other.mediaName, mediaName)) &&
             (identical(other.mediaCategory, mediaCategory) ||
-                const DeepCollectionEquality().equals(
-                  other.mediaCategory,
-                  mediaCategory,
-                )) &&
-            (identical(other.authorId, authorId) ||
-                const DeepCollectionEquality().equals(
-                  other.authorId,
-                  authorId,
-                )));
+                const DeepCollectionEquality().equals(other.mediaCategory, mediaCategory)) &&
+            (identical(other.authorId, authorId) || const DeepCollectionEquality().equals(other.authorId, authorId)));
   }
 
   @override
@@ -6139,33 +6224,20 @@ int? mediaCategoryToJson(enums.MediaCategory mediaCategory) {
   return mediaCategory.value;
 }
 
-enums.MediaCategory mediaCategoryFromJson(
-  Object? mediaCategory, [
-  enums.MediaCategory? defaultValue,
-]) {
-  return enums.MediaCategory.values.firstWhereOrNull(
-        (e) => e.value == mediaCategory,
-      ) ??
+enums.MediaCategory mediaCategoryFromJson(Object? mediaCategory, [enums.MediaCategory? defaultValue]) {
+  return enums.MediaCategory.values.firstWhereOrNull((e) => e.value == mediaCategory) ??
       defaultValue ??
       enums.MediaCategory.swaggerGeneratedUnknown;
 }
 
-enums.MediaCategory? mediaCategoryNullableFromJson(
-  Object? mediaCategory, [
-  enums.MediaCategory? defaultValue,
-]) {
+enums.MediaCategory? mediaCategoryNullableFromJson(Object? mediaCategory, [enums.MediaCategory? defaultValue]) {
   if (mediaCategory == null) {
     return null;
   }
-  return enums.MediaCategory.values.firstWhereOrNull(
-        (e) => e.value == mediaCategory,
-      ) ??
-      defaultValue;
+  return enums.MediaCategory.values.firstWhereOrNull((e) => e.value == mediaCategory) ?? defaultValue;
 }
 
-String mediaCategoryExplodedListToJson(
-  List<enums.MediaCategory>? mediaCategory,
-) {
+String mediaCategoryExplodedListToJson(List<enums.MediaCategory>? mediaCategory) {
   return mediaCategory?.map((e) => e.value!).join(',') ?? '';
 }
 
@@ -6177,15 +6249,12 @@ List<int> mediaCategoryListToJson(List<enums.MediaCategory>? mediaCategory) {
   return mediaCategory.map((e) => e.value!).toList();
 }
 
-List<enums.MediaCategory> mediaCategoryListFromJson(
-  List? mediaCategory, [
-  List<enums.MediaCategory>? defaultValue,
-]) {
+List<enums.MediaCategory> mediaCategoryListFromJson(List? mediaCategory, [List<enums.MediaCategory>? defaultValue]) {
   if (mediaCategory == null) {
     return defaultValue ?? [];
   }
 
-  return mediaCategory.map((e) => mediaCategoryFromJson(e.toString())).toList();
+  return mediaCategory.map((e) => mediaCategoryFromJson(e)).toList();
 }
 
 List<enums.MediaCategory>? mediaCategoryNullableListFromJson(
@@ -6196,7 +6265,7 @@ List<enums.MediaCategory>? mediaCategoryNullableListFromJson(
     return defaultValue;
   }
 
-  return mediaCategory.map((e) => mediaCategoryFromJson(e.toString())).toList();
+  return mediaCategory.map((e) => mediaCategoryFromJson(e)).toList();
 }
 
 int? creationOriginNullableToJson(enums.CreationOrigin? creationOrigin) {
@@ -6207,33 +6276,20 @@ int? creationOriginToJson(enums.CreationOrigin creationOrigin) {
   return creationOrigin.value;
 }
 
-enums.CreationOrigin creationOriginFromJson(
-  Object? creationOrigin, [
-  enums.CreationOrigin? defaultValue,
-]) {
-  return enums.CreationOrigin.values.firstWhereOrNull(
-        (e) => e.value == creationOrigin,
-      ) ??
+enums.CreationOrigin creationOriginFromJson(Object? creationOrigin, [enums.CreationOrigin? defaultValue]) {
+  return enums.CreationOrigin.values.firstWhereOrNull((e) => e.value == creationOrigin) ??
       defaultValue ??
       enums.CreationOrigin.swaggerGeneratedUnknown;
 }
 
-enums.CreationOrigin? creationOriginNullableFromJson(
-  Object? creationOrigin, [
-  enums.CreationOrigin? defaultValue,
-]) {
+enums.CreationOrigin? creationOriginNullableFromJson(Object? creationOrigin, [enums.CreationOrigin? defaultValue]) {
   if (creationOrigin == null) {
     return null;
   }
-  return enums.CreationOrigin.values.firstWhereOrNull(
-        (e) => e.value == creationOrigin,
-      ) ??
-      defaultValue;
+  return enums.CreationOrigin.values.firstWhereOrNull((e) => e.value == creationOrigin) ?? defaultValue;
 }
 
-String creationOriginExplodedListToJson(
-  List<enums.CreationOrigin>? creationOrigin,
-) {
+String creationOriginExplodedListToJson(List<enums.CreationOrigin>? creationOrigin) {
   return creationOrigin?.map((e) => e.value!).join(',') ?? '';
 }
 
@@ -6253,7 +6309,7 @@ List<enums.CreationOrigin> creationOriginListFromJson(
     return defaultValue ?? [];
   }
 
-  return creationOrigin.map((e) => creationOriginFromJson(e.toString())).toList();
+  return creationOrigin.map((e) => creationOriginFromJson(e)).toList();
 }
 
 List<enums.CreationOrigin>? creationOriginNullableListFromJson(
@@ -6264,7 +6320,7 @@ List<enums.CreationOrigin>? creationOriginNullableListFromJson(
     return defaultValue;
   }
 
-  return creationOrigin.map((e) => creationOriginFromJson(e.toString())).toList();
+  return creationOrigin.map((e) => creationOriginFromJson(e)).toList();
 }
 
 int? mediaServerTypeNullableToJson(enums.MediaServerType? mediaServerType) {
@@ -6275,39 +6331,24 @@ int? mediaServerTypeToJson(enums.MediaServerType mediaServerType) {
   return mediaServerType.value;
 }
 
-enums.MediaServerType mediaServerTypeFromJson(
-  Object? mediaServerType, [
-  enums.MediaServerType? defaultValue,
-]) {
-  return enums.MediaServerType.values.firstWhereOrNull(
-        (e) => e.value == mediaServerType,
-      ) ??
+enums.MediaServerType mediaServerTypeFromJson(Object? mediaServerType, [enums.MediaServerType? defaultValue]) {
+  return enums.MediaServerType.values.firstWhereOrNull((e) => e.value == mediaServerType) ??
       defaultValue ??
       enums.MediaServerType.swaggerGeneratedUnknown;
 }
 
-enums.MediaServerType? mediaServerTypeNullableFromJson(
-  Object? mediaServerType, [
-  enums.MediaServerType? defaultValue,
-]) {
+enums.MediaServerType? mediaServerTypeNullableFromJson(Object? mediaServerType, [enums.MediaServerType? defaultValue]) {
   if (mediaServerType == null) {
     return null;
   }
-  return enums.MediaServerType.values.firstWhereOrNull(
-        (e) => e.value == mediaServerType,
-      ) ??
-      defaultValue;
+  return enums.MediaServerType.values.firstWhereOrNull((e) => e.value == mediaServerType) ?? defaultValue;
 }
 
-String mediaServerTypeExplodedListToJson(
-  List<enums.MediaServerType>? mediaServerType,
-) {
+String mediaServerTypeExplodedListToJson(List<enums.MediaServerType>? mediaServerType) {
   return mediaServerType?.map((e) => e.value!).join(',') ?? '';
 }
 
-List<int> mediaServerTypeListToJson(
-  List<enums.MediaServerType>? mediaServerType,
-) {
+List<int> mediaServerTypeListToJson(List<enums.MediaServerType>? mediaServerType) {
   if (mediaServerType == null) {
     return [];
   }
@@ -6323,7 +6364,7 @@ List<enums.MediaServerType> mediaServerTypeListFromJson(
     return defaultValue ?? [];
   }
 
-  return mediaServerType.map((e) => mediaServerTypeFromJson(e.toString())).toList();
+  return mediaServerType.map((e) => mediaServerTypeFromJson(e)).toList();
 }
 
 List<enums.MediaServerType>? mediaServerTypeNullableListFromJson(
@@ -6334,18 +6375,14 @@ List<enums.MediaServerType>? mediaServerTypeNullableListFromJson(
     return defaultValue;
   }
 
-  return mediaServerType.map((e) => mediaServerTypeFromJson(e.toString())).toList();
+  return mediaServerType.map((e) => mediaServerTypeFromJson(e)).toList();
 }
 
-int? liveTvChannelCategoryNullableToJson(
-  enums.LiveTvChannelCategory? liveTvChannelCategory,
-) {
+int? liveTvChannelCategoryNullableToJson(enums.LiveTvChannelCategory? liveTvChannelCategory) {
   return liveTvChannelCategory?.value;
 }
 
-int? liveTvChannelCategoryToJson(
-  enums.LiveTvChannelCategory liveTvChannelCategory,
-) {
+int? liveTvChannelCategoryToJson(enums.LiveTvChannelCategory liveTvChannelCategory) {
   return liveTvChannelCategory.value;
 }
 
@@ -6353,9 +6390,7 @@ enums.LiveTvChannelCategory liveTvChannelCategoryFromJson(
   Object? liveTvChannelCategory, [
   enums.LiveTvChannelCategory? defaultValue,
 ]) {
-  return enums.LiveTvChannelCategory.values.firstWhereOrNull(
-        (e) => e.value == liveTvChannelCategory,
-      ) ??
+  return enums.LiveTvChannelCategory.values.firstWhereOrNull((e) => e.value == liveTvChannelCategory) ??
       defaultValue ??
       enums.LiveTvChannelCategory.swaggerGeneratedUnknown;
 }
@@ -6367,21 +6402,14 @@ enums.LiveTvChannelCategory? liveTvChannelCategoryNullableFromJson(
   if (liveTvChannelCategory == null) {
     return null;
   }
-  return enums.LiveTvChannelCategory.values.firstWhereOrNull(
-        (e) => e.value == liveTvChannelCategory,
-      ) ??
-      defaultValue;
+  return enums.LiveTvChannelCategory.values.firstWhereOrNull((e) => e.value == liveTvChannelCategory) ?? defaultValue;
 }
 
-String liveTvChannelCategoryExplodedListToJson(
-  List<enums.LiveTvChannelCategory>? liveTvChannelCategory,
-) {
+String liveTvChannelCategoryExplodedListToJson(List<enums.LiveTvChannelCategory>? liveTvChannelCategory) {
   return liveTvChannelCategory?.map((e) => e.value!).join(',') ?? '';
 }
 
-List<int> liveTvChannelCategoryListToJson(
-  List<enums.LiveTvChannelCategory>? liveTvChannelCategory,
-) {
+List<int> liveTvChannelCategoryListToJson(List<enums.LiveTvChannelCategory>? liveTvChannelCategory) {
   if (liveTvChannelCategory == null) {
     return [];
   }
@@ -6397,7 +6425,7 @@ List<enums.LiveTvChannelCategory> liveTvChannelCategoryListFromJson(
     return defaultValue ?? [];
   }
 
-  return liveTvChannelCategory.map((e) => liveTvChannelCategoryFromJson(e.toString())).toList();
+  return liveTvChannelCategory.map((e) => liveTvChannelCategoryFromJson(e)).toList();
 }
 
 List<enums.LiveTvChannelCategory>? liveTvChannelCategoryNullableListFromJson(
@@ -6408,7 +6436,7 @@ List<enums.LiveTvChannelCategory>? liveTvChannelCategoryNullableListFromJson(
     return defaultValue;
   }
 
-  return liveTvChannelCategory.map((e) => liveTvChannelCategoryFromJson(e.toString())).toList();
+  return liveTvChannelCategory.map((e) => liveTvChannelCategoryFromJson(e)).toList();
 }
 
 int? mediaQualityNullableToJson(enums.MediaQuality? mediaQuality) {
@@ -6419,28 +6447,17 @@ int? mediaQualityToJson(enums.MediaQuality mediaQuality) {
   return mediaQuality.value;
 }
 
-enums.MediaQuality mediaQualityFromJson(
-  Object? mediaQuality, [
-  enums.MediaQuality? defaultValue,
-]) {
-  return enums.MediaQuality.values.firstWhereOrNull(
-        (e) => e.value == mediaQuality,
-      ) ??
+enums.MediaQuality mediaQualityFromJson(Object? mediaQuality, [enums.MediaQuality? defaultValue]) {
+  return enums.MediaQuality.values.firstWhereOrNull((e) => e.value == mediaQuality) ??
       defaultValue ??
       enums.MediaQuality.swaggerGeneratedUnknown;
 }
 
-enums.MediaQuality? mediaQualityNullableFromJson(
-  Object? mediaQuality, [
-  enums.MediaQuality? defaultValue,
-]) {
+enums.MediaQuality? mediaQualityNullableFromJson(Object? mediaQuality, [enums.MediaQuality? defaultValue]) {
   if (mediaQuality == null) {
     return null;
   }
-  return enums.MediaQuality.values.firstWhereOrNull(
-        (e) => e.value == mediaQuality,
-      ) ??
-      defaultValue;
+  return enums.MediaQuality.values.firstWhereOrNull((e) => e.value == mediaQuality) ?? defaultValue;
 }
 
 String mediaQualityExplodedListToJson(List<enums.MediaQuality>? mediaQuality) {
@@ -6455,15 +6472,12 @@ List<int> mediaQualityListToJson(List<enums.MediaQuality>? mediaQuality) {
   return mediaQuality.map((e) => e.value!).toList();
 }
 
-List<enums.MediaQuality> mediaQualityListFromJson(
-  List? mediaQuality, [
-  List<enums.MediaQuality>? defaultValue,
-]) {
+List<enums.MediaQuality> mediaQualityListFromJson(List? mediaQuality, [List<enums.MediaQuality>? defaultValue]) {
   if (mediaQuality == null) {
     return defaultValue ?? [];
   }
 
-  return mediaQuality.map((e) => mediaQualityFromJson(e.toString())).toList();
+  return mediaQuality.map((e) => mediaQualityFromJson(e)).toList();
 }
 
 List<enums.MediaQuality>? mediaQualityNullableListFromJson(
@@ -6474,7 +6488,7 @@ List<enums.MediaQuality>? mediaQualityNullableListFromJson(
     return defaultValue;
   }
 
-  return mediaQuality.map((e) => mediaQualityFromJson(e.toString())).toList();
+  return mediaQuality.map((e) => mediaQualityFromJson(e)).toList();
 }
 
 int? crawlStatusNullableToJson(enums.CrawlStatus? crawlStatus) {
@@ -6485,28 +6499,17 @@ int? crawlStatusToJson(enums.CrawlStatus crawlStatus) {
   return crawlStatus.value;
 }
 
-enums.CrawlStatus crawlStatusFromJson(
-  Object? crawlStatus, [
-  enums.CrawlStatus? defaultValue,
-]) {
-  return enums.CrawlStatus.values.firstWhereOrNull(
-        (e) => e.value == crawlStatus,
-      ) ??
+enums.CrawlStatus crawlStatusFromJson(Object? crawlStatus, [enums.CrawlStatus? defaultValue]) {
+  return enums.CrawlStatus.values.firstWhereOrNull((e) => e.value == crawlStatus) ??
       defaultValue ??
       enums.CrawlStatus.swaggerGeneratedUnknown;
 }
 
-enums.CrawlStatus? crawlStatusNullableFromJson(
-  Object? crawlStatus, [
-  enums.CrawlStatus? defaultValue,
-]) {
+enums.CrawlStatus? crawlStatusNullableFromJson(Object? crawlStatus, [enums.CrawlStatus? defaultValue]) {
   if (crawlStatus == null) {
     return null;
   }
-  return enums.CrawlStatus.values.firstWhereOrNull(
-        (e) => e.value == crawlStatus,
-      ) ??
-      defaultValue;
+  return enums.CrawlStatus.values.firstWhereOrNull((e) => e.value == crawlStatus) ?? defaultValue;
 }
 
 String crawlStatusExplodedListToJson(List<enums.CrawlStatus>? crawlStatus) {
@@ -6521,26 +6524,81 @@ List<int> crawlStatusListToJson(List<enums.CrawlStatus>? crawlStatus) {
   return crawlStatus.map((e) => e.value!).toList();
 }
 
-List<enums.CrawlStatus> crawlStatusListFromJson(
-  List? crawlStatus, [
-  List<enums.CrawlStatus>? defaultValue,
-]) {
+List<enums.CrawlStatus> crawlStatusListFromJson(List? crawlStatus, [List<enums.CrawlStatus>? defaultValue]) {
   if (crawlStatus == null) {
     return defaultValue ?? [];
   }
 
-  return crawlStatus.map((e) => crawlStatusFromJson(e.toString())).toList();
+  return crawlStatus.map((e) => crawlStatusFromJson(e)).toList();
 }
 
-List<enums.CrawlStatus>? crawlStatusNullableListFromJson(
-  List? crawlStatus, [
-  List<enums.CrawlStatus>? defaultValue,
-]) {
+List<enums.CrawlStatus>? crawlStatusNullableListFromJson(List? crawlStatus, [List<enums.CrawlStatus>? defaultValue]) {
   if (crawlStatus == null) {
     return defaultValue;
   }
 
-  return crawlStatus.map((e) => crawlStatusFromJson(e.toString())).toList();
+  return crawlStatus.map((e) => crawlStatusFromJson(e)).toList();
+}
+
+String? readyNotificationKindNullableToJson(enums.ReadyNotificationKind? readyNotificationKind) {
+  return readyNotificationKind?.value;
+}
+
+String? readyNotificationKindToJson(enums.ReadyNotificationKind readyNotificationKind) {
+  return readyNotificationKind.value;
+}
+
+enums.ReadyNotificationKind readyNotificationKindFromJson(
+  Object? readyNotificationKind, [
+  enums.ReadyNotificationKind? defaultValue,
+]) {
+  return enums.ReadyNotificationKind.values.firstWhereOrNull((e) => e.value == readyNotificationKind) ??
+      defaultValue ??
+      enums.ReadyNotificationKind.swaggerGeneratedUnknown;
+}
+
+enums.ReadyNotificationKind? readyNotificationKindNullableFromJson(
+  Object? readyNotificationKind, [
+  enums.ReadyNotificationKind? defaultValue,
+]) {
+  if (readyNotificationKind == null) {
+    return null;
+  }
+  return enums.ReadyNotificationKind.values.firstWhereOrNull((e) => e.value == readyNotificationKind) ?? defaultValue;
+}
+
+String readyNotificationKindExplodedListToJson(List<enums.ReadyNotificationKind>? readyNotificationKind) {
+  return readyNotificationKind?.map((e) => e.value!).join(',') ?? '';
+}
+
+List<String> readyNotificationKindListToJson(List<enums.ReadyNotificationKind>? readyNotificationKind) {
+  if (readyNotificationKind == null) {
+    return [];
+  }
+
+  return readyNotificationKind.map((e) => e.value!).toList();
+}
+
+List<enums.ReadyNotificationKind> readyNotificationKindListFromJson(
+  List? readyNotificationKind, [
+  List<enums.ReadyNotificationKind>? defaultValue,
+]) {
+  if (readyNotificationKind == null) {
+    return defaultValue ?? [];
+  }
+
+  return readyNotificationKind.map((e) => readyNotificationKindFromJson(e.toString())).toList();
+}
+
+List<enums.ReadyNotificationKind>? readyNotificationKindNullableListFromJson(
+  List? readyNotificationKind, [
+  List<enums.ReadyNotificationKind>? defaultValue,
+]) {
+  if (readyNotificationKind == null) {
+    return defaultValue;
+  }
+
+  return readyNotificationKind.map((e) => readyNotificationKindFromJson(e.toString())).toList();
 }
 
 typedef $JsonFactory<T> = T Function(Map<String, dynamic> json);
@@ -6588,9 +6646,7 @@ class $CustomJsonDecoder {
 
 class $JsonSerializableConverter extends chopper.JsonConverter {
   @override
-  FutureOr<chopper.Response<ResultType>> convertResponse<ResultType, Item>(
-    chopper.Response response,
-  ) async {
+  FutureOr<chopper.Response<ResultType>> convertResponse<ResultType, Item>(chopper.Response response) async {
     if (response.bodyString.isEmpty) {
       // In rare cases, when let's say 204 (no content) is returned -
       // we cannot decode the missing json with the result type specified
@@ -6602,15 +6658,11 @@ class $JsonSerializableConverter extends chopper.JsonConverter {
     }
 
     if (ResultType == DateTime) {
-      return response.copyWith(
-        body: DateTime.parse((response.body as String).replaceAll('"', '')) as ResultType,
-      );
+      return response.copyWith(body: DateTime.parse((response.body as String).replaceAll('"', '')) as ResultType);
     }
 
     final jsonRes = await super.convertResponse(response);
-    return jsonRes.copyWith<ResultType>(
-      body: $jsonDecoder.decode<Item>(jsonRes.body) as ResultType,
-    );
+    return jsonRes.copyWith<ResultType>(body: $jsonDecoder.decode<Item>(jsonRes.body) as ResultType);
   }
 }
 

@@ -24,6 +24,7 @@ targets:
       swagger_dart_code_generator:
         generate_for:
           - swagger/jellyfin-open-api.json
+          - swagger/jellybot.json
         options:
           input_folder: "swagger/"
           output_folder: "lib/jellyfin/"
@@ -34,6 +35,7 @@ targets:
       chopper_generator:
         generate_for:
           - lib/jellyfin/jellyfin_open_api.swagger.dart
+          - lib/jellyfin/jellybot.swagger.dart
           - lib/seerr/**
         options:
           header: "//Generated jellyfin api code"

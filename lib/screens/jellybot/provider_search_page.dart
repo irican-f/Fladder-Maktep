@@ -67,12 +67,7 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
     final controllerState = ref.read(jellybotSearchControllerProvider.notifier).searchState;
     final filtersAsync = controllerState.provider == null
         ? const AsyncValue<List<ISearchFilter>>.data(<ISearchFilter>[])
-        : ref.watch(
-            jellybotSearchFiltersProvider(
-              controllerState.provider!.id!,
-              controllerState.category,
-            ),
-          );
+        : ref.watch(jellybotSearchFiltersProvider(controllerState.provider!.id!, controllerState.category));
 
     return NestedScaffold(
       body: Padding(
@@ -92,20 +87,10 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
                 controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
-                  _buildAppBar(
-                    context,
-                    floatingAppBar,
-                    surfaceColor,
-                    providersAsync,
-                    filtersAsync,
-                  ),
+                  _buildAppBar(context, floatingAppBar, surfaceColor, providersAsync, filtersAsync),
                   if (_showAdvanced) const SliverToBoxAdapter(child: SearchAdvancedControls()),
                   ..._buildResultsSlivers(searchState, controllerState),
-                  SliverPadding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom + 80,
-                    ),
-                  ),
+                  SliverPadding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 80)),
                 ],
               ),
             ),
@@ -124,9 +109,7 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
         data: (response) {
           if (response == null) {
             if (_searchController.text.isEmpty) {
-              return SliverFillRemaining(
-                child: SearchEmptyState(onCategoryTap: _onCategoryQuickPick),
-              );
+              return SliverFillRemaining(child: SearchEmptyState(onCategoryTap: _onCategoryQuickPick));
             }
             return SliverFillRemaining(
               child: SearchNoResultsState(
@@ -163,12 +146,8 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
             ],
           );
         },
-        loading: () => SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, _) => const SearchSkeletonCard(),
-            childCount: 6,
-          ),
-        ),
+        loading: () =>
+            SliverList(delegate: SliverChildBuilderDelegate((context, _) => const SearchSkeletonCard(), childCount: 6)),
         error: (e, _) => SliverFillRemaining(
           child: SearchErrorState(
             message: e.toString(),
@@ -191,10 +170,7 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
       collapsedHeight: 80,
       automaticallyImplyLeading: false,
       leading: AdaptiveLayout.layoutModeOf(context) == LayoutMode.single
-          ? IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.router.maybePop(),
-            )
+          ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.router.maybePop())
           : null,
       pinned: floatingAppBar,
       elevation: 5,
@@ -236,9 +212,7 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
   Widget _buildSearchBar(BuildContext context) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: FladderTheme.smallShape.borderRadius,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: FladderTheme.smallShape.borderRadius),
       shadowColor: Colors.transparent,
       child: OutlinedTextField(
         controller: _searchController,
@@ -328,11 +302,7 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
                 onPressed: () => setState(() => _showAdvanced = !_showAdvanced),
               ),
               if (state.activeFilterCount > 0)
-                Positioned(
-                  right: -4,
-                  top: -4,
-                  child: _CountBadge(count: state.activeFilterCount),
-                ),
+                Positioned(right: -4, top: -4, child: _CountBadge(count: state.activeFilterCount)),
             ],
           ),
         ),
@@ -344,21 +314,9 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
     final ctrl = ref.read(jellybotSearchControllerProvider.notifier);
     final state = ctrl.searchState;
     final defs = [
-      (
-        MediaCategory.movie,
-        context.localized.jellybotMovie,
-        IconsaxPlusBold.video_play,
-      ),
-      (
-        MediaCategory.show,
-        context.localized.jellybotShow,
-        IconsaxPlusBold.monitor,
-      ),
-      (
-        MediaCategory.anime,
-        context.localized.jellybotAnime,
-        IconsaxPlusBold.star,
-      ),
+      (MediaCategory.movie, context.localized.jellybotMovie, IconsaxPlusBold.video_play),
+      (MediaCategory.show, context.localized.jellybotShow, IconsaxPlusBold.monitor),
+      (MediaCategory.anime, context.localized.jellybotAnime, IconsaxPlusBold.star),
     ];
     return defs.asMap().entries.map((e) {
       final i = e.key;
@@ -393,9 +351,11 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
         label: Row(
           spacing: 6,
           children: [
-            Text(isSelected
-                ? state.selectedFilters[filter.name] ?? filter.label ?? filter.name ?? ''
-                : filter.label ?? filter.name ?? ''),
+            Text(
+              isSelected
+                  ? state.selectedFilters[filter.name] ?? filter.label ?? filter.name ?? ''
+                  : filter.label ?? filter.name ?? '',
+            ),
             const Icon(IconsaxPlusLinear.arrow_down, size: 16),
           ],
         ),
@@ -421,14 +381,9 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
               final isSelected = state.provider?.id == provider.id;
               return ListTile(
                 leading: isSelected
-                    ? Icon(
-                        IconsaxPlusBold.tick_circle,
-                        color: Theme.of(context).colorScheme.primary,
-                      )
+                    ? Icon(IconsaxPlusBold.tick_circle, color: Theme.of(context).colorScheme.primary)
                     : const Icon(IconsaxPlusLinear.global),
-                title: Text(
-                  provider.displayName ?? provider.name ?? 'Unknown',
-                ),
+                title: Text(provider.displayName ?? provider.name ?? 'Unknown'),
                 selected: isSelected,
                 onTap: () {
                   Navigator.pop(context);
@@ -457,10 +412,7 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
             children: [
               ListTile(
                 leading: !ctrl.searchState.selectedFilters.containsKey(filter.name)
-                    ? Icon(
-                        IconsaxPlusBold.tick_circle,
-                        color: Theme.of(context).colorScheme.primary,
-                      )
+                    ? Icon(IconsaxPlusBold.tick_circle, color: Theme.of(context).colorScheme.primary)
                     : const Icon(IconsaxPlusLinear.filter_remove),
                 title: Text(context.localized.all),
                 selected: !ctrl.searchState.selectedFilters.containsKey(filter.name),
@@ -473,20 +425,17 @@ class _JellybotProviderSearchPageState extends ConsumerState<JellybotProviderSea
               ),
               const Divider(),
               ...?filter.options?.map((option) {
-                final isSelected = ctrl.searchState.selectedFilters[filter.name] == option.$value;
+                final isSelected = ctrl.searchState.selectedFilters[filter.name] == option.value;
                 return ListTile(
                   leading: isSelected
-                      ? Icon(
-                          IconsaxPlusBold.tick_circle,
-                          color: Theme.of(context).colorScheme.primary,
-                        )
+                      ? Icon(IconsaxPlusBold.tick_circle, color: Theme.of(context).colorScheme.primary)
                       : null,
-                  title: Text(option.label ?? option.$value ?? ''),
+                  title: Text(option.label ?? option.value ?? ''),
                   selected: isSelected,
                   onTap: () {
                     Navigator.pop(context);
                     final next = Map<String, String>.from(ctrl.searchState.selectedFilters);
-                    next[filter.name ?? ''] = option.$value ?? '';
+                    next[filter.name ?? ''] = option.value ?? '';
                     ctrl.setSelectedFilters(next);
                     setState(() {});
                   },
@@ -508,16 +457,12 @@ class _CountBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, borderRadius: BorderRadius.circular(8)),
       child: Text(
         '$count',
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Theme.of(context).colorScheme.onPrimary,
-              fontWeight: FontWeight.bold,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -551,10 +496,7 @@ class _PaginationBar extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  '${currentPage + 1} / $totalPages',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                child: Text('${currentPage + 1} / $totalPages', style: Theme.of(context).textTheme.titleMedium),
               ),
               IconButton.filled(
                 icon: const Icon(Icons.chevron_right),

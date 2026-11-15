@@ -29,7 +29,7 @@ abstract class JellybotSearchState with _$JellybotSearchState {
       minScore: minScore,
       page: page,
       pageSize: pageSize,
-      filters: selectedFilters.entries.map((e) => SearchFilter(name: e.key, $value: e.value)).toList(),
+      filters: selectedFilters.entries.map((e) => SearchFilter(name: e.key, value: e.value)).toList(),
     );
   }
 }
