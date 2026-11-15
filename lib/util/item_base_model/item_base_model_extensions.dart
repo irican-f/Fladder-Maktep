@@ -15,6 +15,7 @@ import 'package:fladder/models/items/episode_model.dart';
 import 'package:fladder/models/items/item_shared_models.dart';
 import 'package:fladder/models/items/movie_model.dart';
 import 'package:fladder/models/items/photos_model.dart';
+import 'package:fladder/models/items/season_model.dart';
 import 'package:fladder/models/items/series_model.dart';
 import 'package:fladder/models/playback/playback_queue_source.dart';
 import 'package:fladder/providers/api_provider.dart';
@@ -58,6 +59,30 @@ Future<T> _trackPending<T>(WidgetRef ref, String id, Future<T> Function() action
     return result;
   } finally {
     pendingItems.remove(id);
+  }
+}
+
+Future<void> _downloadSeasonEpisodes(BuildContext context, WidgetRef ref, SeasonModel season) async {
+  final response = await ref
+      .read(jellyApiProvider)
+      .showsSeriesIdEpisodesGet(seriesId: season.seriesId, seasonId: season.id);
+  final userNotifier = ref.read(userProvider.notifier);
+  final urls = (response.body?.items ?? [])
+      .map((e) => EpisodeModel.fromBaseDto(e, null))
+      .where((e) => e.playAble && e.canDownload == true)
+      .map(userNotifier.createDownloadUrl)
+      .nonNulls
+      .toList();
+  if (urls.isEmpty) {
+    if (context.mounted) {
+      FladderSnack.show(context.localized.noResults, context: context);
+    }
+    return;
+  }
+  for (final url in urls) {
+    await downloadFile(url);
+    // ponytail: fixed gap so the browser doesn't drop rapid-fire anchor clicks; no queue/progress UI.
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 }
 
@@ -138,10 +163,7 @@ extension ItemBaseModelExtensions on ItemBaseModel {
     await showMenu(
       context: context,
       position: position,
-      items: generateActions(
-        context,
-        ref,
-      ).popupMenuItems(useIcons: true),
+      items: generateActions(context, ref).popupMenuItems(useIcons: true),
     );
   }
 
@@ -155,11 +177,8 @@ extension ItemBaseModelExtensions on ItemBaseModel {
     Function(ItemBaseModel item)? onDeleteSuccesFully,
   }) {
     final isAdmin = ref.read(userProvider)?.policy?.isAdministrator ?? false;
-    final downloadEnabled = ref.read(userProvider.select(
-          (value) => value?.canDownload ?? false,
-        )) &&
-        syncAble &&
-        (canDownload ?? false);
+    final downloadEnabled =
+        ref.read(userProvider.select((value) => value?.canDownload ?? false)) && syncAble && (canDownload ?? false);
     final downloadUrl = ref.read(userProvider.notifier).createDownloadUrl(this);
     final syncedItemFuture = ref.read(syncProvider.notifier).getSyncedItem(id);
     final hasSeerrData = overview.seerrUrl?.isNotEmpty == true;
@@ -169,35 +188,39 @@ extension ItemBaseModelExtensions on ItemBaseModel {
       _ => true,
     };
     final ItemAction? parentAction = switch (this) {
-      EpisodeModel _ => !exclude.contains(ItemActions.openShow)
-          ? ItemActionButton(
-              icon: Icon(FladderItemType.series.icon),
-              action: () => parentBaseModel.navigateTo(context),
-              label: Text(context.localized.openShow),
-            )
-          : null,
-      AudioModel _ => !exclude.contains(ItemActions.openParent)
-          ? ItemActionButton(
-              icon: Icon(FladderItemType.musicAlbum.icon),
-              action: () => parentBaseModel.navigateTo(context),
-              label: Text(context.localized.showAlbum),
-            )
-          : null,
-      AlbumModel album => !exclude.contains(ItemActions.openParent)
-          ? ItemActionButton(
-              icon: Icon(FladderItemType.musicArtist.icon),
-              action: () => album.parentBaseModel.navigateTo(context),
-              label: Text(context.localized.showArtist),
-            )
-          : null,
+      EpisodeModel _ =>
+        !exclude.contains(ItemActions.openShow)
+            ? ItemActionButton(
+                icon: Icon(FladderItemType.series.icon),
+                action: () => parentBaseModel.navigateTo(context),
+                label: Text(context.localized.openShow),
+              )
+            : null,
+      AudioModel _ =>
+        !exclude.contains(ItemActions.openParent)
+            ? ItemActionButton(
+                icon: Icon(FladderItemType.musicAlbum.icon),
+                action: () => parentBaseModel.navigateTo(context),
+                label: Text(context.localized.showAlbum),
+              )
+            : null,
+      AlbumModel album =>
+        !exclude.contains(ItemActions.openParent)
+            ? ItemActionButton(
+                icon: Icon(FladderItemType.musicArtist.icon),
+                action: () => album.parentBaseModel.navigateTo(context),
+                label: Text(context.localized.showArtist),
+              )
+            : null,
       SeriesModel _ => null,
-      _ => !exclude.contains(ItemActions.openParent) && !galleryItem
-          ? ItemActionButton(
-              icon: Icon(FladderItemType.folder.icon),
-              action: () => parentBaseModel.navigateTo(context),
-              label: Text(context.localized.openParent),
-            )
-          : null,
+      _ =>
+        !exclude.contains(ItemActions.openParent) && !galleryItem
+            ? ItemActionButton(
+                icon: Icon(FladderItemType.folder.icon),
+                action: () => parentBaseModel.navigateTo(context),
+                label: Text(context.localized.openParent),
+              )
+            : null,
     };
     return [
       if (!exclude.contains(ItemActions.play))
@@ -232,12 +255,7 @@ extension ItemBaseModelExtensions on ItemBaseModel {
               };
 
               if (queueSource != null) {
-                return showTracksDetailsScreen(
-                  context: context,
-                  item: this,
-                  ref: ref,
-                  queueSource: queueSource,
-                );
+                return showTracksDetailsScreen(context: context, item: this, ref: ref, queueSource: queueSource);
               } else {
                 return Future.value();
               }
@@ -279,9 +297,11 @@ extension ItemBaseModelExtensions on ItemBaseModel {
             action: (this is BookModel)
                 ? () => ((this as BookModel).play(context, ref, currentPage: 0))
                 : () => play(context, ref, startPosition: Duration.zero),
-            label: Text((this is BookModel)
-                ? context.localized.readFromStart(name)
-                : context.localized.playFromStart(subTextShort(context.localized) ?? name)),
+            label: Text(
+              (this is BookModel)
+                  ? context.localized.readFromStart(name)
+                  : context.localized.playFromStart(subTextShort(context.localized) ?? name),
+            ),
           ),
       ItemActionDivider(),
       if (!exclude.contains(ItemActions.addCollection) && isAdmin)
@@ -314,8 +334,11 @@ extension ItemBaseModelExtensions on ItemBaseModel {
             icon: const Icon(IconsaxPlusLinear.eye),
             action: () async {
               try {
-                final userData =
-                    await _trackPending(ref, id, () => ref.read(userProvider.notifier).markAsPlayed(true, id));
+                final userData = await _trackPending(
+                  ref,
+                  id,
+                  () => ref.read(userProvider.notifier).markAsPlayed(true, id),
+                );
                 onUserDataChanged?.call(userData?.bodyOrThrow);
               } finally {
                 context.refreshData();
@@ -329,8 +352,11 @@ extension ItemBaseModelExtensions on ItemBaseModel {
             label: Text(context.localized.markAsUnwatched),
             action: () async {
               try {
-                final userData =
-                    await _trackPending(ref, id, () => ref.read(userProvider.notifier).markAsPlayed(false, id));
+                final userData = await _trackPending(
+                  ref,
+                  id,
+                  () => ref.read(userProvider.notifier).markAsPlayed(false, id),
+                );
                 onUserDataChanged?.call(userData?.bodyOrThrow);
               } finally {
                 context.refreshData();
@@ -377,7 +403,16 @@ extension ItemBaseModelExtensions on ItemBaseModel {
           },
           label: Text(context.localized.refreshMetadata),
         ),
-      if (!exclude.contains(ItemActions.download) && downloadEnabled) ...[
+      if (kIsWeb &&
+          this is SeasonModel &&
+          !exclude.contains(ItemActions.download) &&
+          (ref.read(userProvider)?.canDownload ?? false))
+        ItemActionButton(
+          icon: const Icon(IconsaxPlusLinear.document_download),
+          action: () => _downloadSeasonEpisodes(context, ref, this as SeasonModel),
+          label: Text(context.localized.downloadFile(type.label(context.localized).toLowerCase())),
+        )
+      else if (!exclude.contains(ItemActions.download) && downloadEnabled) ...[
         if (!kIsWeb)
           ItemActionButton(
             icon: FutureBuilder(
@@ -385,7 +420,9 @@ extension ItemBaseModelExtensions on ItemBaseModel {
               builder: (context, snapshot) {
                 final syncedItem = snapshot.data;
                 if (syncedItem != null) {
-                  return IgnorePointer(child: SyncButton(item: this, syncedItem: syncedItem));
+                  return IgnorePointer(
+                    child: SyncButton(item: this, syncedItem: syncedItem),
+                  );
                 }
                 return const Icon(IconsaxPlusLinear.arrow_down_2);
               },
@@ -395,9 +432,7 @@ extension ItemBaseModelExtensions on ItemBaseModel {
               builder: (context, snapshot) {
                 final syncedItem = snapshot.data;
                 if (syncedItem != null) {
-                  return Text(
-                    context.localized.syncDetails,
-                  );
+                  return Text(context.localized.syncDetails);
                 }
                 return Text(context.localized.sync);
               },
@@ -422,31 +457,29 @@ extension ItemBaseModelExtensions on ItemBaseModel {
             icon: const Icon(IconsaxPlusLinear.link_21),
             action: () => context.copyToClipboard(downloadUrl),
             label: Text(context.localized.copyStreamUrl),
-          )
+          ),
         ],
       ],
       if (hasSeerrData && tmdbId != null)
         ItemActionButton(
           icon: const Icon(IconsaxPlusLinear.link_21),
           action: () {
-            context.pushRoute(SeerrDetailsRoute(
+            context.pushRoute(
+              SeerrDetailsRoute(
                 mediaType: switch (this) {
                   MovieModel() => SeerrMediaType.movie,
                   SeriesModel() => SeerrMediaType.tvshow,
                   _ => SeerrMediaType.movie,
-                }
-                    .name,
-                tmdbId: tmdbId!));
+                }.name,
+                tmdbId: tmdbId!,
+              ),
+            );
           },
           label: Text(context.localized.seerrDetails),
         ),
       if (canDelete == true)
         ItemActionButton(
-          icon: Container(
-            child: const Icon(
-              IconsaxPlusLinear.trash,
-            ),
-          ),
+          icon: Container(child: const Icon(IconsaxPlusLinear.trash)),
           action: () async {
             final response = await FladderSnack.showResponse(
               showDeleteDialog(context, this, ref),
@@ -494,11 +527,7 @@ extension ItemBaseModelExtensions on ItemBaseModel {
 
   Future<void> sharePhoto(PhotoModel photo, WidgetRef ref) async {
     final file = await CustomCacheManager.instance.getSingleFile(photo.downloadPath(ref));
-    await SharePlus.instance.share(ShareParams(files: [
-      XFile(
-        file.path,
-      ),
-    ]));
+    await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
     await file.delete();
   }
 
@@ -506,8 +535,8 @@ extension ItemBaseModelExtensions on ItemBaseModel {
     final providerIds = this is MovieModel
         ? (this as MovieModel).providerIds
         : this is SeriesModel
-            ? (this as SeriesModel).providerIds
-            : null;
+        ? (this as SeriesModel).providerIds
+        : null;
 
     if (providerIds == null || providerIds.isEmpty) return null;
 
@@ -520,8 +549,8 @@ extension ItemBaseModelExtensions on ItemBaseModel {
     final providerIds = this is MovieModel
         ? (this as MovieModel).providerIds
         : this is SeriesModel
-            ? (this as SeriesModel).providerIds
-            : null;
+        ? (this as SeriesModel).providerIds
+        : null;
 
     if (providerIds == null || providerIds.isEmpty) return null;
     final value = providerIds['Tvdb'];
@@ -550,10 +579,7 @@ Future<void> _showTrackLyricsPopup(BuildContext context, WidgetRef ref, AudioMod
             builder: (context, snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
                 return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: Padding(padding: EdgeInsets.symmetric(vertical: 24), child: CircularProgressIndicator()),
                 );
               }
 
@@ -569,36 +595,20 @@ Future<void> _showTrackLyricsPopup(BuildContext context, WidgetRef ref, AudioMod
             },
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(context.localized.close),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(context.localized.close))],
       );
     },
   );
 }
 
-Future<void> _showTrackLyricsPopupWithTimeline(
-  BuildContext context,
-  List<SyncedLyricLine> timeline,
-) {
+Future<void> _showTrackLyricsPopupWithTimeline(BuildContext context, List<SyncedLyricLine> timeline) {
   return showDialog<void>(
     context: context,
     builder: (context) {
       return AlertDialog(
         title: Text(context.localized.lyrics),
-        content: SizedBox(
-          width: 540,
-          child: _buildLyricsTimelineList(context, timeline),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(context.localized.close),
-          ),
-        ],
+        content: SizedBox(width: 540, child: _buildLyricsTimelineList(context, timeline)),
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(context.localized.close))],
       );
     },
   );
@@ -625,19 +635,12 @@ Widget _buildLyricsTimelineList(BuildContext context, List<SyncedLyricLine> time
             spacing: 4,
             children: List.generate(
               4,
-              (index) => Icon(
-                Icons.music_note_rounded,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              (index) => Icon(Icons.music_note_rounded, size: 18, color: Theme.of(context).colorScheme.primary),
             ),
           );
         }
 
-        return SelectableText(
-          line.text,
-          style: Theme.of(context).textTheme.bodyLarge,
-        );
+        return SelectableText(line.text, style: Theme.of(context).textTheme.bodyLarge);
       },
     ),
   );
