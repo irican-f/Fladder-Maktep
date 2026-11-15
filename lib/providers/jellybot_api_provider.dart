@@ -88,13 +88,30 @@ class _AccessTokenInterceptor implements Interceptor {
 
   @override
   FutureOr<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) {
+    final request = chain.request.copyWith(headers: jellyfinTokenAsAuthorization(chain.request.headers));
     final tokenId = FladderConfig.jellybotAccessTokenId;
     final token = FladderConfig.jellybotAccessToken;
     if (tokenId == null || token == null) {
-      return chain.proceed(chain.request);
+      return chain.proceed(request);
     }
-    return chain.proceed(applyHeaders(chain.request, {'P-Access-Token-Id': tokenId, 'P-Access-Token': token}));
+    return chain.proceed(applyHeaders(request, {'P-Access-Token-Id': tokenId, 'P-Access-Token': token}));
   }
+}
+
+/// Moves the user's Jellyfin token from the generated client's `X-Jellyfin-Token` header into
+/// `Authorization: MediaBrowser Token="…"`: Pangolin answers the browser's CORS preflight with a fixed header list
+/// that allows Authorization but not custom headers, so on web the custom header would block every call.
+@visibleForTesting
+Map<String, String> jellyfinTokenAsAuthorization(Map<String, String> headers) {
+  final token = headers['X-Jellyfin-Token'];
+  if (token == null) {
+    return headers;
+  }
+  return {
+    for (final entry in headers.entries)
+      if (entry.key != 'X-Jellyfin-Token') entry.key: entry.value,
+    'Authorization': 'MediaBrowser Token="$token"',
+  };
 }
 
 /// Creates an HTTP client that handles SSL certificates properly on non-web platforms
