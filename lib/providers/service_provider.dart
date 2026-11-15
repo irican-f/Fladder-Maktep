@@ -39,23 +39,11 @@ class ServerQueryResult {
   final List<ItemBaseModel> items;
   final int? totalRecordCount;
   final int? startIndex;
-  ServerQueryResult({
-    required this.items,
-    this.totalRecordCount,
-    this.startIndex,
-  });
+  ServerQueryResult({required this.items, this.totalRecordCount, this.startIndex});
 
-  factory ServerQueryResult.fromBaseQuery(
-    BaseItemDtoQueryResult baseQuery,
-    Ref ref,
-  ) {
+  factory ServerQueryResult.fromBaseQuery(BaseItemDtoQueryResult baseQuery, Ref ref) {
     return ServerQueryResult(
-      items: baseQuery.items
-              ?.map(
-                (e) => ItemBaseModel.fromBaseDto(e, ref),
-              )
-              .toList() ??
-          [],
+      items: baseQuery.items?.map((e) => ItemBaseModel.fromBaseDto(e, ref)).toList() ?? [],
       totalRecordCount: baseQuery.totalRecordCount,
       startIndex: baseQuery.startIndex,
     );
@@ -95,91 +83,53 @@ class JellyService {
 
   Future<Response<ItemBaseModel>> _syncedItemResponse(String? itemId) async {
     final item = (await ref.read(syncProvider.notifier).getSyncedItem(itemId))?.itemModel;
-    return Response<ItemBaseModel>(
-      http.Response("", 202),
-      item,
-    );
+    return Response<ItemBaseModel>(http.Response("", 202), item);
   }
 
   Future<Response<LyricDto?>> _syncedLyricsResponse(String? itemId) async {
     final lyrics = (await ref.read(syncProvider.notifier).getSyncedItem(itemId))?.lyrics;
-    return Response<LyricDto?>(
-      http.Response("", lyrics != null ? 202 : 404),
-      lyrics,
-    );
+    return Response<LyricDto?>(http.Response("", lyrics != null ? 202 : 404), lyrics);
   }
 
-  Future<Response<ItemBaseModel>> usersUserIdItemsItemIdGet({
-    String? itemId,
-  }) async {
+  Future<Response<ItemBaseModel>> usersUserIdItemsItemIdGet({String? itemId}) async {
     final isOffline = ref.read(offlineStateProvider);
     if (isOffline) {
       return _syncedItemResponse(itemId);
     }
 
     try {
-      final response = await api.itemsItemIdGet(
-        userId: account?.id,
-        itemId: itemId,
-      );
+      final response = await api.itemsItemIdGet(userId: account?.id, itemId: itemId);
       return response.copyWith(body: ItemBaseModel.fromBaseDto(response.bodyOrThrow, ref));
     } catch (e) {
       return _syncedItemResponse(itemId);
     }
   }
 
-  Future<Response<BaseItemDto>> usersUserIdItemsItemIdGetBaseItem({
-    String? itemId,
-  }) async {
+  Future<Response<BaseItemDto>> usersUserIdItemsItemIdGetBaseItem({String? itemId}) async {
     final isOffline = ref.read(offlineStateProvider);
     if (isOffline) {
       final syncedItem = await ref.read(syncProvider.notifier).getSyncedItem(itemId);
       return syncedItem?.data != null
-          ? Response<BaseItemDto>(
-              http.Response("", 202),
-              syncedItem?.data,
-            )
-          : Response<BaseItemDto>(
-              http.Response("", 404),
-              null,
-            );
+          ? Response<BaseItemDto>(http.Response("", 202), syncedItem?.data)
+          : Response<BaseItemDto>(http.Response("", 404), null);
     }
 
     try {
-      return await api.itemsItemIdGet(
-        userId: account?.id,
-        itemId: itemId,
-      );
+      return await api.itemsItemIdGet(userId: account?.id, itemId: itemId);
     } catch (e) {
       final syncedItem = await ref.read(syncProvider.notifier).getSyncedItem(itemId);
       return syncedItem?.data != null
-          ? Response<BaseItemDto>(
-              http.Response("", 202),
-              syncedItem?.data,
-            )
-          : Response<BaseItemDto>(
-              http.Response("", 404),
-              null,
-            );
+          ? Response<BaseItemDto>(http.Response("", 202), syncedItem?.data)
+          : Response<BaseItemDto>(http.Response("", 404), null);
     }
   }
 
-  Future<Response<UserData>> userItemsItemIdUserDataGet({
-    String? itemId,
-  }) async {
-    final response = await api.userItemsItemIdUserDataGet(
-      userId: account?.id,
-      itemId: itemId,
-    );
-    return response.copyWith(
-      body: UserData.fromDto(response.bodyOrThrow),
-    );
+  Future<Response<UserData>> userItemsItemIdUserDataGet({String? itemId}) async {
+    final response = await api.userItemsItemIdUserDataGet(userId: account?.id, itemId: itemId);
+    return response.copyWith(body: UserData.fromDto(response.bodyOrThrow));
   }
 
-  Future<Response<UserData>?> userItemsItemIdUserDataPost({
-    String? itemId,
-    required UserData? body,
-  }) async {
+  Future<Response<UserData>?> userItemsItemIdUserDataPost({String? itemId, required UserData? body}) async {
     if (body == null) {
       return null;
     }
@@ -195,9 +145,7 @@ class JellyService {
         itemId: itemId,
       ),
     );
-    return response.copyWith(
-      body: UserData.fromDto(response.bodyOrThrow),
-    );
+    return response.copyWith(body: UserData.fromDto(response.bodyOrThrow));
   }
 
   Future<Response<ServerQueryResult>> itemsGet({
@@ -292,23 +240,14 @@ class JellyService {
       List<SyncedItem> syncedItems = [];
 
       if (ids != null && ids.isNotEmpty) {
-        final itemsWithId = await Future.wait(
-          ids.map((id) => ref.read(syncProvider.notifier).getSyncedItem(id)),
-        );
+        final itemsWithId = await Future.wait(ids.map((id) => ref.read(syncProvider.notifier).getSyncedItem(id)));
 
         syncedItems = itemsWithId.nonNulls.toList().toList();
       } else if (parentId != null) {
         final parentItems = await ref.read(syncProvider.notifier).getSyncedItem(parentId);
 
         if (parentItems == null) {
-          return Response(
-            http.Response("", 202),
-            ServerQueryResult(
-              items: [],
-              totalRecordCount: 0,
-              startIndex: 0,
-            ),
-          );
+          return Response(http.Response("", 202), ServerQueryResult(items: [], totalRecordCount: 0, startIndex: 0));
         }
 
         final children = await ref.read(syncProvider.notifier).getNestedChildren(parentItems);
@@ -326,14 +265,7 @@ class JellyService {
       }
 
       if (syncedItems.isEmpty) {
-        return Response(
-          http.Response("", 202),
-          ServerQueryResult(
-            items: [],
-            totalRecordCount: 0,
-            startIndex: 0,
-          ),
-        );
+        return Response(http.Response("", 202), ServerQueryResult(items: [], totalRecordCount: 0, startIndex: 0));
       }
 
       final actualItems = syncedItems.nonNulls.toList();
@@ -374,11 +306,7 @@ class JellyService {
 
       return Response(
         http.Response("", 202),
-        ServerQueryResult(
-          items: baseItems,
-          totalRecordCount: baseItems.length,
-          startIndex: 0,
-        ),
+        ServerQueryResult(items: baseItems, totalRecordCount: baseItems.length, startIndex: 0),
       );
     }
 
@@ -475,51 +403,26 @@ class JellyService {
     );
   }
 
-  Future<List<PhotoModel>> itemsGetAlbumPhotos({
-    String? albumId,
-  }) async {
+  Future<List<PhotoModel>> itemsGetAlbumPhotos({String? albumId}) async {
     final response = await itemsGet(
       parentId: albumId,
       enableUserData: true,
-      fields: [
-        ItemFields.parentid,
-        ItemFields.datecreated,
-      ],
+      fields: [ItemFields.parentid, ItemFields.datecreated],
     );
     return response.body?.items.whereType<PhotoModel>().toList() ?? [];
   }
 
-  Future<Response<List<ItemBaseModel>>> personsGet({
-    String? searchTerm,
-    int? limit,
-    bool? isFavorite,
-  }) async {
-    final response = await api.personsGet(
-      userId: account?.id,
-      limit: limit,
-      isFavorite: isFavorite,
-    );
-    return response.copyWith(
-      body: response.body?.items
-              ?.map(
-                (e) => ItemBaseModel.fromBaseDto(e, ref),
-              )
-              .toList() ??
-          [],
-    );
+  Future<Response<List<ItemBaseModel>>> personsGet({String? searchTerm, int? limit, bool? isFavorite}) async {
+    final response = await api.personsGet(userId: account?.id, limit: limit, isFavorite: isFavorite);
+    return response.copyWith(body: response.body?.items?.map((e) => ItemBaseModel.fromBaseDto(e, ref)).toList() ?? []);
   }
 
-  Future<Response<List<ImageInfo>>> itemsItemIdImagesGet({
-    String? itemId,
-    bool? isFavorite,
-  }) async {
+  Future<Response<List<ImageInfo>>> itemsItemIdImagesGet({String? itemId, bool? isFavorite}) async {
     final response = await api.itemsItemIdImagesGet(itemId: itemId);
     return response;
   }
 
-  Future<Response<MetadataEditorInfo>> itemsItemIdMetadataEditorGet({
-    String? itemId,
-  }) async {
+  Future<Response<MetadataEditorInfo>> itemsItemIdMetadataEditorGet({String? itemId}) async {
     return api.itemsItemIdMetadataEditorGet(itemId: itemId);
   }
 
@@ -530,33 +433,17 @@ class JellyService {
   }) async {
     return api.itemsItemIdRemoteImagesGet(
       itemId: itemId,
-      type: ItemsItemIdRemoteImagesGetType.values.firstWhereOrNull(
-        (element) => element.value == type?.value,
-      ),
+      type: ItemsItemIdRemoteImagesGetType.values.firstWhereOrNull((element) => element.value == type?.value),
       includeAllLanguages: includeAllLanguages,
     );
   }
 
-  Future<Response> itemsItemIdPost({
-    String? itemId,
-    required BaseItemDto? body,
-  }) async {
-    return api.itemsItemIdPost(
-      itemId: itemId,
-      body: body,
-    );
+  Future<Response> itemsItemIdPost({String? itemId, required BaseItemDto? body}) async {
+    return api.itemsItemIdPost(itemId: itemId, body: body);
   }
 
-  Future<Response<dynamic>?> itemIdImagesImageTypePost(
-    ImageType type,
-    String itemId,
-    Uint8List data,
-  ) async {
-    return api.itemIdImagesImageTypePost(
-      type,
-      itemId,
-      data,
-    );
+  Future<Response<dynamic>?> itemIdImagesImageTypePost(ImageType type, String itemId, Uint8List data) async {
+    return api.itemIdImagesImageTypePost(type, itemId, data);
   }
 
   Future<Response> itemsItemIdRemoteImagesDownloadPost({
@@ -566,9 +453,7 @@ class JellyService {
   }) async {
     return api.itemsItemIdRemoteImagesDownloadPost(
       itemId: itemId,
-      type: ItemsItemIdRemoteImagesDownloadPostType.values.firstWhereOrNull(
-        (element) => element.value == type?.value,
-      ),
+      type: ItemsItemIdRemoteImagesDownloadPostType.values.firstWhereOrNull((element) => element.value == type?.value),
       imageUrl: imageUrl,
     );
   }
@@ -719,15 +604,16 @@ class JellyService {
     return api.sessionsPlayingPost(body: body);
   }
 
-  Future<Response> sessionsPlayingStoppedPost({
-    required PlaybackStopInfo? body,
-  }) async {
+  Future<Response> sessionsPlayingStoppedPost({required PlaybackStopInfo? body}) async {
     if (ref.read(incognitoProvider)) return Response(http.Response("", 200), null);
     final positionTicks = body?.positionTicks;
     if (positionTicks != null) {
       ref
           .read(syncProvider.notifier)
-          .updatePlaybackPosition(itemId: body?.itemId, position: Duration(milliseconds: positionTicks ~/ 10000));
+          .updatePlaybackPosition(
+            itemId: body?.itemId,
+            position: Duration(milliseconds: positionTicks ~/ 10000),
+          );
     }
     return api.sessionsPlayingStoppedPost(body: body);
   }
@@ -740,30 +626,24 @@ class JellyService {
   Future<Response<PlaybackInfoResponse>> itemsItemIdPlaybackInfoPost({
     required String? itemId,
     required PlaybackInfoDto? body,
-  }) async =>
-      api.itemsItemIdPlaybackInfoPost(
-        itemId: itemId,
-        userId: account?.id,
-        enableDirectPlay: body?.enableDirectPlay,
-        enableDirectStream: body?.enableDirectStream,
-        enableTranscoding: body?.enableTranscoding,
-        autoOpenLiveStream: body?.autoOpenLiveStream,
-        maxStreamingBitrate: body?.maxStreamingBitrate,
-        liveStreamId: body?.liveStreamId,
-        startTimeTicks: body?.startTimeTicks,
-        mediaSourceId: body?.mediaSourceId,
-        audioStreamIndex: body?.audioStreamIndex,
-        subtitleStreamIndex: body?.subtitleStreamIndex,
-        body: body,
-      );
+  }) async => api.itemsItemIdPlaybackInfoPost(
+    itemId: itemId,
+    userId: account?.id,
+    enableDirectPlay: body?.enableDirectPlay,
+    enableDirectStream: body?.enableDirectStream,
+    enableTranscoding: body?.enableTranscoding,
+    autoOpenLiveStream: body?.autoOpenLiveStream,
+    maxStreamingBitrate: body?.maxStreamingBitrate,
+    liveStreamId: body?.liveStreamId,
+    startTimeTicks: body?.startTimeTicks,
+    mediaSourceId: body?.mediaSourceId,
+    audioStreamIndex: body?.audioStreamIndex,
+    subtitleStreamIndex: body?.subtitleStreamIndex,
+    body: body,
+  );
 
   //VideosItemsStreamGet
-  Future<Response<String>> videoStreamGet(
-    String? itemId,
-    String? container,
-    int? maxHeight,
-    int? maxBitRate,
-  ) async {
+  Future<Response<String>> videoStreamGet(String? itemId, String? container, int? maxHeight, int? maxBitRate) async {
     var response = await api.videosItemIdStreamContainerGet(
       itemId: itemId,
       container: container,
@@ -776,14 +656,9 @@ class JellyService {
     return response;
   }
 
-  Future<Response<LyricDto?>> audioItemIdLyricsGet({
-    required String? itemId,
-  }) async {
+  Future<Response<LyricDto?>> audioItemIdLyricsGet({required String? itemId}) async {
     if (itemId == null || itemId.isEmpty) {
-      return Response<LyricDto?>(
-        http.Response("", 400),
-        null,
-      );
+      return Response<LyricDto?>(http.Response("", 400), null);
     }
 
     final isOffline = ref.read(offlineStateProvider);
@@ -831,11 +706,7 @@ class JellyService {
       } else {
         return Response<BaseItemDtoQueryResult>(
           http.Response("", 400),
-          const BaseItemDtoQueryResult(
-            items: [],
-            totalRecordCount: 0,
-            startIndex: 0,
-          ),
+          const BaseItemDtoQueryResult(items: [], totalRecordCount: 0, startIndex: 0),
         );
       }
     }
@@ -850,10 +721,7 @@ class JellyService {
       var response = await api.showsSeriesIdEpisodesGet(
         seriesId: seriesId,
         userId: account?.id,
-        fields: [
-          ...?fields,
-          ItemFields.parentid,
-        ],
+        fields: [...?fields, ItemFields.parentid, ItemFields.candelete, ItemFields.candownload],
         isMissing: isMissing,
         limit: limit,
         sortBy: sortBy,
@@ -872,10 +740,7 @@ class JellyService {
     }
   }
 
-  Future<List<ItemBaseModel>> fetchEpisodeFromShow({
-    required String? seriesId,
-    String? seasonId,
-  }) async {
+  Future<List<ItemBaseModel>> fetchEpisodeFromShow({required String? seriesId, String? seasonId}) async {
     final response = await showsSeriesIdEpisodesGet(seriesId: seriesId, seasonId: seasonId);
     return response.body?.items?.map((e) => ItemBaseModel.fromBaseDto(e, ref)).toList() ?? [];
   }
@@ -888,18 +753,11 @@ class JellyService {
     return api.itemsItemIdSpecialFeaturesGet(itemId: itemId, userId: account?.id);
   }
 
-  Future<Response<BaseItemDtoQueryResult>> itemsItemIdSimilarGet({
-    String? itemId,
-    int? limit,
-  }) async {
+  Future<Response<BaseItemDtoQueryResult>> itemsItemIdSimilarGet({String? itemId, int? limit}) async {
     Future<Response<BaseItemDtoQueryResult>> fetchSimilarGet() async {
       return Response<BaseItemDtoQueryResult>(
         http.Response("", 400),
-        const BaseItemDtoQueryResult(
-          items: [],
-          totalRecordCount: 0,
-          startIndex: 0,
-        ),
+        const BaseItemDtoQueryResult(items: [], totalRecordCount: 0, startIndex: 0),
       );
     }
 
@@ -910,11 +768,12 @@ class JellyService {
     }
 
     try {
-      return await api.itemsItemIdSimilarGet(userId: account?.id, itemId: itemId, limit: limit, fields: [
-        ItemFields.parentid,
-        ItemFields.candelete,
-        ItemFields.candownload,
-      ]);
+      return await api.itemsItemIdSimilarGet(
+        userId: account?.id,
+        itemId: itemId,
+        limit: limit,
+        fields: [ItemFields.parentid, ItemFields.candelete, ItemFields.candownload],
+      );
     } catch (e) {
       return fetchSimilarGet();
     }
@@ -939,78 +798,52 @@ class JellyService {
     );
   }
 
-  Future<Response<dynamic>> playlistsPlaylistIdItemsPost({
-    String? playlistId,
-    List<String>? ids,
-  }) async {
-    return api.playlistsPlaylistIdItemsPost(
-      playlistId: playlistId,
-      ids: ids,
-      userId: account?.id,
-    );
+  Future<Response<dynamic>> playlistsPlaylistIdItemsPost({String? playlistId, List<String>? ids}) async {
+    return api.playlistsPlaylistIdItemsPost(playlistId: playlistId, ids: ids, userId: account?.id);
   }
 
-  Future<Response<dynamic>> playlistsPost({
-    String? name,
-    List<String>? ids,
-    required CreatePlaylistDto? body,
-  }) async {
-    return api.playlistsPost(
-      name: name,
-      ids: ids,
-      userId: account?.id,
-      body: body,
-    );
+  Future<Response<dynamic>> playlistsPost({String? name, List<String>? ids, required CreatePlaylistDto? body}) async {
+    return api.playlistsPost(name: name, ids: ids, userId: account?.id, body: body);
   }
 
-  Future<Response<List<AccountModel>>> usersPublicGet(
-    CredentialsModel credentials,
-  ) async {
+  Future<Response<List<AccountModel>>> usersPublicGet(CredentialsModel credentials) async {
     final response = await api.usersPublicGet();
     return response.copyWith(
-      body: response.body?.map(
-        (e) {
-          var imageUrl = ref.read(imageUtilityProvider).getUserImageUrl(e.id ?? "");
-          return AccountModel(
-            name: e.name ?? "",
-            credentials: credentials,
-            id: e.id ?? "",
-            avatar: imageUrl,
-            lastUsed: DateTime.now(),
-          );
-        },
-      ).toList(),
+      body: response.body?.map((e) {
+        var imageUrl = ref.read(imageUtilityProvider).getUserImageUrl(e.id ?? "");
+        return AccountModel(
+          name: e.name ?? "",
+          credentials: credentials,
+          id: e.id ?? "",
+          avatar: imageUrl,
+          lastUsed: DateTime.now(),
+        );
+      }).toList(),
     );
   }
 
   Future<Response<List<AccountModel>>> getAllUsers() {
     return api.usersGet().then(
-          (response) => response.copyWith(
-            body: response.body?.map(
-              (e) {
-                var imageUrl = ref.read(imageUtilityProvider).getUserImageUrl(e.id ?? "");
-                return AccountModel(
-                  name: e.name ?? "",
-                  credentials: CredentialsModel.createNewCredentials(),
-                  id: e.id ?? "",
-                  avatar: imageUrl,
-                  policy: e.policy,
-                  lastUsed: e.lastActivityDate ?? DateTime.now(),
-                  hasPassword: e.hasPassword ?? false,
-                  hasConfiguredPassword: e.hasConfiguredPassword ?? false,
-                );
-              },
-            ).toList(),
-          ),
-        );
+      (response) => response.copyWith(
+        body: response.body?.map((e) {
+          var imageUrl = ref.read(imageUtilityProvider).getUserImageUrl(e.id ?? "");
+          return AccountModel(
+            name: e.name ?? "",
+            credentials: CredentialsModel.createNewCredentials(),
+            id: e.id ?? "",
+            avatar: imageUrl,
+            policy: e.policy,
+            lastUsed: e.lastActivityDate ?? DateTime.now(),
+            hasPassword: e.hasPassword ?? false,
+            hasConfiguredPassword: e.hasConfiguredPassword ?? false,
+          );
+        }).toList(),
+      ),
+    );
   }
 
   Future<List<DeviceInfoDto>?> getAllDevices() async {
-    return (await api.devicesGet(
-      userId: account?.id,
-    ))
-        .body
-        ?.items;
+    return (await api.devicesGet(userId: account?.id)).body?.items;
   }
 
   Future<List<ParentalRating>?> getParentalRatings() async {
@@ -1020,10 +853,7 @@ class JellyService {
   Future<Response<UserDto>> createNewUser(CreateUserByName user) => api.usersNewPost(body: user);
 
   Future<Response<dynamic>> setUserPolicy({required String id, required UserPolicy? policy}) =>
-      api.usersUserIdPolicyPost(
-        userId: id,
-        body: policy,
-      );
+      api.usersUserIdPolicyPost(userId: id, body: policy);
 
   Future<Response<BaseItemDtoQueryResult>> libraryMediaFolders() => api.libraryMediaFoldersGet();
 
@@ -1031,7 +861,9 @@ class JellyService {
     required String userName,
     required String password,
   }) async {
-    return api.usersAuthenticateByNamePost(body: AuthenticateUserByName(username: userName, pw: password));
+    return api.usersAuthenticateByNamePost(
+      body: AuthenticateUserByName(username: userName, pw: password),
+    );
   }
 
   Future<void> deleteUser(String userId) => api.usersUserIdDelete(userId: userId);
@@ -1056,21 +888,14 @@ class JellyService {
 
   Future<Response<List<TaskInfo>>> getActiveTasks() => api.scheduledTasksGet();
 
-  Future<Response<List<SessionInfoDto>>> getActiveSessions({
-    int timeoutSeconds = 960,
-  }) =>
-      api.sessionsGet(
-        activeWithinSeconds: timeoutSeconds,
-      );
+  Future<Response<List<SessionInfoDto>>> getActiveSessions({int timeoutSeconds = 960}) =>
+      api.sessionsGet(activeWithinSeconds: timeoutSeconds);
 
   Future<void> stopActiveTask(String taskId) => api.scheduledTasksRunningTaskIdDelete(taskId: taskId);
   Future<void> startTask(String taskId) => api.scheduledTasksRunningTaskIdPost(taskId: taskId);
 
   Future<Response<dynamic>> updateTaskTriggers(String taskId, {required List<TaskTriggerInfo> triggers}) =>
-      api.scheduledTasksTaskIdTriggersPost(
-        taskId: taskId,
-        body: triggers,
-      );
+      api.scheduledTasksTaskIdTriggersPost(taskId: taskId, body: triggers);
 
   Future<Response<UserSettings>> getCustomConfig() async {
     final response = await api.displayPreferencesDisplayPreferencesIdGet(
@@ -1080,9 +905,7 @@ class JellyService {
     );
     final customPrefs = response.body?.customPrefs?.parseValues();
     final userPrefs = customPrefs != null ? UserSettings.fromJson(customPrefs) : UserSettings();
-    return response.copyWith(
-      body: userPrefs,
-    );
+    return response.copyWith(body: userPrefs);
   }
 
   Future<Response<dynamic>> setCustomConfig(UserSettings currentSettings) async {
@@ -1096,21 +919,15 @@ class JellyService {
       $client: _client,
       body: currentDisplayPreferences.body?.copyWith(
         customPrefs: currentSettings.toJson().map(
-              (key, value) => MapEntry(
-                key,
-                value is String ? value : jsonEncode(value),
-              ),
-            ),
+          (key, value) => MapEntry(key, value is String ? value : jsonEncode(value)),
+        ),
       ),
     );
   }
 
   Future<Response> sessionsLogoutPost() => api.sessionsLogoutPost();
 
-  Future<Response<String>> itemsItemIdDownloadGet({
-    String? itemId,
-  }) =>
-      api.itemsItemIdDownloadGet(itemId: itemId);
+  Future<Response<String>> itemsItemIdDownloadGet({String? itemId}) => api.itemsItemIdDownloadGet(itemId: itemId);
 
   Future<Response> collectionsCollectionIdItemsPost({required String? collectionId, required List<String>? ids}) =>
       api.collectionsCollectionIdItemsPost(collectionId: collectionId, ids: ids);
@@ -1124,20 +941,19 @@ class JellyService {
     bool? includeExternalContent,
     List<CollectionType>? presetViews,
     bool? includeHidden,
-  }) =>
-      api.userViewsGet(
-        userId: account?.id,
-        includeExternalContent: includeExternalContent,
-        presetViews: presetViews,
-        includeHidden: includeHidden,
-      );
+  }) => api.userViewsGet(
+    userId: account?.id,
+    includeExternalContent: includeExternalContent,
+    presetViews: presetViews,
+    includeHidden: includeHidden,
+  );
 
   Future<Response<List<ExternalIdInfo>>> itemsItemIdExternalIdInfosGet({required String? itemId}) =>
       api.itemsItemIdExternalIdInfosGet(itemId: itemId);
 
-  Future<Response<List<RemoteSearchResult>>> itemsRemoteSearchSeriesPost(
-          {required SeriesInfoRemoteSearchQuery? body}) =>
-      api.itemsRemoteSearchSeriesPost(body: body);
+  Future<Response<List<RemoteSearchResult>>> itemsRemoteSearchSeriesPost({
+    required SeriesInfoRemoteSearchQuery? body,
+  }) => api.itemsRemoteSearchSeriesPost(body: body);
 
   Future<Response<List<RemoteSearchResult>>> itemsRemoteSearchMoviePost({required MovieInfoRemoteSearchQuery? body}) =>
       api.itemsRemoteSearchMoviePost(body: body);
@@ -1149,22 +965,13 @@ class JellyService {
   Future<Response<LibraryOptionsResultDto>> librariesAvailableOptionsGet({
     LibrariesAvailableOptionsGetLibraryContentType? libraryContentType,
     bool? isNewLibrary,
-  }) =>
-      api.librariesAvailableOptionsGet(
-        libraryContentType: libraryContentType,
-        isNewLibrary: isNewLibrary,
-      );
+  }) => api.librariesAvailableOptionsGet(libraryContentType: libraryContentType, isNewLibrary: isNewLibrary);
 
   Future<Response<dynamic>> itemsRemoteSearchApplyItemIdPost({
     required String? itemId,
     bool? replaceAllImages,
     required RemoteSearchResult? body,
-  }) =>
-      api.itemsRemoteSearchApplyItemIdPost(
-        itemId: itemId,
-        replaceAllImages: replaceAllImages,
-        body: body,
-      );
+  }) => api.itemsRemoteSearchApplyItemIdPost(itemId: itemId, replaceAllImages: replaceAllImages, body: body);
 
   Future<Response<BaseItemDtoQueryResult>> showsSeriesIdSeasonsGet({
     required String? seriesId,
@@ -1187,11 +994,7 @@ class JellyService {
       } else {
         return Response<BaseItemDtoQueryResult>(
           http.Response("", 400),
-          const BaseItemDtoQueryResult(
-            items: [],
-            totalRecordCount: 0,
-            startIndex: 0,
-          ),
+          const BaseItemDtoQueryResult(items: [], totalRecordCount: 0, startIndex: 0),
         );
       }
     }
@@ -1224,18 +1027,17 @@ class JellyService {
     bool? isNews,
     bool? isSeries,
     bool? recursive,
-  }) =>
-      api.itemsFilters2Get(
-        parentId: parentId,
-        includeItemTypes: includeItemTypes,
-        isAiring: isAiring,
-        isMovie: isMovie,
-        isSports: isSports,
-        isKids: isKids,
-        isNews: isNews,
-        isSeries: isSeries,
-        recursive: recursive,
-      );
+  }) => api.itemsFilters2Get(
+    parentId: parentId,
+    includeItemTypes: includeItemTypes,
+    isAiring: isAiring,
+    isMovie: isMovie,
+    isSports: isSports,
+    isKids: isKids,
+    isNews: isNews,
+    isSeries: isSeries,
+    recursive: recursive,
+  );
 
   Future<Response<BaseItemDtoQueryResult>> studiosGet({
     int? startIndex,
@@ -1255,30 +1057,26 @@ class JellyService {
     String? nameLessThan,
     bool? enableImages,
     bool? enableTotalRecordCount,
-  }) =>
-      api.studiosGet(
-        startIndex: startIndex,
-        limit: limit,
-        searchTerm: searchTerm,
-        parentId: parentId,
-        fields: fields,
-        excludeItemTypes: excludeItemTypes,
-        includeItemTypes: includeItemTypes,
-        isFavorite: isFavorite,
-        enableUserData: enableUserData,
-        imageTypeLimit: imageTypeLimit,
-        enableImageTypes: enableImageTypes,
-        nameStartsWithOrGreater: nameStartsWithOrGreater,
-        nameStartsWith: nameStartsWith,
-        nameLessThan: nameLessThan,
-        enableImages: enableImages,
-        enableTotalRecordCount: enableTotalRecordCount,
-      );
+  }) => api.studiosGet(
+    startIndex: startIndex,
+    limit: limit,
+    searchTerm: searchTerm,
+    parentId: parentId,
+    fields: fields,
+    excludeItemTypes: excludeItemTypes,
+    includeItemTypes: includeItemTypes,
+    isFavorite: isFavorite,
+    enableUserData: enableUserData,
+    imageTypeLimit: imageTypeLimit,
+    enableImageTypes: enableImageTypes,
+    nameStartsWithOrGreater: nameStartsWithOrGreater,
+    nameStartsWith: nameStartsWith,
+    nameLessThan: nameLessThan,
+    enableImages: enableImages,
+    enableTotalRecordCount: enableTotalRecordCount,
+  );
 
-  Future<Response<ServerQueryResult>> albumInstantMixGet({
-    required String itemId,
-    int? limit,
-  }) async {
+  Future<Response<ServerQueryResult>> albumInstantMixGet({required String itemId, int? limit}) async {
     final response = await api.albumsItemIdInstantMixGet(
       userId: account?.id,
       itemId: itemId,
@@ -1289,15 +1087,10 @@ class JellyService {
       imageTypeLimit: 1,
       enableImageTypes: [ImageType.primary],
     );
-    return response.copyWith(
-      body: ServerQueryResult.fromBaseQuery(response.bodyOrThrow, ref),
-    );
+    return response.copyWith(body: ServerQueryResult.fromBaseQuery(response.bodyOrThrow, ref));
   }
 
-  Future<Response<ServerQueryResult>> artistInstantMixGet({
-    required String itemId,
-    int? limit,
-  }) async {
+  Future<Response<ServerQueryResult>> artistInstantMixGet({required String itemId, int? limit}) async {
     final response = await api.artistsItemIdInstantMixGet(
       userId: account?.id,
       itemId: itemId,
@@ -1308,15 +1101,10 @@ class JellyService {
       imageTypeLimit: 1,
       enableImageTypes: [ImageType.primary],
     );
-    return response.copyWith(
-      body: ServerQueryResult.fromBaseQuery(response.bodyOrThrow, ref),
-    );
+    return response.copyWith(body: ServerQueryResult.fromBaseQuery(response.bodyOrThrow, ref));
   }
 
-  Future<Response<ServerQueryResult>> audioInstantMixGet({
-    required String itemId,
-    int? limit,
-  }) async {
+  Future<Response<ServerQueryResult>> audioInstantMixGet({required String itemId, int? limit}) async {
     final response = await api.songsItemIdInstantMixGet(
       userId: account?.id,
       itemId: itemId,
@@ -1327,9 +1115,7 @@ class JellyService {
       imageTypeLimit: 1,
       enableImageTypes: [ImageType.primary],
     );
-    return response.copyWith(
-      body: ServerQueryResult.fromBaseQuery(response.bodyOrThrow, ref),
-    );
+    return response.copyWith(body: ServerQueryResult.fromBaseQuery(response.bodyOrThrow, ref));
   }
 
   Future<Response<ServerQueryResult>> playlistsPlaylistIdItemsGet({
@@ -1347,12 +1133,13 @@ class JellyService {
       final syncedItem = await ref.read(syncProvider.notifier).getSyncedItem(playlistId);
       final nestedItems = await ref.read(syncProvider.notifier).getNestedChildren(syncedItem);
       return Response(
-          http.Response("", 202),
-          ServerQueryResult(
-            items: nestedItems.map((e) => e.itemModel).nonNulls.toList(),
-            totalRecordCount: nestedItems.length,
-            startIndex: 0,
-          ));
+        http.Response("", 202),
+        ServerQueryResult(
+          items: nestedItems.map((e) => e.itemModel).nonNulls.toList(),
+          totalRecordCount: nestedItems.length,
+          startIndex: 0,
+        ),
+      );
     }
 
     final response = await api.playlistsPlaylistIdItemsGet(
@@ -1366,16 +1153,11 @@ class JellyService {
       imageTypeLimit: imageTypeLimit,
       enableImageTypes: enableImageTypes,
     );
-    return response.copyWith(
-      body: ServerQueryResult.fromBaseQuery(response.bodyOrThrow, ref),
-    );
+    return response.copyWith(body: ServerQueryResult.fromBaseQuery(response.bodyOrThrow, ref));
   }
 
   Future<Response> playlistsPlaylistIdItemsDelete({required String? playlistId, List<String>? entryIds}) =>
-      api.playlistsPlaylistIdItemsDelete(
-        playlistId: playlistId,
-        entryIds: entryIds,
-      );
+      api.playlistsPlaylistIdItemsDelete(playlistId: playlistId, entryIds: entryIds);
 
   Future<Response<UserDto>> usersMeGet() => api.usersMeGet();
 
@@ -1388,25 +1170,19 @@ class JellyService {
     bool? replaceAllMetadata,
     bool? replaceAllImages,
     bool? replaceTrickplayImages,
-  }) =>
-      api.itemsItemIdRefreshPost(
-        itemId: itemId,
-        metadataRefreshMode: metadataRefreshMode?.metadataRefreshMode,
-        imageRefreshMode: imageRefreshMode?.imageRefreshMode,
-        replaceAllMetadata: replaceAllMetadata,
-        replaceAllImages: replaceAllImages,
-        regenerateTrickplay: replaceTrickplayImages,
-      );
+  }) => api.itemsItemIdRefreshPost(
+    itemId: itemId,
+    metadataRefreshMode: metadataRefreshMode?.metadataRefreshMode,
+    imageRefreshMode: imageRefreshMode?.imageRefreshMode,
+    replaceAllMetadata: replaceAllMetadata,
+    replaceAllImages: replaceAllImages,
+    regenerateTrickplay: replaceTrickplayImages,
+  );
 
-  Future<Response<UserItemDataDto>> usersUserIdFavoriteItemsItemIdPost({
-    required String? itemId,
-  }) async {
+  Future<Response<UserItemDataDto>> usersUserIdFavoriteItemsItemIdPost({required String? itemId}) async {
     Response<UserItemDataDto>? response;
     try {
-      response = await api.userFavoriteItemsItemIdPost(
-        itemId: itemId,
-        userId: account?.id,
-      );
+      response = await api.userFavoriteItemsItemIdPost(itemId: itemId, userId: account?.id);
     } finally {
       await ref
           .read(syncProvider.notifier)
@@ -1415,15 +1191,10 @@ class JellyService {
     return response;
   }
 
-  Future<Response<UserItemDataDto>> usersUserIdFavoriteItemsItemIdDelete({
-    required String? itemId,
-  }) async {
+  Future<Response<UserItemDataDto>> usersUserIdFavoriteItemsItemIdDelete({required String? itemId}) async {
     Response<UserItemDataDto>? response;
     try {
-      response = await api.userFavoriteItemsItemIdDelete(
-        itemId: itemId,
-        userId: account?.id,
-      );
+      response = await api.userFavoriteItemsItemIdDelete(itemId: itemId, userId: account?.id);
     } finally {
       await ref
           .read(syncProvider.notifier)
@@ -1440,7 +1211,9 @@ class JellyService {
     try {
       response = await api.userPlayedItemsItemIdPost(itemId: itemId, userId: account?.id, datePlayed: datePlayed);
     } finally {
-      await ref.read(syncProvider.notifier).updatePlayedItem(
+      await ref
+          .read(syncProvider.notifier)
+          .updatePlayedItem(
             itemId,
             datePlayed: datePlayed,
             played: true,
@@ -1450,46 +1223,31 @@ class JellyService {
     return response;
   }
 
-  Future<Response<UserItemDataDto>> usersUserIdPlayedItemsItemIdDelete({
-    required String? itemId,
-  }) async {
+  Future<Response<UserItemDataDto>> usersUserIdPlayedItemsItemIdDelete({required String? itemId}) async {
     Response<UserItemDataDto>? response;
     try {
-      response = await api.userPlayedItemsItemIdDelete(
-        itemId: itemId,
-        userId: account?.id,
-      );
+      response = await api.userPlayedItemsItemIdDelete(itemId: itemId, userId: account?.id);
     } finally {
-      await ref.read(syncProvider.notifier).updatePlayedItem(
-            itemId,
-            played: false,
-            responseSuccessful: response?.isSuccessful ?? false,
-          );
+      await ref
+          .read(syncProvider.notifier)
+          .updatePlayedItem(itemId, played: false, responseSuccessful: response?.isSuccessful ?? false);
     }
 
     return response;
   }
 
-  Future<Response<MediaSegmentsModel>?> mediaSegmentsGet({
-    required String id,
-  }) async {
+  Future<Response<MediaSegmentsModel>?> mediaSegmentsGet({required String id}) async {
     try {
       final response = await api.mediaSegmentsItemIdGet(itemId: id);
       final newSegments = response.body?.items?.map((e) => e.toSegment).toList() ?? [];
-      return response.copyWith(
-        body: MediaSegmentsModel(segments: newSegments),
-      );
+      return response.copyWith(body: MediaSegmentsModel(segments: newSegments));
     } catch (e) {
       log(e.toString());
       return null;
     }
   }
 
-  Future<Response<TrickPlayModel>?> getTrickPlay({
-    required ItemBaseModel? item,
-    int? width,
-    required Ref ref,
-  }) async {
+  Future<Response<TrickPlayModel>?> getTrickPlay({required ItemBaseModel? item, int? width, required Ref ref}) async {
     try {
       if (item == null) return null;
       if (item.overview.trickPlayInfo?.isEmpty == true) {
@@ -1497,13 +1255,11 @@ class JellyService {
       }
       final trickPlayModels = item.overview.trickPlayInfo?.values;
       final preferSmallest = ref.read(lowResourceModeProvider) || ref.read(argumentsStateProvider).leanBackMode;
-      final trickPlayModel =
-          preferSmallest ? trickPlayModels?.sortedBy<num>((e) => e.width).firstOrNull : trickPlayModels?.lastOrNull;
+      final trickPlayModel = preferSmallest
+          ? trickPlayModels?.sortedBy<num>((e) => e.width).firstOrNull
+          : trickPlayModels?.lastOrNull;
       if (trickPlayModel == null) return null;
-      final response = await api.videosItemIdTrickplayWidthTilesM3u8Get(
-        itemId: item.id,
-        width: trickPlayModel.width,
-      );
+      final response = await api.videosItemIdTrickplayWidthTilesM3u8Get(itemId: item.id, width: trickPlayModel.width);
 
       final server = ref.read(serverUrlProvider);
 
@@ -1517,32 +1273,32 @@ class JellyService {
           .toList();
 
       return response.copyWith(
-          body: trickPlayModel.copyWith(
-              images: sanitizedUrls
-                  .map(
-                    (e) {
-                      final parsed = Uri.tryParse(e);
-                      if (parsed == null) return '';
-                      if (parsed.hasScheme && parsed.host.isNotEmpty) {
-                        return parsed.toString();
-                      }
-                      return buildServerUrl(
-                        ref,
-                        pathSegments: [
-                          'Videos',
-                          item.id,
-                          'Trickplay',
-                          trickPlayModel.width.toString(),
-                          ...parsed.pathSegments.where((s) => s.isNotEmpty),
-                        ],
-                        queryParameters: parsed.queryParameters.isNotEmpty
-                            ? {for (final entry in parsed.queryParameters.entries) entry.key: entry.value}
-                            : null,
-                      );
-                    },
-                  )
-                  .where((e) => e.isNotEmpty)
-                  .toList()));
+        body: trickPlayModel.copyWith(
+          images: sanitizedUrls
+              .map((e) {
+                final parsed = Uri.tryParse(e);
+                if (parsed == null) return '';
+                if (parsed.hasScheme && parsed.host.isNotEmpty) {
+                  return parsed.toString();
+                }
+                return buildServerUrl(
+                  ref,
+                  pathSegments: [
+                    'Videos',
+                    item.id,
+                    'Trickplay',
+                    trickPlayModel.width.toString(),
+                    ...parsed.pathSegments.where((s) => s.isNotEmpty),
+                  ],
+                  queryParameters: parsed.queryParameters.isNotEmpty
+                      ? {for (final entry in parsed.queryParameters.entries) entry.key: entry.value}
+                      : null,
+                );
+              })
+              .where((e) => e.isNotEmpty)
+              .toList(),
+        ),
+      );
     } catch (e) {
       log(e.toString());
       return null;
@@ -1562,10 +1318,7 @@ class JellyService {
   Future<UserConfiguration?> _updateUserConfiguration(UserConfiguration newUserConfiguration) async {
     if (account?.id == null) return null;
 
-    final response = await api.usersConfigurationPost(
-      userId: account!.id,
-      body: newUserConfiguration,
-    );
+    final response = await api.usersConfigurationPost(userId: account!.id, body: newUserConfiguration);
 
     if (response.isSuccessful) {
       return newUserConfiguration;
@@ -1587,9 +1340,7 @@ class JellyService {
     final current = account?.userConfiguration;
     if (current == null) return Future.value(null);
 
-    final updated = current.copyWith(
-      rememberSubtitleSelections: !(current.rememberSubtitleSelections ?? false),
-    );
+    final updated = current.copyWith(rememberSubtitleSelections: !(current.rememberSubtitleSelections ?? false));
     return _updateUserConfiguration(updated);
   }
 
@@ -1601,27 +1352,16 @@ class JellyService {
     return api.quickConnectInitiatePost();
   }
 
-  Future<Response<QuickConnectResult>> quickConnectConnectGet({
-    String? secret,
-  }) async {
+  Future<Response<QuickConnectResult>> quickConnectConnectGet({String? secret}) async {
     return api.quickConnectConnectGet(secret: secret);
   }
 
   Future<Response<AuthenticationResult>> quickConnectAuthenticate(String secret) async {
-    return api.usersAuthenticateWithQuickConnectPost(
-      body: QuickConnectDto(secret: secret),
-    );
+    return api.usersAuthenticateWithQuickConnectPost(body: QuickConnectDto(secret: secret));
   }
 
-  Future<Response<dynamic>> resetPassword({
-    required String userId,
-  }) {
-    return api.usersPasswordPost(
-      userId: userId,
-      body: const UpdateUserPassword(
-        resetPassword: true,
-      ),
-    );
+  Future<Response<dynamic>> resetPassword({required String userId}) {
+    return api.usersPasswordPost(userId: userId, body: const UpdateUserPassword(resetPassword: true));
   }
 
   Future<Response<dynamic>> setNewPassword({
@@ -1632,11 +1372,7 @@ class JellyService {
   }) {
     return api.usersPasswordPost(
       userId: userId,
-      body: UpdateUserPassword(
-        currentPassword: currentPassword,
-        newPw: newPassword,
-        currentPw: confirmPassword,
-      ),
+      body: UpdateUserPassword(currentPassword: currentPassword, newPw: newPassword, currentPw: confirmPassword),
     );
   }
 
@@ -1663,30 +1399,17 @@ class JellyService {
     );
   }
 
-  Future<Response<String>> parentPathGet(
-    String path,
-  ) async {
-    return api.environmentParentPathGet(
-      path: path,
-    );
+  Future<Response<String>> parentPathGet(String path) async {
+    return api.environmentParentPathGet(path: path);
   }
 
-  Future<Response<dynamic>> virtualFoldersUpdate({
-    required String id,
-    required LibraryOptions? libraryOptions,
-  }) {
+  Future<Response<dynamic>> virtualFoldersUpdate({required String id, required LibraryOptions? libraryOptions}) {
     return api.libraryVirtualFoldersLibraryOptionsPost(
-      body: UpdateLibraryOptionsDto(
-        id: id,
-        libraryOptions: libraryOptions,
-      ),
+      body: UpdateLibraryOptionsDto(id: id, libraryOptions: libraryOptions),
     );
   }
 
-  Future<Response<dynamic>> virtualFoldersPost({
-    required VirtualFolderInfo newFolder,
-    bool? refreshLibrary,
-  }) {
+  Future<Response<dynamic>> virtualFoldersPost({required VirtualFolderInfo newFolder, bool? refreshLibrary}) {
     return api.libraryVirtualFoldersPost(
       name: newFolder.name ?? "",
       collectionType: switch (newFolder.collectionType) {
@@ -1699,20 +1422,12 @@ class JellyService {
       },
       paths: newFolder.locations,
       refreshLibrary: refreshLibrary,
-      body: AddVirtualFolderDto(
-        libraryOptions: newFolder.libraryOptions,
-      ),
+      body: AddVirtualFolderDto(libraryOptions: newFolder.libraryOptions),
     );
   }
 
-  Future<Response<BaseItemDtoQueryResult>> liveTvChannelsGet({
-    int? limit,
-  }) async {
-    return await api.liveTvChannelsGet(
-      limit: limit,
-      userId: account?.id,
-      addCurrentProgram: true,
-    );
+  Future<Response<BaseItemDtoQueryResult>> liveTvChannelsGet({int? limit}) async {
+    return await api.liveTvChannelsGet(limit: limit, userId: account?.id, addCurrentProgram: true);
   }
 
   Future<Response<BaseItemDtoQueryResult>> liveTvChannelPrograms({
@@ -1731,10 +1446,7 @@ class JellyService {
       maxEndDate: maxEndDate,
       enableUserData: false,
       sortBy: [ItemSortBy.startdate],
-      fields: [
-        ItemFields.overview,
-        ItemFields.parentid,
-      ],
+      fields: [ItemFields.overview, ItemFields.parentid],
       enableTotalRecordCount: false,
     );
   }
@@ -1908,8 +1620,9 @@ class JellyService {
     if (enableAudioVbrEncoding != null) queryParams['enableAudioVbrEncoding'] = enableAudioVbrEncoding.toString();
 
     // Build the query string
-    final queryString =
-        queryParams.entries.map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}').join('&');
+    final queryString = queryParams.entries
+        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
 
     return queryString.isEmpty ? '$baseUrl$path' : '$baseUrl$path?$queryString';
   }
@@ -1926,8 +1639,9 @@ int _sortSyncedItems(BaseItemDto? aItem, BaseItemDto? bItem, List<ItemSortBy>? s
     for (int i = 0; i < sortBy.length; i++) {
       final sortField = sortBy[i];
 
-      final order =
-          (sortOrder != null && sortOrder.length > i) ? sortOrder[i] : (sortOrder?.firstOrNull ?? SortOrder.ascending);
+      final order = (sortOrder != null && sortOrder.length > i)
+          ? sortOrder[i]
+          : (sortOrder?.firstOrNull ?? SortOrder.ascending);
 
       final isAscending = order != SortOrder.descending;
       int comp = 0;
