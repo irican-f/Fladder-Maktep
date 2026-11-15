@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
+import 'package:fladder/providers/jellybot_notifications_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
 import 'package:fladder/screens/settings/settings_list_tile.dart';
@@ -35,21 +36,13 @@ class _JellybotScreenState extends ConsumerState<JellybotScreen> {
             }
           },
           child: AdaptiveLayout.layoutModeOf(context) == LayoutMode.single
-              ? Card(
-                  elevation: 0,
-                  child: Stack(
-                    children: [_leftPane(context), content],
-                  ),
-                )
+              ? Card(elevation: 0, child: Stack(children: [_leftPane(context), content]))
               : Row(
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Expanded(flex: 2, child: _leftPane(context)),
-                    Expanded(
-                      flex: 3,
-                      child: content,
-                    ),
+                    Expanded(flex: 3, child: content),
                   ],
                 ),
         );
@@ -73,6 +66,7 @@ class _JellybotScreenState extends ConsumerState<JellybotScreen> {
         AdaptiveLayout.layoutModeOf(context) == LayoutMode.dual && context.tabsRouter.current.name == route.routeName;
 
     final isAdmin = ref.watch(userProvider.select((value) => value?.policy?.isAdministrator ?? false));
+    final unread = ref.watch(jellybotUnreadNotificationsProvider).value ?? 0;
 
     return Padding(
       padding: EdgeInsets.only(left: AdaptiveLayout.of(context).sideBarWidth),
@@ -84,9 +78,20 @@ class _JellybotScreenState extends ConsumerState<JellybotScreen> {
           showBackButtonNested: true,
           items: [
             SettingsListTile(
+              label: Text(context.localized.notifications),
+              subLabel: Text(
+                unread > 0
+                    ? context.localized.jellybotUnreadCount(unread)
+                    : context.localized.jellybotNotificationsDesc,
+              ),
+              autoFocus: true,
+              selected: containsRoute(const JellybotNotificationsRoute()),
+              icon: unread > 0 ? IconsaxPlusBold.notification : IconsaxPlusLinear.notification,
+              onTap: () => navigateTo(const JellybotNotificationsRoute()),
+            ),
+            SettingsListTile(
               label: Text(context.localized.jellybotProviderSearch),
               subLabel: Text(context.localized.jellybotProviderSearchDesc),
-              autoFocus: true,
               selected: containsRoute(const JellybotProviderSearchRoute()),
               icon: IconsaxPlusLinear.search_normal,
               onTap: () => navigateTo(const JellybotProviderSearchRoute()),

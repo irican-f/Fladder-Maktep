@@ -41,7 +41,7 @@ final class JellybotApiProvider
   }
 }
 
-String _$jellybotApiHash() => r'81f85a749ee957ab45a4d8bacff5c8512f85a2c7';
+String _$jellybotApiHash() => r'2da8aca8920aafa9fa26fae759f37e84089a3783';
 
 abstract class _$JellybotApi extends $Notifier<Jellybot> {
   Jellybot build();

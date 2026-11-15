@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:chopper/chopper.dart';
@@ -9,7 +10,9 @@ import 'package:fladder/models/jellybot/jellybot_add_flow_state.dart';
 import 'package:fladder/models/jellybot/jellybot_problem_details.dart';
 import 'package:fladder/providers/jellybot_api_provider.dart';
 import 'package:fladder/providers/jellybot_search_provider.dart';
+import 'package:fladder/providers/update_notifications_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/services/notification_service.dart';
 
 part 'jellybot_add_flow_provider.g.dart';
 
@@ -37,12 +40,7 @@ class JellybotAddFlow extends _$JellybotAddFlow {
     final user = ref.read(userProvider);
     try {
       final response = await api.apiCrawlLinksPost(
-        body: ExtractMediaRequest(
-          url: item.url,
-          mediaCategory: category,
-          userId: user?.id,
-          userName: user?.name,
-        ),
+        body: ExtractMediaRequest(url: item.url, mediaCategory: category, userId: user?.id, userName: user?.name),
       );
       _handlePreviewResponse(response, expected: snapshot);
     } catch (e) {
@@ -125,6 +123,11 @@ class JellybotAddFlow extends _$JellybotAddFlow {
       }
       ref.invalidate(addedCrawlLinkUrlsProvider);
       state = snapshot.copyWith(step: AddFlowStep.success);
+      // The user just asked for something they'll want to hear about: the moment to ask for notifications.
+      // A no-op once granted (or permanently denied).
+      if (ref.read(supportsNotificationsProvider)) {
+        unawaited(NotificationService.requestPermission());
+      }
     } catch (e) {
       if (!identical(state, snapshot)) {
         return;
@@ -158,11 +161,7 @@ class JellybotAddFlow extends _$JellybotAddFlow {
     if (s == null) {
       return;
     }
-    final snapshot = s.copyWith(
-      step: AddFlowStep.extracting,
-      hasRetriedExpiredToken: true,
-      mediaTitle: name,
-    );
+    final snapshot = s.copyWith(step: AddFlowStep.extracting, hasRetriedExpiredToken: true, mediaTitle: name);
     state = snapshot;
     final api = ref.read(jellybotApiProvider);
     final user = ref.read(userProvider);
@@ -180,12 +179,7 @@ class JellybotAddFlow extends _$JellybotAddFlow {
         );
       } else {
         response = await api.apiCrawlLinksPost(
-          body: ExtractMediaRequest(
-            url: s.item.url,
-            mediaCategory: s.category,
-            userId: user?.id,
-            userName: user?.name,
-          ),
+          body: ExtractMediaRequest(url: s.item.url, mediaCategory: s.category, userId: user?.id, userName: user?.name),
         );
       }
       _handlePreviewResponse(response, keepTitle: name, skipDuplicateCheck: true, expected: snapshot);

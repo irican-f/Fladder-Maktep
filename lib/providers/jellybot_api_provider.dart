@@ -18,6 +18,25 @@ part 'jellybot_api_provider.g.dart';
 
 const String _jellybotBaseUrlKey = 'jellybotBaseUrl';
 
+/// The JellyBot URL set by the user or the bundled config, or null when neither set one.
+///
+/// Usable from the background isolate: it only needs [SharedPreferences] and a loaded [FladderConfig].
+String? configuredJellybotBaseUrl(SharedPreferences prefs) {
+  final url = prefs.getString(_jellybotBaseUrlKey) ?? FladderConfig.jellybotBaseUrl;
+  return url == null || url.isEmpty ? null : url;
+}
+
+/// Builds a JellyBot client that sends the Pangolin access-token headers. Also used by the background worker.
+Jellybot createJellybotClient(String baseUrl) => Jellybot.create(
+  baseUrl: Uri.parse(baseUrl),
+  httpClient: _createHttpClient(),
+  interceptors: [
+    const _AccessTokenInterceptor(),
+    // Level.headers would log the access tokens — keep at basic.
+    HttpLoggingInterceptor(level: Level.basic),
+  ],
+);
+
 /// Returns the default Jellybot URL from config.json
 String get _defaultJellybotUrl => FladderConfig.jellybotBaseUrl ?? 'http://localhost:8888';
 
@@ -54,16 +73,7 @@ class JellybotBaseUrlNotifier extends StateNotifier<String> {
 class JellybotApi extends _$JellybotApi {
   @override
   Jellybot build() {
-    final baseUrl = ref.watch(jellybotBaseUrlProvider);
-    return Jellybot.create(
-      baseUrl: Uri.parse(baseUrl),
-      httpClient: _createHttpClient(),
-      interceptors: [
-        const _AccessTokenInterceptor(),
-        // Level.headers would log the access tokens — keep at basic.
-        HttpLoggingInterceptor(level: Level.basic),
-      ],
-    );
+    return createJellybotClient(ref.watch(jellybotBaseUrlProvider));
   }
 }
 
@@ -83,12 +93,7 @@ class _AccessTokenInterceptor implements Interceptor {
     if (tokenId == null || token == null) {
       return chain.proceed(chain.request);
     }
-    return chain.proceed(
-      applyHeaders(chain.request, {
-        'P-Access-Token-Id': tokenId,
-        'P-Access-Token': token,
-      }),
-    );
+    return chain.proceed(applyHeaders(chain.request, {'P-Access-Token-Id': tokenId, 'P-Access-Token': token}));
   }
 }
 

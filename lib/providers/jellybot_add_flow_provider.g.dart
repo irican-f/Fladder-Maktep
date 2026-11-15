@@ -65,7 +65,7 @@ final class JellybotAddFlowProvider
   }
 }
 
-String _$jellybotAddFlowHash() => r'be47a2e369677a9ffac962789b6281d6bce43958';
+String _$jellybotAddFlowHash() => r'981589c244ed570eb96aeea3eb2737c6a62e1938';
 
 /// Drives the add-link flow: extract → (season) → (duplicate) → confirm →
 /// commit. State is null when no flow is active. The sheet

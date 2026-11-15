@@ -3372,5 +3372,71 @@
   "deepLinkItemNotFound": "This item isn't available for any of your accounts",
   "lowResourceModeTitle": "Low resource mode",
   "lowResourceModeDesc": "Uses less memory on devices with limited RAM by lowering caches and buffers and turning off heavy visual effects. Automatic enables it on devices with 3 GB of RAM or less.",
-  "lowResourceModeAuto": "Automatic"
+  "lowResourceModeAuto": "Automatic",
+  "jellybotReadyToWatch": "Ready to watch",
+  "@jellybotReadyToWatch": {},
+  "jellybotReadySummary": "{count, plural, one{{count} title ready to watch} other{{count} titles ready to watch}}",
+  "@jellybotReadySummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "jellybotReadyNotifications": "Ready-to-watch notifications",
+  "@jellybotReadyNotifications": {},
+  "jellybotReadyNotificationsDesc": "Get notified once what you added with Jellybot is in the library",
+  "@jellybotReadyNotificationsDesc": {},
+  "jellybotOnlyMine": "Only shows I added myself",
+  "@jellybotOnlyMine": {},
+  "jellybotOnlyMineDesc": "Applies to movies too. Shows you follow with the bell are always included",
+  "@jellybotOnlyMineDesc": {},
+  "jellybotFollowShow": "Notify me about new episodes",
+  "@jellybotFollowShow": {},
+  "jellybotUnfollowShow": "Stop new episode notifications",
+  "@jellybotUnfollowShow": {},
+  "jellybotShowFollowed": "You'll be notified when new episodes are ready",
+  "@jellybotShowFollowed": {},
+  "jellybotShowUnfollowed": "New episode notifications turned off for this show",
+  "@jellybotShowUnfollowed": {},
+  "jellybotNotificationsDesc": "What's ready to watch",
+  "@jellybotNotificationsDesc": {},
+  "jellybotUnreadCount": "{count} unread",
+  "@jellybotUnreadCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "jellybotKindMovie": "Movie ready",
+  "@jellybotKindMovie": {},
+  "jellybotKindSeasonComplete": "Season {season} complete",
+  "@jellybotKindSeasonComplete": {
+    "placeholders": {
+      "season": {
+        "type": "int"
+      }
+    }
+  },
+  "jellybotKindEpisodes": "{count, plural, one{Episode {episodes}} other{Episodes {episodes}}}",
+  "@jellybotKindEpisodes": {
+    "description": "Episode numbers of a new-episodes event, e.g. 'Episodes 3–4'",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "episodes": {
+        "type": "String"
+      }
+    }
+  },
+  "jellybotKindNewEpisodes": "New episodes",
+  "@jellybotKindNewEpisodes": {},
+  "jellybotNoNotifications": "Nothing ready yet",
+  "@jellybotNoNotifications": {},
+  "jellybotNoNotificationsDesc": "What you add with Jellybot shows up here once it's in the library",
+  "@jellybotNoNotificationsDesc": {},
+  "jellybotNotificationsFailed": "Couldn't load notifications",
+  "@jellybotNotificationsFailed": {}
 }

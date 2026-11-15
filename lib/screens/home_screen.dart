@@ -8,6 +8,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:fladder/models/settings/client_settings_model.dart';
 import 'package:fladder/providers/dashboard_mode_provider.dart';
 import 'package:fladder/providers/jellybot_live_tv_provider.dart';
+import 'package:fladder/providers/jellybot_notifications_provider.dart';
 import 'package:fladder/providers/sync_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/providers/window_title_provider.dart';
@@ -192,8 +193,8 @@ class HomeScreen extends ConsumerWidget {
             case HomeTabs.jellybot:
               return DestinationModel(
                 label: context.localized.jellybot,
-                icon: Icon(e.icon),
-                selectedIcon: Icon(e.selectedIcon),
+                icon: _JellybotTabIcon(e.icon),
+                selectedIcon: _JellybotTabIcon(e.selectedIcon),
                 route: const JellybotRoute(),
                 action: () => e.navigate(context),
               );
@@ -232,5 +233,18 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+/// JellyBot tab icon with a dot while JellyBot has unread "ready to watch" events.
+class _JellybotTabIcon extends ConsumerWidget {
+  const _JellybotTabIcon(this.icon);
+
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasUnread = ref.watch(jellybotUnreadNotificationsProvider.select((value) => (value.value ?? 0) > 0));
+    return Badge(isLabelVisible: hasUnread, child: Icon(icon));
   }
 }

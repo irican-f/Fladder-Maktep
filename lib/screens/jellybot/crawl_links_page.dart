@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fladder/jellyfin/jellybot.swagger.dart';
 import 'package:fladder/providers/jellybot_api_provider.dart';
+import 'package:fladder/providers/jellybot_notifications_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/screens/jellybot/widgets/jellybot_subscription_bell.dart';
 import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/screens/shared/nested_scaffold.dart';
 import 'package:fladder/screens/shared/outlined_text_field.dart';
@@ -119,10 +121,7 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
         title: Text(context.localized.jellybotDeleteLink),
         content: Text(context.localized.jellybotDeleteLinkConfirm(link.name ?? 'Unknown')),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(context.localized.cancel),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(context.localized.cancel)),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
             onPressed: () => Navigator.pop(context, true),
@@ -155,21 +154,12 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
         title: Text(context.localized.jellybotRenameLink),
         content: TextField(
           controller: controller,
-          decoration: InputDecoration(
-            labelText: context.localized.name,
-            border: const OutlineInputBorder(),
-          ),
+          decoration: InputDecoration(labelText: context.localized.name, border: const OutlineInputBorder()),
           autofocus: true,
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(context.localized.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text(context.localized.save),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(context.localized.cancel)),
+          FilledButton(onPressed: () => Navigator.pop(context, controller.text), child: Text(context.localized.save)),
         ],
       ),
     );
@@ -205,16 +195,9 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                IconsaxPlusLinear.lock,
-                size: 64,
-                color: Theme.of(context).colorScheme.outline,
-              ),
+              Icon(IconsaxPlusLinear.lock, size: 64, color: Theme.of(context).colorScheme.outline),
               const SizedBox(height: 16),
-              Text(
-                context.localized.adminOnly,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              Text(context.localized.adminOnly, style: Theme.of(context).textTheme.titleMedium),
             ],
           ),
         ),
@@ -235,6 +218,7 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
             child: PullToRefresh(
               refreshKey: _refreshKey,
               onRefresh: () async {
+                ref.invalidate(jellybotSeriesSubscriptionProvider);
                 await _loadCrawlLinks();
               },
               child: (context) => CustomScrollView(
@@ -246,10 +230,7 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
                     collapsedHeight: 80,
                     automaticallyImplyLeading: false,
                     leading: AdaptiveLayout.layoutModeOf(context) == LayoutMode.single
-                        ? IconButton(
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () => context.router.maybePop(),
-                          )
+                        ? IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.router.maybePop())
                         : null,
                     primary: true,
                     pinned: floatingAppBar,
@@ -295,24 +276,19 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
                   ),
                   // Loading indicator
                   if (_isLoading)
-                    const SliverFillRemaining(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
+                    const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
                   else if (filteredLinks.isNotEmpty) ...[
                     SliverPadding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final link = filteredLinks[index];
-                            return _CrawlLinkCard(
-                              link: link,
-                              onDelete: () => _deleteCrawlLink(link),
-                              onRename: () => _renameCrawlLink(link),
-                            );
-                          },
-                          childCount: filteredLinks.length,
-                        ),
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final link = filteredLinks[index];
+                          return _CrawlLinkCard(
+                            link: link,
+                            onDelete: () => _deleteCrawlLink(link),
+                            onRename: () => _renameCrawlLink(link),
+                          );
+                        }, childCount: filteredLinks.length),
                       ),
                     ),
                     // Pagination
@@ -350,11 +326,7 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              IconsaxPlusLinear.link_21,
-                              size: 64,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
+                            Icon(IconsaxPlusLinear.link_21, size: 64, color: Theme.of(context).colorScheme.outline),
                             const SizedBox(height: 16),
                             Text(
                               context.localized.jellybotNoCrawlLinks,
@@ -364,9 +336,7 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
                         ),
                       ),
                     ),
-                  SliverPadding(
-                    padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 80),
-                  ),
+                  SliverPadding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 80)),
                 ],
               ),
             ),
@@ -379,9 +349,7 @@ class _JellybotCrawlLinksPageState extends ConsumerState<JellybotCrawlLinksPage>
   Widget _buildSearchBar(BuildContext context) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: FladderTheme.smallShape.borderRadius,
-      ),
+      shape: RoundedRectangleBorder(borderRadius: FladderTheme.smallShape.borderRadius),
       shadowColor: Colors.transparent,
       child: OutlinedTextField(
         controller: _searchController,
@@ -468,12 +436,7 @@ class _FilterChipData {
   final IconData selectedIcon;
   final _CrawlLinkFilter value;
 
-  const _FilterChipData({
-    required this.label,
-    required this.icon,
-    required this.selectedIcon,
-    required this.value,
-  });
+  const _FilterChipData({required this.label, required this.icon, required this.selectedIcon, required this.value});
 }
 
 class _CrawlLinkCard extends StatelessWidget {
@@ -481,11 +444,7 @@ class _CrawlLinkCard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onRename;
 
-  const _CrawlLinkCard({
-    required this.link,
-    required this.onDelete,
-    required this.onRename,
-  });
+  const _CrawlLinkCard({required this.link, required this.onDelete, required this.onRename});
 
   @override
   Widget build(BuildContext context) {
@@ -535,9 +494,7 @@ class _CrawlLinkCard extends StatelessWidget {
                   children: [
                     Text(
                       link.name ?? 'Unknown',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -545,9 +502,9 @@ class _CrawlLinkCard extends StatelessWidget {
                     if (_providerDisplayName(link) != null)
                       Text(
                         _providerDisplayName(link)!,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     const SizedBox(height: 8),
                     Wrap(
@@ -602,6 +559,10 @@ class _CrawlLinkCard extends StatelessWidget {
                   ],
                 ),
               ),
+              // Show links carry the Jellyfin series id in mediaId once found; before that there's nothing to follow.
+              if ((link.category == MediaCategory.show || link.category == MediaCategory.anime) &&
+                  (link.mediaId?.isNotEmpty ?? false))
+                JellybotSubscriptionBell(seriesId: link.mediaId!),
               // Actions
               PopupMenuButton(
                 itemBuilder: (context) => [

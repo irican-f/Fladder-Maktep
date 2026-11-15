@@ -21,6 +21,7 @@ import 'package:fladder/screens/settings/filters/filters_dialog_popup.dart';
 import 'package:fladder/screens/settings/settings_list_tile.dart';
 import 'package:fladder/screens/settings/settings_scaffold.dart';
 import 'package:fladder/screens/settings/widgets/home_preferences_editors.dart';
+import 'package:fladder/screens/settings/widgets/jellybot_notification_settings.dart';
 import 'package:fladder/screens/settings/widgets/password_reset_dialog.dart';
 import 'package:fladder/screens/settings/widgets/preferred_audio_track_setting.dart';
 import 'package:fladder/screens/settings/widgets/seerr_connection_dialog.dart';
@@ -50,11 +51,7 @@ class ProfileSettingsPage extends ConsumerStatefulWidget {
 class _UserSettingsPageState extends ConsumerState<ProfileSettingsPage> with WidgetsBindingObserver {
   bool? enabledBatteryOptimization;
 
-  String _seerrStatusLabel(
-    BuildContext context,
-    SeerrCredentialsModel? credentials,
-    SeerrUserModel? seerrUser,
-  ) {
+  String _seerrStatusLabel(BuildContext context, SeerrCredentialsModel? credentials, SeerrUserModel? seerrUser) {
     if (credentials == null || credentials.serverUrl.isEmpty) return context.localized.seerrNotConfigured;
 
     if (credentials.sessionCookie.isNotEmpty || credentials.apiKey.isNotEmpty) {
@@ -122,80 +119,53 @@ class _UserSettingsPageState extends ConsumerState<ProfileSettingsPage> with Wid
     return SettingsScaffold(
       label: context.localized.settingsProfileTitle,
       items: [
-        ...settingsListGroup(
-          context,
-          SettingsLabelDivider(label: context.localized.general),
-          [
-            SortableItemList(
-              items: user?.userSettings?.dashboardSorting.keys.toList() ?? DashboardSorting.values,
-              included: user?.userSettings?.dashboardSorting.included ?? <DashboardSorting>[],
-              itemBuilder: (filter) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  filter.label(context),
-                ),
-              ),
-              onReorder: (reordered) => ref.read(userProvider.notifier).setDashboardSorting(reordered),
-              onIncludeChange: (items) => ref.read(userProvider.notifier).setDashboardEnabled(items),
-            ),
-            SettingsListTile(
-              label: Text(context.localized.libraryFilters),
-              subLabel: Text(context.localized.editYourLibraryFilters),
-              onTap: () => showFiltersDialogue(context),
-            ),
-          ],
-        ),
+        ...settingsListGroup(context, SettingsLabelDivider(label: context.localized.general), [
+          SortableItemList(
+            items: user?.userSettings?.dashboardSorting.keys.toList() ?? DashboardSorting.values,
+            included: user?.userSettings?.dashboardSorting.included ?? <DashboardSorting>[],
+            itemBuilder: (filter) => Padding(padding: const EdgeInsets.all(8.0), child: Text(filter.label(context))),
+            onReorder: (reordered) => ref.read(userProvider.notifier).setDashboardSorting(reordered),
+            onIncludeChange: (items) => ref.read(userProvider.notifier).setDashboardEnabled(items),
+          ),
+          SettingsListTile(
+            label: Text(context.localized.libraryFilters),
+            subLabel: Text(context.localized.editYourLibraryFilters),
+            onTap: () => showFiltersDialogue(context),
+          ),
+        ]),
         const SizedBox(height: 16),
-        ...settingsListGroup(
-          context,
-          SettingsLabelDivider(label: context.localized.settingsSecurity),
-          [
-            SettingsListTile(
-              label: Text(context.localized.settingSecurityApplockTitle),
-              subLabel: Text(user?.authMethod.name(context) ?? ""),
-              onTap: () => showAuthOptionsDialogue(
-                context,
-                user!,
-                (newUser) {
-                  ref.read(userProvider.notifier).updateUser(newUser);
-                },
-              ),
-            ),
-            SettingsListTileCheckbox(
-              label: Text(context.localized.profileSettingsOpenAuthAtLaunch),
-              value: user?.askForAuthOnLaunch ?? false,
-              onChanged: user?.authMethod.shouldLock == true
-                  ? (val) async {
-                      if (user == null || val == null) return;
-                      ref.read(userProvider.notifier).updateUser(
-                            user.copyWith(askForAuthOnLaunch: val),
-                          );
-                    }
-                  : null,
-            ),
-            SettingsListTile(
-              label: Text(context.localized.password),
-              onTap: () => openPasswordResetDialog(context),
-            ),
-          ],
-        ),
+        ...settingsListGroup(context, SettingsLabelDivider(label: context.localized.settingsSecurity), [
+          SettingsListTile(
+            label: Text(context.localized.settingSecurityApplockTitle),
+            subLabel: Text(user?.authMethod.name(context) ?? ""),
+            onTap: () => showAuthOptionsDialogue(context, user!, (newUser) {
+              ref.read(userProvider.notifier).updateUser(newUser);
+            }),
+          ),
+          SettingsListTileCheckbox(
+            label: Text(context.localized.profileSettingsOpenAuthAtLaunch),
+            value: user?.askForAuthOnLaunch ?? false,
+            onChanged: user?.authMethod.shouldLock == true
+                ? (val) async {
+                    if (user == null || val == null) return;
+                    ref.read(userProvider.notifier).updateUser(user.copyWith(askForAuthOnLaunch: val));
+                  }
+                : null,
+          ),
+          SettingsListTile(label: Text(context.localized.password), onTap: () => openPasswordResetDialog(context)),
+        ]),
         const SizedBox(height: 16),
-        ...settingsListGroup(
-          context,
-          SettingsLabelDivider(label: context.localized.audio(1)),
-          [
-            const PreferredAudioTrackSetting(),
-          ],
-        ),
+        ...settingsListGroup(context, SettingsLabelDivider(label: context.localized.audio(1)), [
+          const PreferredAudioTrackSetting(),
+        ]),
         const SizedBox(height: 16),
-        ...settingsListGroup(
-          context,
-          SettingsLabelDivider(label: context.localized.subtitles),
-          [
-            Builder(builder: (context) {
+        ...settingsListGroup(context, SettingsLabelDivider(label: context.localized.subtitles), [
+          Builder(
+            builder: (context) {
               final anyLanguageLabel = context.localized.anyLanguage;
-              final subtitleLanguagePreference =
-                  user?.userConfiguration?.subtitleLanguagePreference?.trim().toLowerCase();
+              final subtitleLanguagePreference = user?.userConfiguration?.subtitleLanguagePreference
+                  ?.trim()
+                  .toLowerCase();
               final hasSubtitleLanguagePreference = subtitleLanguagePreference?.isNotEmpty == true;
 
               final currentCulture = cultures.firstWhereOrNull(
@@ -220,242 +190,228 @@ class _UserSettingsPageState extends ConsumerState<ProfileSettingsPage> with Wid
                       selected: e.matchesLanguageCode(subtitleLanguagePreference),
                       label: Text(e.displayName ?? e.name ?? context.localized.unknown),
                       action: () {
-                        ref.read(userProvider.notifier).updateSubtitleLanguagePreference(
-                            e.threeLetterISOLanguageName?.toLowerCase() ?? e.twoLetterISOLanguageName?.toLowerCase());
+                        ref
+                            .read(userProvider.notifier)
+                            .updateSubtitleLanguagePreference(
+                              e.threeLetterISOLanguageName?.toLowerCase() ?? e.twoLetterISOLanguageName?.toLowerCase(),
+                            );
                       },
                     ),
                   ),
                 ],
               );
-            }),
-            SettingsListTileEnum(
-              label: Text(context.localized.settingsProfileSubtitleMode),
-              current: user?.userConfiguration?.subtitleMode?.label(context) ?? context.localized.none,
-              itemBuilder: (context) => allowedSubModes
-                  .map(
-                    (mode) => ItemActionButton(
-                      selected: user?.userConfiguration?.subtitleMode == mode,
-                      label: Text(mode.label(context)),
-                      action: () {
-                        ref.read(userProvider.notifier).updateSubtitleMode(mode);
-                      },
-                    ),
-                  )
-                  .toList(),
-            ),
-          ],
-        ),
-        if (ref.watch(supportsNotificationsProvider)) ...[
-          const SizedBox(height: 16),
-          ...settingsListGroup(
-            context,
-            SettingsLabelDivider(label: context.localized.notifications),
-            [
-              Column(
-                children: [
-                  SettingsListTileEnum(
-                    label: Text(context.localized.updateCheckInterval),
-                    subLabel: Text(context.localized.updateCheckIntervalDesc),
-                    current: timePickerString(context, clientSettings.updateNotificationsInterval),
-                    itemBuilder: (context) {
-                      final durations = const [
-                        Duration(minutes: 15),
-                        Duration(minutes: 30),
-                        Duration(hours: 1),
-                        Duration(hours: 3),
-                        Duration(hours: 6),
-                        Duration(hours: 12),
-                        Duration(days: 1),
-                      ];
-                      return durations.map((duration) {
-                        return ItemActionButton(
-                          label: Text(timePickerString(context, duration)),
-                          action: () =>
-                              ref.read(clientSettingsProvider.notifier).setUpdateNotificationsInterval(duration),
-                        );
-                      }).toList();
+            },
+          ),
+          SettingsListTileEnum(
+            label: Text(context.localized.settingsProfileSubtitleMode),
+            current: user?.userConfiguration?.subtitleMode?.label(context) ?? context.localized.none,
+            itemBuilder: (context) => allowedSubModes
+                .map(
+                  (mode) => ItemActionButton(
+                    selected: user?.userConfiguration?.subtitleMode == mode,
+                    label: Text(mode.label(context)),
+                    action: () {
+                      ref.read(userProvider.notifier).updateSubtitleMode(mode);
                     },
                   ),
-                  if (lastUpdateAt != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          context.localized.lastUpdateAt(lastUpdateAt, lastUpdateAt),
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                color: Theme.of(context).textTheme.bodyMedium?.color?.withAlpha(155),
-                              ),
+                )
+                .toList(),
+          ),
+        ]),
+        if (ref.watch(supportsNotificationsProvider)) ...[
+          const SizedBox(height: 16),
+          ...settingsListGroup(context, SettingsLabelDivider(label: context.localized.notifications), [
+            Column(
+              children: [
+                SettingsListTileEnum(
+                  label: Text(context.localized.updateCheckInterval),
+                  subLabel: Text(context.localized.updateCheckIntervalDesc),
+                  current: timePickerString(context, clientSettings.updateNotificationsInterval),
+                  itemBuilder: (context) {
+                    final durations = const [
+                      Duration(minutes: 15),
+                      Duration(minutes: 30),
+                      Duration(hours: 1),
+                      Duration(hours: 3),
+                      Duration(hours: 6),
+                      Duration(hours: 12),
+                      Duration(days: 1),
+                    ];
+                    return durations.map((duration) {
+                      return ItemActionButton(
+                        label: Text(timePickerString(context, duration)),
+                        action: () =>
+                            ref.read(clientSettingsProvider.notifier).setUpdateNotificationsInterval(duration),
+                      );
+                    }).toList();
+                  },
+                ),
+                if (lastUpdateAt != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        context.localized.lastUpdateAt(lastUpdateAt, lastUpdateAt),
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withAlpha(155),
                         ),
                       ),
                     ),
-                  SettingsMessageBox(
-                    context.localized.notificationsIntervalClientReminder,
-                    messageType: MessageType.info,
                   ),
-                  if (enabledBatteryOptimization == true)
-                    SettingsMessageBox(
-                      context.localized.batteryOptimizationDesc,
-                      messageType: MessageType.warning,
-                      onTap: () async {
-                        await BatteryOptimization.openBatteryOptimizationSettings();
-                        if (!mounted) return;
-                        await checkBatteryOptimization();
-                      },
-                    ),
-                  if (!kIsWeb && Platform.isIOS)
-                    SettingsMessageBox(
-                      context.localized.notificationTimerIOSWarning,
-                      messageType: MessageType.info,
-                    ),
-                ],
-              ),
-              SettingsListTileCheckbox(
-                label: Text(context.localized.showNewItemNotificationTitle),
-                value: user?.updateNotificationsEnabled ?? false,
-                onChanged: (val) async {
-                  final current = ref.read(userProvider);
-                  if (current == null || val == null) return;
-
-                  ref.read(userProvider.notifier).userState = current.copyWith(updateNotificationsEnabled: val);
-
-                  if (val) {
-                    await NotificationService.requestPermission();
-                    await ref.read(updateNotificationsProvider).registerBackgroundTask();
-                  } else {
-                    await ref.read(updateNotificationsProvider).conditionallyUnregisterBackgroundTask();
-                  }
-                },
-              ),
-              SettingsListTileCheckbox(
-                label: Text(context.localized.includeHiddenItems),
-                subLabel: Text(context.localized.includeHiddenItemsDesc),
-                value: user?.includeHiddenViews ?? false,
-                onChanged: user?.updateNotificationsEnabled ?? false
-                    ? (val) async {
-                        final current = ref.read(userProvider);
-                        if (current == null || val == null) return;
-                        ref.read(userProvider.notifier).userState = current.copyWith(
-                          includeHiddenViews: val,
-                        );
-                        await ref.read(updateNotificationsProvider).registerBackgroundTask();
-                      }
-                    : null,
-              ),
-              if (kDebugMode) ...[
-                SettingsListTile(
-                  label: const Text('Show notification (debug)'),
-                  onTap: () async => await ref.read(updateNotificationsProvider).executeBackgroundTask(),
+                SettingsMessageBox(
+                  context.localized.notificationsIntervalClientReminder,
+                  messageType: MessageType.info,
                 ),
-                SettingsListTile(
-                  label: const Text('Cancel all tasks (debug)'),
-                  onTap: () async => await ref.read(updateNotificationsProvider).cancelAllTasks(),
-                ),
+                if (enabledBatteryOptimization == true)
+                  SettingsMessageBox(
+                    context.localized.batteryOptimizationDesc,
+                    messageType: MessageType.warning,
+                    onTap: () async {
+                      await BatteryOptimization.openBatteryOptimizationSettings();
+                      if (!mounted) return;
+                      await checkBatteryOptimization();
+                    },
+                  ),
+                if (!kIsWeb && Platform.isIOS)
+                  SettingsMessageBox(context.localized.notificationTimerIOSWarning, messageType: MessageType.info),
               ],
-            ],
-          ),
-        ],
-        const SizedBox(height: 16),
-        ...settingsListGroup(
-          context,
-          const SettingsLabelDivider(label: "Seerr"),
-          [
-            SettingsListTile(
-              label: Text(context.localized.seerr),
-              subLabel: Text(_seerrStatusLabel(context, user?.seerrCredentials, seerrUser)),
-              onTap: () => showSeerrConnectionDialog(context),
             ),
-            if (seerrUser?.canManageRequests ?? false)
-              SettingsListTileCheckbox(
-                label: Text(context.localized.seerrRequestNotifications),
-                value: user?.seerrRequestsEnabled ?? false,
-                onChanged: (val) async {
-                  final current = ref.read(userProvider);
-                  if (current == null || val == null) return;
+            SettingsListTileCheckbox(
+              label: Text(context.localized.showNewItemNotificationTitle),
+              value: user?.updateNotificationsEnabled ?? false,
+              onChanged: (val) async {
+                final current = ref.read(userProvider);
+                if (current == null || val == null) return;
 
-                  ref.read(userProvider.notifier).userState = current.copyWith(seerrRequestsEnabled: val);
+                ref.read(userProvider.notifier).userState = current.copyWith(updateNotificationsEnabled: val);
 
-                  if (val) {
-                    await NotificationService.requestPermission();
-                    await ref.read(updateNotificationsProvider).registerBackgroundTask();
-                  } else {
-                    await ref.read(updateNotificationsProvider).conditionallyUnregisterBackgroundTask();
-                  }
-                },
-              ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        const LibraryOrderEditor(),
-        const SizedBox(height: 16),
-        ...settingsListGroup(
-          context,
-          SettingsLabelDivider(label: context.localized.advanced),
-          [
-            SettingsListTile(
-              label: Text(context.localized.server),
-              subLabel: Text(user?.credentials.url.isNotEmpty == true ? user!.credentials.url : context.localized.none),
-              onTap: () {
-                openSimpleTextInput(
-                  context,
-                  user?.credentials.url,
-                  (value) async {
-                    final messenger = ScaffoldMessenger.of(context);
-                    final failedMessage = context.localized.unableToConnectHost;
-                    final success = await ref.read(userProvider.notifier).setServerURL(value);
-                    if (!success) {
-                      messenger.showSnackBar(SnackBar(content: Text(failedMessage)));
-                    }
-                  },
-                  context.localized.server,
-                  context.localized.settingsServerUrlSetDesc,
-                );
-              },
-            ),
-            SettingsListTile(
-              label: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: 8,
-                children: [
-                  if (user?.credentials.localUrl?.isNotEmpty == true)
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: ref.watch(localConnectionAvailableProvider)
-                            ? Colors.greenAccent
-                            : Theme.of(context).colorScheme.error,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  Text(context.localized.settingsLocalUrlTitle),
-                ],
-              ),
-              subLabel: Text(user?.credentials.localUrl ?? context.localized.none),
-              onTap: () {
-                openSimpleTextInput(
-                  context,
-                  user?.credentials.localUrl,
-                  (value) => ref.read(userProvider.notifier).setLocalURL(value),
-                  context.localized.settingsLocalUrlSetTitle,
-                  context.localized.settingsLocalUrlSetDesc,
-                );
+                if (val) {
+                  await NotificationService.requestPermission();
+                  await ref.read(updateNotificationsProvider).registerBackgroundTask();
+                } else {
+                  await ref.read(updateNotificationsProvider).conditionallyUnregisterBackgroundTask();
+                }
               },
             ),
             SettingsListTileCheckbox(
-              label: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: 8,
-                children: [
-                  Text(context.localized.incognitoModeLocal),
-                ],
-              ),
-              value: user?.incognitoMode ?? false,
-              subLabel: Text(context.localized.incognitoModeDesc),
-              onChanged: (value) => ref.read(userProvider.notifier).toggleIncognitoMode(),
+              label: Text(context.localized.includeHiddenItems),
+              subLabel: Text(context.localized.includeHiddenItemsDesc),
+              value: user?.includeHiddenViews ?? false,
+              onChanged: user?.updateNotificationsEnabled ?? false
+                  ? (val) async {
+                      final current = ref.read(userProvider);
+                      if (current == null || val == null) return;
+                      ref.read(userProvider.notifier).userState = current.copyWith(includeHiddenViews: val);
+                      await ref.read(updateNotificationsProvider).registerBackgroundTask();
+                    }
+                  : null,
             ),
-          ],
-        ),
+            if (kDebugMode) ...[
+              SettingsListTile(
+                label: const Text('Show notification (debug)'),
+                onTap: () async => await ref.read(updateNotificationsProvider).executeBackgroundTask(),
+              ),
+              SettingsListTile(
+                label: const Text('Cancel all tasks (debug)'),
+                onTap: () async => await ref.read(updateNotificationsProvider).cancelAllTasks(),
+              ),
+            ],
+          ]),
+        ],
+        const SizedBox(height: 16),
+        ...settingsListGroup(context, const SettingsLabelDivider(label: "Seerr"), [
+          SettingsListTile(
+            label: Text(context.localized.seerr),
+            subLabel: Text(_seerrStatusLabel(context, user?.seerrCredentials, seerrUser)),
+            onTap: () => showSeerrConnectionDialog(context),
+          ),
+          if (seerrUser?.canManageRequests ?? false)
+            SettingsListTileCheckbox(
+              label: Text(context.localized.seerrRequestNotifications),
+              value: user?.seerrRequestsEnabled ?? false,
+              onChanged: (val) async {
+                final current = ref.read(userProvider);
+                if (current == null || val == null) return;
+
+                ref.read(userProvider.notifier).userState = current.copyWith(seerrRequestsEnabled: val);
+
+                if (val) {
+                  await NotificationService.requestPermission();
+                  await ref.read(updateNotificationsProvider).registerBackgroundTask();
+                } else {
+                  await ref.read(updateNotificationsProvider).conditionallyUnregisterBackgroundTask();
+                }
+              },
+            ),
+        ]),
+        // Not behind supportsNotificationsProvider: the in-app list and tab dot also work on web.
+        const JellybotNotificationSettings(),
+        const SizedBox(height: 16),
+        const LibraryOrderEditor(),
+        const SizedBox(height: 16),
+        ...settingsListGroup(context, SettingsLabelDivider(label: context.localized.advanced), [
+          SettingsListTile(
+            label: Text(context.localized.server),
+            subLabel: Text(user?.credentials.url.isNotEmpty == true ? user!.credentials.url : context.localized.none),
+            onTap: () {
+              openSimpleTextInput(
+                context,
+                user?.credentials.url,
+                (value) async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  final failedMessage = context.localized.unableToConnectHost;
+                  final success = await ref.read(userProvider.notifier).setServerURL(value);
+                  if (!success) {
+                    messenger.showSnackBar(SnackBar(content: Text(failedMessage)));
+                  }
+                },
+                context.localized.server,
+                context.localized.settingsServerUrlSetDesc,
+              );
+            },
+          ),
+          SettingsListTile(
+            label: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: 8,
+              children: [
+                if (user?.credentials.localUrl?.isNotEmpty == true)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: ref.watch(localConnectionAvailableProvider)
+                          ? Colors.greenAccent
+                          : Theme.of(context).colorScheme.error,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                Text(context.localized.settingsLocalUrlTitle),
+              ],
+            ),
+            subLabel: Text(user?.credentials.localUrl ?? context.localized.none),
+            onTap: () {
+              openSimpleTextInput(
+                context,
+                user?.credentials.localUrl,
+                (value) => ref.read(userProvider.notifier).setLocalURL(value),
+                context.localized.settingsLocalUrlSetTitle,
+                context.localized.settingsLocalUrlSetDesc,
+              );
+            },
+          ),
+          SettingsListTileCheckbox(
+            label: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: 8,
+              children: [Text(context.localized.incognitoModeLocal)],
+            ),
+            value: user?.incognitoMode ?? false,
+            subLabel: Text(context.localized.incognitoModeDesc),
+            onChanged: (value) => ref.read(userProvider.notifier).toggleIncognitoMode(),
+          ),
+        ]),
       ],
     );
   }

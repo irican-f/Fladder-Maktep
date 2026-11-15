@@ -31,19 +31,13 @@ class NotificationService {
     final darwin = const DarwinInitializationSettings();
     final linux = const LinuxInitializationSettings(defaultActionName: 'Open notification');
     final windows = const WindowsInitializationSettings(
-      appName: 'Fladder',
+      appName: 'Cine Maktep',
       appUserModelId: 'nl.jknaapen.fladder',
       guid: 'd49b0314-ee7a-4626-bf79-97cdb8a991bb',
     );
 
     await _plugin.initialize(
-      settings: InitializationSettings(
-        android: android,
-        iOS: darwin,
-        macOS: darwin,
-        linux: linux,
-        windows: windows,
-      ),
+      settings: InitializationSettings(android: android, iOS: darwin, macOS: darwin, linux: linux, windows: windows),
       onDidReceiveNotificationResponse: (NotificationResponse resp) {
         _selectNotificationController.add(resp.payload);
       },
@@ -185,18 +179,20 @@ class NotificationService {
       final iosChild = DarwinNotificationDetails(threadIdentifier: groupKey);
       final linuxChild = const LinuxNotificationDetails(defaultActionName: 'Open notification');
       final windowsChild = const WindowsNotificationDetails();
-      futures.add(_plugin.show(
-        id: childId,
-        title: notification.title,
-        body: notification.subtitle,
-        payload: notification.payLoad,
-        notificationDetails: NotificationDetails(
-          android: androidChild,
-          iOS: iosChild,
-          linux: linuxChild,
-          windows: windowsChild,
+      futures.add(
+        _plugin.show(
+          id: childId,
+          title: notification.title,
+          body: notification.subtitle,
+          payload: notification.payLoad,
+          notificationDetails: NotificationDetails(
+            android: androidChild,
+            iOS: iosChild,
+            linux: linuxChild,
+            windows: windowsChild,
+          ),
         ),
-      ));
+      );
     }
 
     await Future.wait(futures);

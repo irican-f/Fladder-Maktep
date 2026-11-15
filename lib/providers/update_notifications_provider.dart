@@ -42,12 +42,20 @@ class UpdateNotifications {
   Timer? _desktopTimer;
   ReceivePort? _workerReceivePort;
 
+  /// Runs a check in this isolate and publishes its result, which also refreshes the JellyBot unread state.
+  Future<void> _check() async {
+    final result = await performHeadlessUpdateCheck();
+    if (result != null) {
+      ref.read(notificationsProvider.notifier).state = result;
+    }
+  }
+
   Future<void> registerBackgroundTask() async {
     await Future.delayed(const Duration(milliseconds: 500));
     final accounts = ref
         .read(sharedUtilityProvider)
         .getAccounts()
-        .where((a) => a.updateNotificationsEnabled || a.seerrRequestsEnabled)
+        .where((a) => accountWantsUpdateNotifications(a, ref.read(sharedPreferencesProvider)))
         .toList();
     if (accounts.isEmpty) {
       await unregisterBackgroundTask();
@@ -61,9 +69,9 @@ class UpdateNotifications {
       if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
         _desktopTimer?.cancel();
         _desktopTimer = Timer.periodic(interval, (_) {
-          performHeadlessUpdateCheck();
+          _check();
         });
-        await performHeadlessUpdateCheck();
+        await _check();
         return;
       }
 
@@ -74,15 +82,12 @@ class UpdateNotifications {
         updateTaskName,
         frequency: interval,
         existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
-        constraints: Constraints(
-          networkType: NetworkType.connected,
-        ),
-        initialDelay: const Duration(seconds: 5),
-        inputData: <String, dynamic>{
-          'frequency': interval.inMinutes,
-          'timestamp': DateTime.now().toIso8601String(),
-        },
+        constraints: Constraints(networkType: NetworkType.connected),
+        // The check below covers app open; a 5 s first tick would race it from another isolate.
+        initialDelay: interval,
+        inputData: <String, dynamic>{'frequency': interval.inMinutes, 'timestamp': DateTime.now().toIso8601String()},
       );
+      unawaited(_check());
     } catch (e) {
       log('Error registering background task: $e');
     }
@@ -106,7 +111,7 @@ class UpdateNotifications {
       final accounts = ref
           .read(sharedUtilityProvider)
           .getAccounts()
-          .where((a) => a.updateNotificationsEnabled || a.seerrRequestsEnabled)
+          .where((a) => accountWantsUpdateNotifications(a, ref.read(sharedPreferencesProvider)))
           .toList();
       if (accounts.isEmpty) {
         _desktopTimer?.cancel();
@@ -132,9 +137,7 @@ class UpdateNotifications {
           updateTaskNameDebug,
           updateTaskNameDebug,
           existingWorkPolicy: ExistingWorkPolicy.replace,
-          constraints: Constraints(
-            networkType: NetworkType.connected,
-          ),
+          constraints: Constraints(networkType: NetworkType.connected),
         );
       }
     } catch (e) {

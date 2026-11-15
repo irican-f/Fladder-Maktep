@@ -2534,5 +2534,24 @@
         }
     },
     "leanBackModeTitle": "Mode Lean-back",
-    "leanBackModeInfo": "Le mode Lean-back est réactivé par défaut sur les appareils AndroidTV. Activer cette option sur les appareils non-AndroidTV peut entraîner un comportement inattendu."
+    "leanBackModeInfo": "Le mode Lean-back est réactivé par défaut sur les appareils AndroidTV. Activer cette option sur les appareils non-AndroidTV peut entraîner un comportement inattendu.",
+    "jellybotReadyToWatch": "Prêt à regarder",
+    "jellybotReadySummary": "{count, plural, one{{count} titre prêt à regarder} other{{count} titres prêts à regarder}}",
+    "jellybotReadyNotifications": "Notifications « prêt à regarder »",
+    "jellybotReadyNotificationsDesc": "Être prévenu quand ce que vous avez ajouté avec Jellybot arrive dans la bibliothèque",
+    "jellybotOnlyMine": "Seulement les séries que j'ai ajoutées",
+    "jellybotOnlyMineDesc": "S'applique aussi aux films. Les séries suivies avec la cloche sont toujours incluses",
+    "jellybotFollowShow": "Me prévenir des nouveaux épisodes",
+    "jellybotUnfollowShow": "Ne plus me prévenir des nouveaux épisodes",
+    "jellybotShowFollowed": "Vous serez prévenu quand de nouveaux épisodes seront prêts",
+    "jellybotShowUnfollowed": "Notifications de nouveaux épisodes désactivées pour cette série",
+    "jellybotNotificationsDesc": "Ce qui est prêt à regarder",
+    "jellybotUnreadCount": "{count, plural, one{{count} non lue} other{{count} non lues}}",
+    "jellybotKindMovie": "Film prêt",
+    "jellybotKindSeasonComplete": "Saison {season} complète",
+    "jellybotKindEpisodes": "{count, plural, one{Épisode {episodes}} other{Épisodes {episodes}}}",
+    "jellybotKindNewEpisodes": "Nouveaux épisodes",
+    "jellybotNoNotifications": "Rien de prêt pour l'instant",
+    "jellybotNoNotificationsDesc": "Ce que vous ajoutez avec Jellybot apparaît ici une fois dans la bibliothèque",
+    "jellybotNotificationsFailed": "Impossible de charger les notifications"
 }

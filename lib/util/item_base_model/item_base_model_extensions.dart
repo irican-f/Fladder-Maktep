@@ -21,6 +21,7 @@ import 'package:fladder/models/playback/playback_queue_source.dart';
 import 'package:fladder/providers/api_provider.dart';
 import 'package:fladder/providers/audio_lyrics_provider.dart';
 import 'package:fladder/providers/dashboard_provider.dart';
+import 'package:fladder/providers/jellybot_notifications_provider.dart';
 import 'package:fladder/providers/music_dashboard_provider.dart';
 import 'package:fladder/providers/pending_items_provider.dart';
 import 'package:fladder/providers/sync_provider.dart';
@@ -29,6 +30,7 @@ import 'package:fladder/providers/video_player_provider.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
 import 'package:fladder/screens/collections/add_to_collection.dart';
 import 'package:fladder/screens/details_screens/tracks_detail_screen.dart';
+import 'package:fladder/screens/jellybot/widgets/jellybot_subscription_bell.dart';
 import 'package:fladder/screens/metadata/edit_item.dart';
 import 'package:fladder/screens/metadata/identifty_screen.dart';
 import 'package:fladder/screens/metadata/info_screen.dart';
@@ -43,6 +45,7 @@ import 'package:fladder/util/clipboard_helper.dart';
 import 'package:fladder/util/custom_cache_manager.dart';
 import 'package:fladder/util/file_downloader.dart';
 import 'package:fladder/util/item_base_model/play_item_helpers.dart';
+import 'package:fladder/util/jellybot_ready_notifications.dart';
 import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/util/refresh_state.dart';
 import 'package:fladder/widgets/pop_up/delete_file.dart';
@@ -182,6 +185,10 @@ extension ItemBaseModelExtensions on ItemBaseModel {
     final downloadUrl = ref.read(userProvider.notifier).createDownloadUrl(this);
     final syncedItemFuture = ref.read(syncProvider.notifier).getSyncedItem(id);
     final hasSeerrData = overview.seerrUrl?.isNotEmpty == true;
+    // Synchronous menu: shows the bell once the (kept-alive) status has been fetched; this read starts the fetch.
+    final jellybotSubscription = this is SeriesModel
+        ? ref.read(jellybotSeriesSubscriptionProvider(jellybotSeriesKey(id))).value
+        : null;
     final showMarkAs = switch (this) {
       AlbumModel() => false,
       ArtistModel() => false,
@@ -380,6 +387,18 @@ extension ItemBaseModelExtensions on ItemBaseModel {
             }
           },
           label: Text(userData.isFavourite ? context.localized.removeAsFavorite : context.localized.addAsFavorite),
+        ),
+      if (jellybotSubscription?.tracked == true)
+        ItemActionButton(
+          icon: Icon(
+            jellybotSubscription?.subscribed == true ? IconsaxPlusBold.notification : IconsaxPlusLinear.notification,
+          ),
+          action: () => toggleJellybotSubscription(context, ref, id),
+          label: Text(
+            jellybotSubscription?.subscribed == true
+                ? context.localized.jellybotUnfollowShow
+                : context.localized.jellybotFollowShow,
+          ),
         ),
       ...otherActions,
       ItemActionDivider(),
